@@ -7,7 +7,7 @@
 # etc.) and you want Praxis to connect to it.
 #
 # IMPORTANT: database.mode=external requires a database Secret source. Helm will fail
-# with PANGOLIN-061 if none of the options below is configured.
+# with praxis-061 if none of the options below is configured.
 #
 # Three supported configurations:
 #

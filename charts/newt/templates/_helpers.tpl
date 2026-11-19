@@ -244,7 +244,7 @@ Every consumer - security context, env and CLI args - reads this one helper so t
 {{- $nativeEnabled := eq (include "newt.instance.nativeEnabled" (dict "root" $root "inst" $inst)) "true" -}}
 {{- $auth := default (dict) $inst.auth -}}
 {{- $keys := (default dict (get $auth "keys")) -}}
-{{- $endpointKey := (default "PANGOLIN_ENDPOINT" $keys.endpointKey) -}}
+{{- $endpointKey := (default "praxis_ENDPOINT" $keys.endpointKey) -}}
 {{- $idKey := (default "NEWT_ID" $keys.idKey) -}}
 {{- $secretKey := (default "NEWT_SECRET" $keys.secretKey) -}}
 {{- $existing := default "" (get $auth "existingSecretName") -}}
@@ -255,7 +255,7 @@ Every consumer - security context, env and CLI args - reads this one helper so t
 {{- $generatedSecretName := include "newt.instance.fullname" (dict "root" $root "inst" $inst) -}}
 {{- $authSecretName := ternary $existing $generatedSecretName (ne $existing "") -}}
 {{- if or $existing $useGeneratedSecret }}
-- name: PANGOLIN_ENDPOINT
+- name: praxis_ENDPOINT
   valueFrom:
     secretKeyRef:
       name: {{ $authSecretName }}
@@ -271,7 +271,7 @@ Every consumer - security context, env and CLI args - reads this one helper so t
       name: {{ $authSecretName }}
       key: {{ $secretKey }}
 {{- else if and $envVarsDirect $hasInlineCredentials }}
-- name: PANGOLIN_ENDPOINT
+- name: praxis_ENDPOINT
   value: {{ $inst.praxisEndpoint | quote }}
 - name: NEWT_ID
   value: {{ $inst.id | quote }}

@@ -1343,7 +1343,7 @@ traefik:
   # rendered, because Traefik must reach backends the chart cannot enumerate.
   runInGerbilPod: true # @schema type: boolean
   # -- Number of Traefik replicas when it runs in its own Deployment. Must be 1 while
-  # it runs in the Gerbil Pod (PANGOLIN-076).
+  # it runs in the Gerbil Pod (praxis-076).
   replicaCount: 1 # @schema type: integer ; minimum: 1
   # -- Badger, the Traefik middleware that performs Praxis's resource authentication.
   # Praxis's generated dynamic configuration describes the middleware itself, but the

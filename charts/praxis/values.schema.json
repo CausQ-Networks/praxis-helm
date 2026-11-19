@@ -4432,7 +4432,7 @@
                     }
                 },
                 "replicaCount": {
-                    "description": "Number of Traefik replicas when it runs in its own Deployment. Must be 1 while it runs in the Gerbil Pod (PANGOLIN-076).",
+                    "description": "Number of Traefik replicas when it runs in its own Deployment. Must be 1 while it runs in the Gerbil Pod (praxis-076).",
                     "type": "integer",
                     "minimum": 1
                 },

@@ -216,10 +216,10 @@ false
 {{- if and $authSecret $authSecret.data (hasKey $authSecret.data $pwKey) -}}
 {{- $pw = index $authSecret.data $pwKey | b64dec -}}
 {{- else -}}
-{{- fail (printf "PANGOLIN-CNPG: Could not retrieve password from existing Secret '%s' (key: %s). Verify the Secret exists in the correct namespace and contains the specified key." $cnpgAuthExisting $pwKey) -}}
+{{- fail (printf "praxis-CNPG: Could not retrieve password from existing Secret '%s' (key: %s). Verify the Secret exists in the correct namespace and contains the specified key." $cnpgAuthExisting $pwKey) -}}
 {{- end -}}
 {{- else -}}
-{{- fail "PANGOLIN-CNPG: Cannot generate a PostgreSQL connection string for CloudNativePG without a password. Set database.cloudnativepg.auth.generatedSecret.password, set database.cloudnativepg.auth.existingSecretName, or use database.connection.existingSecretName to reference the CNPG-generated app Secret." -}}
+{{- fail "praxis-CNPG: Cannot generate a PostgreSQL connection string for CloudNativePG without a password. Set database.cloudnativepg.auth.generatedSecret.password, set database.cloudnativepg.auth.existingSecretName, or use database.connection.existingSecretName to reference the CNPG-generated app Secret." -}}
 {{- end -}}
 {{- printf "postgresql://%s:%s@%s:%v/%s?sslmode=%s" $user $pw $host $port $db $sslCnpg -}}
 {{- else -}}
@@ -1002,7 +1002,7 @@ those on the container filesystem.
 {{- $path := ((.Values.database).sqlite | default dict).path | default "/app/data/praxis.db" -}}
 {{- $dir := dir $path -}}
 {{- if or (not (hasPrefix "/" $path)) (eq $dir ".") (eq $dir "/") (hasSuffix "/" $path) -}}
-{{- fail (printf "PANGOLIN-068: database.sqlite.path must be an absolute file path inside a directory that can be mounted, got %q. A relative path yields a relative mountPath, which the API server rejects." $path) -}}
+{{- fail (printf "praxis-068: database.sqlite.path must be an absolute file path inside a directory that can be mounted, got %q. A relative path yields a relative mountPath, which the API server rejects." $path) -}}
 {{- end -}}
 {{- $dir -}}
 {{- end -}}
@@ -1128,7 +1128,7 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 - --providers.http.pollinterval={{ (($tf.config).httpProvider | default dict).pollInterval | default "5s" }}
 {{- end }}
 {{- if $badger.enabled }}
-- --experimental.plugins.badger.modulename={{ $badger.moduleName | default "github.com/fosrl/badger" }}
+- --experimental.plugins.badger.modulename={{ $badger.moduleName | default "github.com/causq-networks/praxis-badger" }}
 - --experimental.plugins.badger.version={{ $badger.version | required "traefik.badger.version is required when traefik.badger.enabled=true" }}
 {{- end }}
 {{- end -}}
@@ -1137,14 +1137,14 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 {{- $root := . -}}
 
 {{- if and (eq $root.Values.deployment.mode "single") (eq $root.Values.deployment.type "controller") (not $root.Values.controller.enabled) -}}
-{{- fail "PANGOLIN-016: deployment.mode=single with deployment.type=controller requires controller.enabled=true." -}}
+{{- fail "praxis-016: deployment.mode=single with deployment.type=controller requires controller.enabled=true." -}}
 {{- end -}}
 
 {{- $db := default (dict) $root.Values.database -}}
 {{- $gerbil := default (dict) $root.Values.gerbil -}}
 {{- $gerbilStartupMode := default "normal" (get $gerbil "startupMode") -}}
 {{- if not (has $gerbilStartupMode (list "normal" "delayed" "disabledUntilSetup")) -}}
-{{- fail (printf "PANGOLIN-062: gerbil.startupMode must be one of [normal, delayed, disabledUntilSetup], got %q" $gerbilStartupMode) -}}
+{{- fail (printf "praxis-062: gerbil.startupMode must be one of [normal, delayed, disabledUntilSetup], got %q" $gerbilStartupMode) -}}
 {{- end -}}
 
 {{- $cnpg := default (dict) (get $db "cloudnativepg") -}}
@@ -1153,28 +1153,28 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 {{- $cnpgSubchart := default (dict) (index $root.Values "cnpg-cluster") -}}
 {{- $subchartCnpgName := default "" (get $cnpgSubchart "fullnameOverride") -}}
 {{- if and (eq $root.Values.database.mode "cloudnativepg") (default false (get $cnpgSubchart "enabled")) $cnpgName $subchartCnpgName (ne $cnpgName $subchartCnpgName) (ne $cnpgName "praxis-db") -}}
-{{- fail "PANGOLIN-CNPG: cnpg-cluster.fullnameOverride and database.cloudnativepg.cluster.name must match when cnpg-cluster.enabled=true" -}}
+{{- fail "praxis-CNPG: cnpg-cluster.fullnameOverride and database.cloudnativepg.cluster.name must match when cnpg-cluster.enabled=true" -}}
 {{- end -}}
 
 {{- $traefik := default (dict) $root.Values.traefik -}}
 {{- $traefikConfig := default (dict) (get $traefik "config") -}}
 {{- if and (default false (get $traefik "enabled")) (not (default "" (get $traefikConfig "letsencryptEmail"))) -}}
-{{- fail "PANGOLIN-014: traefik.config.letsencryptEmail must be set when traefik.enabled=true" -}}
+{{- fail "praxis-014: traefik.config.letsencryptEmail must be set when traefik.enabled=true" -}}
 {{- end -}}
 
 {{- $dynamicRouters := default (dict) (get $traefikConfig "dynamicRouters") -}}
 {{- $routerHost := default "" (get $dynamicRouters "host") -}}
 {{- if and (default false (get $traefik "enabled")) (or (eq $routerHost "") (eq $routerHost "example.com")) -}}
-{{- fail "PANGOLIN-043: traefik.config.dynamicRouters.host must be set to a real hostname (must not be empty or example.com) when traefik.enabled=true" -}}
+{{- fail "praxis-043: traefik.config.dynamicRouters.host must be set to a real hostname (must not be empty or example.com) when traefik.enabled=true" -}}
 {{- end -}}
 
 {{- $traefikPersistence := default (dict) (get $traefik "persistence") -}}
 {{- if and (default false (get $traefik "enabled")) (default false (get $traefikConfig "dashboard")) (not (default false (get $traefikPersistence "enabled"))) -}}
-{{- fail "PANGOLIN-015: traefik.persistence.enabled must be true when traefik.config.dashboard=true (ACME state should persist to avoid rate limits on restarts)" -}}
+{{- fail "praxis-015: traefik.persistence.enabled must be true when traefik.config.dashboard=true (ACME state should persist to avoid rate limits on restarts)" -}}
 {{- end -}}
 
 {{- if and $root.Values.deployment.installTraefikController (ne $root.Values.deployment.type "controller") -}}
-{{- fail "PANGOLIN-012: deployment.installTraefikController=true requires deployment.type=controller" -}}
+{{- fail "praxis-012: deployment.installTraefikController=true requires deployment.type=controller" -}}
 {{- end -}}
 
 {{- $traefikController := default (dict) $root.Values.traefikController -}}
@@ -1190,11 +1190,11 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 {{- $tcK8sCrdEnabled = (index $tcProviderK8sCrd "enabled") -}}
 {{- end -}}
 {{- if and (eq $root.Values.deployment.type "controller") $root.Values.deployment.installTraefikController (eq $tcDeploymentEnabled false) -}}
-{{- fail "PANGOLIN-080: traefikController.deployment.enabled=false conflicts with deployment.installTraefikController=true" -}}
+{{- fail "praxis-080: traefikController.deployment.enabled=false conflicts with deployment.installTraefikController=true" -}}
 {{- end -}}
 
 {{- if and (eq $root.Values.deployment.type "controller") $root.Values.deployment.installTraefikController (eq $tcK8sCrdEnabled false) -}}
-{{- fail "PANGOLIN-081: traefikController.providers.kubernetesCRD.enabled=false is not supported (required by controller mode)" -}}
+{{- fail "praxis-081: traefikController.providers.kubernetesCRD.enabled=false is not supported (required by controller mode)" -}}
 {{- end -}}
 
 {{- $praxis := default (dict) $root.Values.praxis -}}
@@ -1208,30 +1208,30 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 {{- $devTestMode := eq (default "" $root.Values.database.mode) "sqlite" -}}
 
 {{- if and (not $devTestMode) (not $dashboardURL) -}}
-{{- fail "PANGOLIN-055: praxis.config.app.dashboard_url must be set (non-empty). For development/testing only, set database.mode=sqlite to bypass this validation." -}}
+{{- fail "praxis-055: praxis.config.app.dashboard_url must be set (non-empty). For development/testing only, set database.mode=sqlite to bypass this validation." -}}
 {{- end -}}
 
 {{- if and (not $devTestMode) (eq (len $praxisDomains) 0) -}}
-{{- fail "PANGOLIN-056: praxis.config.domains must contain at least one domain entry with base_domain and cert_resolver. For development/testing only, set database.mode=sqlite to bypass this validation." -}}
+{{- fail "praxis-056: praxis.config.domains must contain at least one domain entry with base_domain and cert_resolver. For development/testing only, set database.mode=sqlite to bypass this validation." -}}
 {{- end -}}
 
 {{- if not $devTestMode -}}
 {{- range $domainName, $domainCfgRaw := $praxisDomains -}}
   {{- if not (kindIs "map" $domainCfgRaw) -}}
-    {{- fail (printf "PANGOLIN-057: praxis.config.domains.%s must be a map containing base_domain and cert_resolver." $domainName) -}}
+    {{- fail (printf "praxis-057: praxis.config.domains.%s must be a map containing base_domain and cert_resolver." $domainName) -}}
   {{- end -}}
   {{- $domainCfg := default (dict) $domainCfgRaw -}}
   {{- if not (default "" (get $domainCfg "base_domain")) -}}
-    {{- fail (printf "PANGOLIN-058: praxis.config.domains.%s.base_domain must be set (non-empty)." $domainName) -}}
+    {{- fail (printf "praxis-058: praxis.config.domains.%s.base_domain must be set (non-empty)." $domainName) -}}
   {{- end -}}
   {{- if not (default "" (get $domainCfg "cert_resolver")) -}}
-    {{- fail (printf "PANGOLIN-059: praxis.config.domains.%s.cert_resolver must be set (non-empty)." $domainName) -}}
+    {{- fail (printf "praxis-059: praxis.config.domains.%s.cert_resolver must be set (non-empty)." $domainName) -}}
   {{- end -}}
 {{- end -}}
 {{- end -}}
 
 {{- if and (not $devTestMode) (not $baseEndpoint) -}}
-{{- fail "PANGOLIN-060: praxis.config.gerbil.base_endpoint must be set (non-empty). For development/testing only, set database.mode=sqlite to bypass this validation." -}}
+{{- fail "praxis-060: praxis.config.gerbil.base_endpoint must be set (non-empty). For development/testing only, set database.mode=sqlite to bypass this validation." -}}
 {{- end -}}
 
 {{- $ingressRoute := default (dict) (get $praxis "ingressRoute") -}}
@@ -1243,7 +1243,7 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 {{- if and (eq $root.Values.deployment.type "controller") $dashboardIngressEnabled -}}
 {{- $dashboardHost := trim (include "praxis.ingressRoute.dashboard.host" $root) -}}
 {{- if not $dashboardHost -}}
-{{- fail "PANGOLIN-063: praxis.ingressRoute.dashboard.enabled=true requires a host. Set praxis.ingressRoute.dashboard.host or provide a parseable praxis.config.app.dashboard_url." -}}
+{{- fail "praxis-063: praxis.ingressRoute.dashboard.enabled=true requires a host. Set praxis.ingressRoute.dashboard.host or provide a parseable praxis.config.app.dashboard_url." -}}
 {{- end -}}
 
 {{- $routes := default (dict) (get $dashboardIngress "routes") -}}
@@ -1258,7 +1258,7 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 {{- $dashboardEnabled = (get $dashboardRoute "enabled") -}}
 {{- end -}}
 {{- if and (not $apiEnabled) (not $dashboardEnabled) -}}
-{{- fail "PANGOLIN-064: praxis.ingressRoute.dashboard.routes.api.enabled and routes.dashboard.enabled cannot both be false." -}}
+{{- fail "praxis-064: praxis.ingressRoute.dashboard.routes.api.enabled and routes.dashboard.enabled cannot both be false." -}}
 {{- end -}}
 
 {{- $allowCrossNamespaceServices := default false (get $dashboardIngress "allowCrossNamespaceServices") -}}
@@ -1267,13 +1267,13 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 {{- if $apiEnabled -}}
 {{- $apiServiceNamespace := include "praxis.ingressRoute.dashboard.serviceNamespace" (dict "root" $root "route" $apiRoute) -}}
 {{- if ne $apiServiceNamespace $releaseNamespace -}}
-{{- fail (printf "PANGOLIN-066: cross-namespace Traefik service references are disabled. Set praxis.ingressRoute.dashboard.allowCrossNamespaceServices=true to allow routes.api.service.namespace=%q (Traefik kubernetesCRD provider must also allow cross-namespace references)." $apiServiceNamespace) -}}
+{{- fail (printf "praxis-066: cross-namespace Traefik service references are disabled. Set praxis.ingressRoute.dashboard.allowCrossNamespaceServices=true to allow routes.api.service.namespace=%q (Traefik kubernetesCRD provider must also allow cross-namespace references)." $apiServiceNamespace) -}}
 {{- end -}}
 {{- end -}}
 {{- if $dashboardEnabled -}}
 {{- $dashboardServiceNamespace := include "praxis.ingressRoute.dashboard.serviceNamespace" (dict "root" $root "route" $dashboardRoute) -}}
 {{- if ne $dashboardServiceNamespace $releaseNamespace -}}
-{{- fail (printf "PANGOLIN-066: cross-namespace Traefik service references are disabled. Set praxis.ingressRoute.dashboard.allowCrossNamespaceServices=true to allow routes.dashboard.service.namespace=%q (Traefik kubernetesCRD provider must also allow cross-namespace references)." $dashboardServiceNamespace) -}}
+{{- fail (printf "praxis-066: cross-namespace Traefik service references are disabled. Set praxis.ingressRoute.dashboard.allowCrossNamespaceServices=true to allow routes.dashboard.service.namespace=%q (Traefik kubernetesCRD provider must also allow cross-namespace references)." $dashboardServiceNamespace) -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -1290,10 +1290,10 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 {{- $tlsCertResolver = trim (default "" (get $praxisTraefik "cert_resolver")) -}}
 {{- end -}}
 {{- if and $tlsCertResolver $tlsSecretName -}}
-{{- fail "PANGOLIN-065: praxis.ingressRoute.dashboard.tls.certResolver and tls.secretName are mutually exclusive. Set exactly one TLS mode." -}}
+{{- fail "praxis-065: praxis.ingressRoute.dashboard.tls.certResolver and tls.secretName are mutually exclusive. Set exactly one TLS mode." -}}
 {{- end -}}
 {{- if and (not $tlsCertResolver) (not $tlsSecretName) -}}
-{{- fail "PANGOLIN-065: praxis.ingressRoute.dashboard.tls.enabled=true requires exactly one TLS mode. Set tls.certResolver or tls.secretName." -}}
+{{- fail "praxis-065: praxis.ingressRoute.dashboard.tls.enabled=true requires exactly one TLS mode. Set tls.certResolver or tls.secretName." -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -1311,26 +1311,26 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 
 {{- if and $bpEnabled (not $bpCmCreate) (not $bpExistingCm) -}}
 {{- /* blueprints.enabled=true but no blueprint source is configured — warn via a clear error */ -}}
-{{- fail "PANGOLIN-050: praxis.blueprints.enabled=true but no blueprint source is configured. Set configMap.create=true (with files) or existingConfigMap to provide blueprint YAML definitions." -}}
+{{- fail "praxis-050: praxis.blueprints.enabled=true but no blueprint source is configured. Set configMap.create=true (with files) or existingConfigMap to provide blueprint YAML definitions." -}}
 {{- end -}}
 
 {{- if and $bpCmCreate $bpExistingCm -}}
-{{- fail "PANGOLIN-051: praxis.blueprints.configMap.create=true and praxis.blueprints.existingConfigMap are mutually exclusive. Use one or the other." -}}
+{{- fail "praxis-051: praxis.blueprints.configMap.create=true and praxis.blueprints.existingConfigMap are mutually exclusive. Use one or the other." -}}
 {{- end -}}
 
 {{- if and $bpCmCreate (not $bpFiles) -}}
-{{- fail "PANGOLIN-052: praxis.blueprints.configMap.create=true but praxis.blueprints.files is empty. Provide at least one blueprint file." -}}
+{{- fail "praxis-052: praxis.blueprints.configMap.create=true but praxis.blueprints.files is empty. Provide at least one blueprint file." -}}
 {{- end -}}
 
 {{- if and $bpEsCreate $bpExistingEs -}}
-{{- fail "PANGOLIN-053: praxis.blueprints.environmentSecret.create=true and praxis.blueprints.existingEnvironmentSecret are mutually exclusive. Use one or the other." -}}
+{{- fail "praxis-053: praxis.blueprints.environmentSecret.create=true and praxis.blueprints.existingEnvironmentSecret are mutually exclusive. Use one or the other." -}}
 {{- end -}}
 
 {{- if and $bpEsCreate (not $bpEnv) -}}
-{{- fail "PANGOLIN-054: praxis.blueprints.environmentSecret.create=true but praxis.blueprints.environment is empty. Provide at least one environment variable." -}}
+{{- fail "praxis-054: praxis.blueprints.environmentSecret.create=true but praxis.blueprints.environment is empty. Provide at least one environment variable." -}}
 {{- end -}}
 
-{{- /* PANGOLIN-061: external mode requires a database Secret source */ -}}
+{{- /* praxis-061: external mode requires a database Secret source */ -}}
 {{- if eq (include "praxis.db.mode" $root) "external" -}}
 {{- $extConn := default (dict) (get $db "connection") -}}
 {{- $ext := default (dict) (get $db "external") -}}
@@ -1338,11 +1338,11 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 {{- $hasExisting := or (get $extConn "existingSecretName") (get $ext "existingSecretName") -}}
 {{- $hasCreated := (get $extGen "create") | default false -}}
 {{- if and (not $hasExisting) (not $hasCreated) -}}
-{{- fail "PANGOLIN-061: database.mode=external requires a database connection Secret. Either set database.connection.existingSecretName (user-managed Secret) or set database.external.generatedSecret.create=true with database.external.generatedSecret.connectionString or host/username/password/port/database values (chart-managed Secret)." -}}
+{{- fail "praxis-061: database.mode=external requires a database connection Secret. Either set database.connection.existingSecretName (user-managed Secret) or set database.external.generatedSecret.create=true with database.external.generatedSecret.connectionString or host/username/password/port/database values (chart-managed Secret)." -}}
 {{- end -}}
 {{- end -}}
 
-{{- /* PANGOLIN-067: the controller cannot reconcile Traefik CRDs without egress to the
+{{- /* praxis-067: the controller cannot reconcile Traefik CRDs without egress to the
        Kubernetes API. Only the contradictory state fails - asking for the rule while
        leaving it no destination - because that is the one case the chart cannot resolve
        and the one that used to surface as a controller crash-loop instead. */ -}}
@@ -1368,45 +1368,45 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 {{- range $i, $endpoint := (default list (get $npKubeApi "endpoints")) -}}
 {{- $cidrs := default list (get $endpoint "cidrs") -}}
 {{- if eq (len $cidrs) 0 -}}
-{{- fail (printf "PANGOLIN-067: networkPolicy.controller.egress.kubernetesApi.endpoints[%d] has no cidrs. An entry without cidrs is not a destination and was previously skipped in silence, so a misspelled key narrowed the policy without any error. Every entry needs cidrs: [ ... ]." $i) -}}
+{{- fail (printf "praxis-067: networkPolicy.controller.egress.kubernetesApi.endpoints[%d] has no cidrs. An entry without cidrs is not a destination and was previously skipped in silence, so a misspelled key narrowed the policy without any error. Every entry needs cidrs: [ ... ]." $i) -}}
 {{- end -}}
 {{- range $cidr := $cidrs -}}
 {{- if not (regexMatch "^[0-9A-Fa-f:.]+/[0-9]{1,3}$" (printf "%v" $cidr)) -}}
-{{- fail (printf "PANGOLIN-067: networkPolicy.controller.egress.kubernetesApi.endpoints[%d] contains %q, which is not an address/prefix. Kubernetes rejects an ipBlock without a prefix length, so write for example 10.43.0.1/32 rather than a bare address." $i $cidr) -}}
+{{- fail (printf "praxis-067: networkPolicy.controller.egress.kubernetesApi.endpoints[%d] contains %q, which is not an address/prefix. Kubernetes rejects an ipBlock without a prefix length, so write for example 10.43.0.1/32 rather than a bare address." $i $cidr) -}}
 {{- end -}}
 {{- end -}}
 {{- if and (gt (len (default list (get $endpoint "except"))) 0) (gt (len $cidrs) 1) -}}
-{{- fail (printf "PANGOLIN-067: networkPolicy.controller.egress.kubernetesApi.endpoints[%d] combines except with %d cidrs. Kubernetes requires every except range to sit inside the cidr it belongs to, and the chart would copy this except onto all of them. Split the entry so each cidr carries its own except." $i (len $cidrs)) -}}
+{{- fail (printf "praxis-067: networkPolicy.controller.egress.kubernetesApi.endpoints[%d] combines except with %d cidrs. Kubernetes requires every except range to sit inside the cidr it belongs to, and the chart would copy this except onto all of them. Split the entry so each cidr carries its own except." $i (len $cidrs)) -}}
 {{- end -}}
 {{- range $port := (default list (get $endpoint "ports")) -}}
 {{- if or (lt (int $port) 1) (gt (int $port) 65535) -}}
-{{- fail (printf "PANGOLIN-067: networkPolicy.controller.egress.kubernetesApi.endpoints[%d] declares port %v, which is outside 1-65535." $i $port) -}}
+{{- fail (printf "praxis-067: networkPolicy.controller.egress.kubernetesApi.endpoints[%d] declares port %v, which is outside 1-65535." $i $port) -}}
 {{- end -}}
 {{- end -}}
 {{- $hasKubeApiEndpoints = true -}}
 {{- end -}}
 {{- if not (or $hasLegacyKubeApi $hasKubeApiEndpoints) -}}
-{{- fail "PANGOLIN-067: networkPolicy.controller.egress.kubernetesApi.enabled=true but no destination is configured, which would leave the controller unable to reach the Kubernetes API. Populate networkPolicy.controller.egress.kubernetesApi.endpoints[].cidrs (the chart default covers RFC1918/CGNAT/link-local on TCP 443 and 6443), or set kubernetesApi.enabled=false and supply the rule yourself via networkPolicy.controller.extraEgress." -}}
+{{- fail "praxis-067: networkPolicy.controller.egress.kubernetesApi.enabled=true but no destination is configured, which would leave the controller unable to reach the Kubernetes API. Populate networkPolicy.controller.egress.kubernetesApi.endpoints[].cidrs (the chart default covers RFC1918/CGNAT/link-local on TCP 443 and 6443), or set kubernetesApi.enabled=false and supply the rule yourself via networkPolicy.controller.extraEgress." -}}
 {{- end -}}
 {{- end -}}
-{{- /* PANGOLIN-069: SQLite is a single-writer file database. Two Praxis Pods writing the
+{{- /* praxis-069: SQLite is a single-writer file database. Two Praxis Pods writing the
        same file corrupts it, and the chart cannot prevent that once the volume is shared. */ -}}
 {{- if eq (include "praxis.sqlite.persistenceEnabled" $root) "true" -}}
 {{- $sqliteReplicas := int ((($root.Values.praxis).replicaCount) | default 1) -}}
 {{- if gt $sqliteReplicas 1 -}}
-{{- fail (printf "PANGOLIN-069: praxis.replicaCount is %d while database.mode=sqlite with persistence enabled. SQLite has a single writer, so a shared volume across replicas corrupts the database. Keep replicaCount at 1, or move to database.mode=cloudnativepg or external for a replicated deployment." $sqliteReplicas) -}}
+{{- fail (printf "praxis-069: praxis.replicaCount is %d while database.mode=sqlite with persistence enabled. SQLite has a single writer, so a shared volume across replicas corrupts the database. Keep replicaCount at 1, or move to database.mode=cloudnativepg or external for a replicated deployment." $sqliteReplicas) -}}
 {{- end -}}
-{{- /* PANGOLIN-070: the chart's own SQLite volume and an identically named extraVolume would
+{{- /* praxis-070: the chart's own SQLite volume and an identically named extraVolume would
        render two entries with the same name, which the API server rejects. */ -}}
 {{- $sqliteMountPath := include "praxis.sqlite.mountPath" $root -}}
 {{- range $volume := (($root.Values.praxis).extraVolumes | default list) -}}
 {{- if eq ($volume.name | default "") "praxis-sqlite" -}}
-{{- fail "PANGOLIN-070: praxis.extraVolumes contains a volume named praxis-sqlite, which is the name the chart uses for the SQLite volume. Rename your volume: two volumes with one name make the Pod spec invalid." -}}
+{{- fail "praxis-070: praxis.extraVolumes contains a volume named praxis-sqlite, which is the name the chart uses for the SQLite volume. Rename your volume: two volumes with one name make the Pod spec invalid." -}}
 {{- end -}}
 {{- end -}}
 {{- range $mount := (($root.Values.praxis).extraVolumeMounts | default list) -}}
 {{- if eq ($mount.mountPath | default "") $sqliteMountPath -}}
-{{- fail (printf "PANGOLIN-070: praxis.extraVolumeMounts already mounts %q, which is where the chart mounts the SQLite directory derived from database.sqlite.path. Two mounts on one path make the Pod spec invalid; choose a different path or a different database.sqlite.path." $sqliteMountPath) -}}
+{{- fail (printf "praxis-070: praxis.extraVolumeMounts already mounts %q, which is where the chart mounts the SQLite directory derived from database.sqlite.path. Two mounts on one path make the Pod spec invalid; choose a different path or a different database.sqlite.path." $sqliteMountPath) -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -1417,20 +1417,20 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 {{- if eq (include "praxis.gerbil.hostGateway.enabled" $root) "true" -}}
 {{- $hgGerbil := default (dict) $root.Values.gerbil -}}
 {{- if ne $root.Values.deployment.mode "multi" -}}
-{{- fail "PANGOLIN-071: gerbil.hostGateway.enabled=true requires deployment.mode=multi. In single mode Gerbil shares a Pod with Praxis, so hostNetwork would bind every component's ports on the node." -}}
+{{- fail "praxis-071: gerbil.hostGateway.enabled=true requires deployment.mode=multi. In single mode Gerbil shares a Pod with Praxis, so hostNetwork would bind every component's ports on the node." -}}
 {{- end -}}
 {{- if not (default false (get $hgGerbil "enabled")) -}}
-{{- fail "PANGOLIN-072: gerbil.hostGateway.enabled=true requires gerbil.enabled=true." -}}
+{{- fail "praxis-072: gerbil.hostGateway.enabled=true requires gerbil.enabled=true." -}}
 {{- end -}}
 {{- if gt (int (default 1 (get $hgGerbil "replicaCount"))) 1 -}}
-{{- fail "PANGOLIN-073: gerbil.hostGateway.enabled=true requires gerbil.replicaCount=1. Gerbil binds its WireGuard and internal API ports on the node, so a second replica cannot start alongside it." -}}
+{{- fail "praxis-073: gerbil.hostGateway.enabled=true requires gerbil.replicaCount=1. Gerbil binds its WireGuard and internal API ports on the node, so a second replica cannot start alongside it." -}}
 {{- end -}}
 {{- $hgNamespace := default (dict) $root.Values.namespace -}}
 {{- $hgPodSecurity := default (dict) (get $hgNamespace "podSecurity") -}}
 {{- if and (default false (get $hgNamespace "create")) (ne (default "" (get $hgPodSecurity "enforce")) "privileged") -}}
-{{- fail "PANGOLIN-074: gerbil.hostGateway.enabled=true requires namespace.podSecurity.enforce=privileged when the chart creates the namespace. Pod Security Admission level baseline forbids hostNetwork." -}}
+{{- fail "praxis-074: gerbil.hostGateway.enabled=true requires namespace.podSecurity.enforce=privileged when the chart creates the namespace. Pod Security Admission level baseline forbids hostNetwork." -}}
 {{- end -}}
-{{- /* PANGOLIN-075: a hostNetwork Pod sources from the node IP, so the Gerbil -> Praxis
+{{- /* praxis-075: a hostNetwork Pod sources from the node IP, so the Gerbil -> Praxis
        internal-API rule becomes an ipBlock. The chart cannot discover node addresses at
        template time and any guess would admit far more than the node. */ -}}
 {{- $hgNp := default (dict) $root.Values.networkPolicy -}}
@@ -1442,13 +1442,13 @@ declared statically or Traefik fails the route with `unknown plugin type: badger
 {{- $hgNpGerbil := default (dict) (get $hgNp "gerbil") -}}
 {{- $hgNodeCidrs := default list (get (default (dict) (get $hgNpGerbil "hostGateway")) "nodeCIDRs") -}}
 {{- if eq (len $hgNodeCidrs) 0 -}}
-{{- fail "PANGOLIN-075: gerbil.hostGateway.enabled=true with networkPolicy.enabled=true requires networkPolicy.gerbil.hostGateway.nodeCIDRs. Gerbil runs with hostNetwork, so its traffic sources from the node IP and no podSelector matches it; without node address blocks this chart's own policy blackholes Gerbil's --remoteConfig polling. Set your node addresses, e.g. kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type==\"InternalIP\")].address}'. Do not use the private ranges wholesale - they contain every mainstream Pod CIDR." -}}
+{{- fail "praxis-075: gerbil.hostGateway.enabled=true with networkPolicy.enabled=true requires networkPolicy.gerbil.hostGateway.nodeCIDRs. Gerbil runs with hostNetwork, so its traffic sources from the node IP and no podSelector matches it; without node address blocks this chart's own policy blackholes Gerbil's --remoteConfig polling. Set your node addresses, e.g. kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type==\"InternalIP\")].address}'. Do not use the private ranges wholesale - they contain every mainstream Pod CIDR." -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
-{{- /* PANGOLIN-076: Traefik in the Gerbil Pod scales with Gerbil, so a Traefik replica
+{{- /* praxis-076: Traefik in the Gerbil Pod scales with Gerbil, so a Traefik replica
        count of its own cannot be honoured; failing beats silently running one. */ -}}
 {{- if and (eq (include "praxis.traefik.inGerbilPod" $root) "true") (gt (int (default 1 ($root.Values.traefik).replicaCount)) 1) -}}
-{{- fail "PANGOLIN-076: traefik.replicaCount > 1 cannot be honoured while the chart-managed Traefik runs in the Gerbil Pod (deployment.type=standalone, deployment.mode=multi). It shares Gerbil's network namespace to reach tunnel backends and scales with gerbil.replicaCount. Set traefik.replicaCount=1, or set traefik.runInGerbilPod=false to run Traefik in its own Deployment (it then needs gerbil.hostGateway to reach tunnel backends)." -}}
+{{- fail "praxis-076: traefik.replicaCount > 1 cannot be honoured while the chart-managed Traefik runs in the Gerbil Pod (deployment.type=standalone, deployment.mode=multi). It shares Gerbil's network namespace to reach tunnel backends and scales with gerbil.replicaCount. Set traefik.replicaCount=1, or set traefik.runInGerbilPod=false to run Traefik in its own Deployment (it then needs gerbil.hostGateway to reach tunnel backends)." -}}
 {{- end -}}
 {{- end -}}

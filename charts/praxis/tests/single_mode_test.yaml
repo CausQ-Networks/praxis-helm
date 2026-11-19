@@ -242,7 +242,7 @@ tests:
     template: templates/validate.yaml
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-016: deployment.mode=single with deployment.type=controller requires controller.enabled=true."
+          errorMessage: "praxis-016: deployment.mode=single with deployment.type=controller requires controller.enabled=true."
 
   - it: network policy renders in single mode
     set:

@@ -61,7 +61,7 @@ namespace:
   name: praxis
   podSecurity:
     # hostNetwork requires `privileged`; `baseline` forbids it and the chart fails with
-    # PANGOLIN-074 rather than letting the Pod be rejected at admission.
+    # praxis-074 rather than letting the Pod be rejected at admission.
     enforce: privileged
     warn: baseline
     audit: baseline

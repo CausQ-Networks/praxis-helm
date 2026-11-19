@@ -83,7 +83,7 @@ name in this order:
 2. `database.cloudnativepg.cluster.name`
 
 If both are set to different values, chart rendering fails with:
-`PANGOLIN-CNPG: cnpg-cluster.fullnameOverride and database.cloudnativepg.cluster.name must match when cnpg-cluster.enabled=true`.
+`praxis-CNPG: cnpg-cluster.fullnameOverride and database.cloudnativepg.cluster.name must match when cnpg-cluster.enabled=true`.
 
 ### Connecting Praxis to a CNPG cluster
 
@@ -147,7 +147,7 @@ self-managed, etc.), set `database.mode=external` and configure one of these opt
 
 ### Option A — User-managed Secret (recommended for production)
 
-Create the Secret yourself and reference it. The chart will fail with a clear error (PANGOLIN-061)
+Create the Secret yourself and reference it. The chart will fail with a clear error (praxis-061)
 if no Secret source is configured.
 
 ```bash
@@ -191,7 +191,7 @@ database:
 ```
 
 > **Note:** Setting `database.mode=external` without any Secret source configuration will cause Helm
-> to fail at render time with a clear `PANGOLIN-061` error. This prevents Praxis from starting with
+> to fail at render time with a clear `praxis-061` error. This prevents Praxis from starting with
 > a missing database Secret.
 
 See `examples/values-controller-external-db.yaml` for a complete working example.
@@ -280,7 +280,7 @@ praxis:
 	- database connection Secret (`database.connection.existingSecretName`)
 - Review `praxis.config.traefik.*` so Praxis emits routes for the same Traefik entrypoints and certificate resolver names your cluster actually uses.
 - For external PostgreSQL:
-	- User-managed Secret: set `database.connection.existingSecretName` — Helm fails with PANGOLIN-061 if omitted
+	- User-managed Secret: set `database.connection.existingSecretName` — Helm fails with praxis-061 if omitted
 	- Chart-managed Secret: set `database.external.generatedSecret.create=true` with a `connectionString` or individual params
 - If you use standalone Traefik + ACME:
 	- set `traefik.config.letsencryptEmail`
@@ -407,8 +407,8 @@ Be clear about what it does **not** solve:
 | Not available in `single` mode | Gerbil shares a Pod with Praxis there, so `hostNetwork` would bind every component's ports on the node. |
 
 The chart refuses the combinations that cannot work rather than letting them surface as a
-Pending Pod or a silent `502`: `PANGOLIN-071` (single mode), `PANGOLIN-072` (Gerbil
-disabled), `PANGOLIN-073` (more than one replica) and `PANGOLIN-074` (chart-created
+Pending Pod or a silent `502`: `praxis-071` (single mode), `praxis-072` (Gerbil
+disabled), `praxis-073` (more than one replica) and `praxis-074` (chart-created
 namespace without `privileged`).
 
 ### NetworkPolicy
@@ -417,7 +417,7 @@ A `hostNetwork` Pod is not matched by a `podSelector` on any mainstream CNI — 
 sources from the node IP. In host gateway mode the Gerbil → Praxis internal-API rule is
 therefore expressed as node address blocks
 (`networkPolicy.gerbil.hostGateway.nodeCIDRs`). There is deliberately no default: the
-private ranges contain every mainstream Pod CIDR, so `PANGOLIN-075` fails the render
+private ranges contain every mainstream Pod CIDR, so `praxis-075` fails the render
 until you set your own node addresses. Without such a rule the chart's own default
 policy would blackhole Gerbil's `--remoteConfig` polling.
 
@@ -451,7 +451,7 @@ helm upgrade <release> <chart> -n <namespace> --reuse-values --set gerbil.startu
 - Without `traefik.persistence.enabled`, ACME state lives in an `emptyDir` and certificates are re-issued after every restart; Let's Encrypt rate limits make that a problem quickly. With persistence enabled the chart creates the `<release>-praxis-traefik-acme` PVC unless `traefik.persistence.existingClaim` is set.
 - Praxis's generated routers use the `web` / `websecure` entrypoints and the `letsencrypt` resolver by default. If you rename them via `traefik.config.httpEntrypoint`, `httpsEntrypoint` or `certResolver`, set the same names in `praxis.config.traefik`.
 - Raw TCP/UDP resources need an entrypoint per port (`tcp-<port>` / `udp-<port>`) and a matching Service port, which this chart does not create.
-- `traefik.replicaCount` must be `1` while Traefik runs in the Gerbil Pod (`PANGOLIN-076`).
+- `traefik.replicaCount` must be `1` while Traefik runs in the Gerbil Pod (`praxis-076`).
 
 ## Storage
 
@@ -1041,7 +1041,7 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | traefik.deployment.updateStrategy | object | `{}` | Rollout strategy for this component, overriding `runtime.updateStrategy`. Left empty the chart picks it: a component holding a PVC that is not ReadWriteMany is switched to Recreate, because a surged Pod could never attach the volume. |
 | traefik.enabled | bool | `false` | Enable built-in Traefik workload. Used mainly when `deployment.type=standalone`. |
 | traefik.persistence.enabled | bool | `false` | Persist Traefik ACME state on a PVC. Strongly recommended when using ACME; required when enabling the dashboard (traefik.config.dashboard=true). |
-| traefik.replicaCount | int | `1` | Number of Traefik replicas when it runs in its own Deployment. Must be 1 while it runs in the Gerbil Pod (PANGOLIN-076). |
+| traefik.replicaCount | int | `1` | Number of Traefik replicas when it runs in its own Deployment. Must be 1 while it runs in the Gerbil Pod (praxis-076). |
 | traefik.runInGerbilPod | bool | `true` | Run the chart-managed Traefik as a container in the Gerbil Pod (deployment.type=standalone, deployment.mode=multi). Traefik then shares Gerbil's network namespace, where the WireGuard interface and the routes to tunnel backends live - the Docker Compose layout. A Traefik in a Pod of its own has no route to the 100.89.x.x addresses Praxis advertises and answers 502 for every tunnel-backed resource unless gerbil.hostGateway is used. Ignored when Gerbil does not run (gerbil.enabled=false or a startupMode other than `normal`); Traefik then gets its own Deployment. While Traefik shares the Pod, the Gerbil egress NetworkPolicy is not rendered, because Traefik must reach backends the chart cannot enumerate. |
 | traefik.service.enabled | bool | `true` | Create the public Traefik Service. |
 | traefikController | object | `{"experimental":{"plugins":{"badger":{"moduleName":"github.com/CausQ-Networks/praxis-badger","version":"v1.8.0"}}},"ingressClass":{"isDefaultClass":false},"nameOverride":"traefik"}` | Values passed to the bundled Traefik chart, which is installed only when `deployment.installTraefikController=true`. Everything the official chart accepts can be set here; the defaults below are the ones this chart cannot leave to the subchart.  In controller mode praxis-kube-controller reads Praxis's generated configuration and materialises it as Traefik CRDs, so the bundled Traefik needs the Kubernetes providers rather than an HTTP provider. It still needs the Badger plugin declared statically, because the middleware the controller writes into every router references it by alias. |

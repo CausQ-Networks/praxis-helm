@@ -376,7 +376,7 @@ tests:
     template: templates/validate.yaml
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-071"
+          errorPattern: "praxis-071"
 
   - it: rejects host gateway mode with Gerbil disabled
     set:
@@ -394,7 +394,7 @@ tests:
     template: templates/validate.yaml
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-072"
+          errorPattern: "praxis-072"
 
   - it: rejects more than one Gerbil replica
     set:
@@ -416,7 +416,7 @@ tests:
     template: templates/validate.yaml
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-073"
+          errorPattern: "praxis-073"
 
   - it: rejects a chart-created namespace that forbids hostNetwork
     set:
@@ -437,7 +437,7 @@ tests:
     template: templates/validate.yaml
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-074"
+          errorPattern: "praxis-074"
 
   - it: rejects host gateway mode without node CIDRs while a policy is enforced
     set:
@@ -453,7 +453,7 @@ tests:
     template: templates/validate.yaml
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-075"
+          errorPattern: "praxis-075"
 
   - it: accepts host gateway mode without node CIDRs when no policy is rendered
     set:

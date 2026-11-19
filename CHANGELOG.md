@@ -61,13 +61,13 @@ This changelog is chart-scoped to support multiple charts over time.
 - The dashboard `next` port (3002) is now allowed whenever the chart-managed dashboard
   IngressRoute targets it, instead of being blocked by a default that could drift
   ([#22](https://github.com/CausQ-Networks/praxis-helm/issues/22)).
-- `gerbil.startupMode=disabledUntilSetup` is accepted again. A duplicate PANGOLIN-062
+- `gerbil.startupMode=disabledUntilSetup` is accepted again. A duplicate praxis-062
   check rejected the value its own schema enum advertised.
-- The three Traefik-controller validations no longer share error code `PANGOLIN-012`, so
-  the code in a failed render identifies which condition tripped. `PANGOLIN-012` keeps the
+- The three Traefik-controller validations no longer share error code `praxis-012`, so
+  the code in a failed render identifies which condition tripped. `praxis-012` keeps the
   `deployment.installTraefikController=true` / `deployment.type` mismatch; the subchart
-  conflicts move to `PANGOLIN-080` (`traefikController.deployment.enabled=false`) and
-  `PANGOLIN-081` (`traefikController.providers.kubernetesCRD.enabled=false`). The messages
+  conflicts move to `praxis-080` (`traefikController.deployment.enabled=false`) and
+  `praxis-081` (`traefikController.providers.kubernetesCRD.enabled=false`). The messages
   themselves are unchanged.
 - Explicit `false` and `0` now stick for `praxis.config.app.telemetry.anonymous_usage`,
   `praxis.config.app.notifications.*`, `praxis.config.server.trust_proxy` and
@@ -83,7 +83,7 @@ This changelog is chart-scoped to support multiple charts over time.
 - `traefik.runInGerbilPod` (default `true`). See the breaking change below.
 - `controller.config.ingressClass` (default `traefik`) and
   `controller.config.resyncInterval` (default `10m`) for praxis-kube-controller 0.1.0.
-- `PANGOLIN-076` rejects `traefik.replicaCount > 1` while Traefik runs in the Gerbil Pod.
+- `praxis-076` rejects `traefik.replicaCount > 1` while Traefik runs in the Gerbil Pod.
 
 - `database.sqlite.persistence.*` is implemented: it renders a PVC and mounts the
   directory holding `database.sqlite.path` in both `multi` and `single` mode. The values
@@ -92,7 +92,7 @@ This changelog is chart-scoped to support multiple charts over time.
 - `networkPolicy.controller.egress.kubernetesApi.endpoints` accepts CIDR groups with
   their own port lists, covering both pre-DNAT (Service ClusterIP:443) and post-DNAT
   (node IP:6443) CNI behaviour.
-- `PANGOLIN-067` fails the render when Kubernetes API egress is enabled with no
+- `praxis-067` fails the render when Kubernetes API egress is enabled with no
   destination configured.
 - The Praxis 1.22 configuration surface: `server.{ai_gateway_port, ai_gateway_override,
   badger_override, remote_headers.*, enable_ai_gateway_client_ip_header, maxmind_db_path,
@@ -114,7 +114,7 @@ This changelog is chart-scoped to support multiple charts over time.
   `hostNetwork` so tunnel routes land in the node network namespace, plus
   `traefik.colocateWithGerbil` to pin the chart-managed Traefik to that node and
   `networkPolicy.gerbil.hostGateway.nodeCIDRs` for the node-sourced NetworkPolicy rule.
-  `PANGOLIN-071`..`075` reject the combinations that cannot work. This is a workaround,
+  `praxis-071`..`075` reject the combinations that cannot work. This is a workaround,
   not the portable fix: [#20](https://github.com/CausQ-Networks/praxis-helm/issues/20) stays open.
 - `global.clusterDomain` for clusters that do not use `cluster.local`.
 

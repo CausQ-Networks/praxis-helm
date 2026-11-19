@@ -157,7 +157,7 @@ tests:
     template: templates/validate.yaml
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-050: praxis.blueprints.enabled=true but no blueprint source is configured. Set configMap.create=true (with files) or existingConfigMap to provide blueprint YAML definitions."
+          errorMessage: "praxis-050: praxis.blueprints.enabled=true but no blueprint source is configured. Set configMap.create=true (with files) or existingConfigMap to provide blueprint YAML definitions."
 
   - it: fails when blueprints enabled with only environmentSecret (no ConfigMap source)
     set:
@@ -168,7 +168,7 @@ tests:
     template: templates/validate.yaml
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-050: praxis.blueprints.enabled=true but no blueprint source is configured. Set configMap.create=true (with files) or existingConfigMap to provide blueprint YAML definitions."
+          errorMessage: "praxis-050: praxis.blueprints.enabled=true but no blueprint source is configured. Set configMap.create=true (with files) or existingConfigMap to provide blueprint YAML definitions."
 
   - it: fails when configMap.create and existingConfigMap are both set
     set:
@@ -180,7 +180,7 @@ tests:
     template: templates/validate.yaml
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-051: praxis.blueprints.configMap.create=true and praxis.blueprints.existingConfigMap are mutually exclusive. Use one or the other."
+          errorMessage: "praxis-051: praxis.blueprints.configMap.create=true and praxis.blueprints.existingConfigMap are mutually exclusive. Use one or the other."
 
   - it: fails when configMap.create=true but files is empty
     set:
@@ -189,7 +189,7 @@ tests:
     template: templates/validate.yaml
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-052: praxis.blueprints.configMap.create=true but praxis.blueprints.files is empty. Provide at least one blueprint file."
+          errorMessage: "praxis-052: praxis.blueprints.configMap.create=true but praxis.blueprints.files is empty. Provide at least one blueprint file."
 
   - it: fails when environmentSecret.create and existingEnvironmentSecret are both set
     set:
@@ -202,7 +202,7 @@ tests:
     template: templates/validate.yaml
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-053: praxis.blueprints.environmentSecret.create=true and praxis.blueprints.existingEnvironmentSecret are mutually exclusive. Use one or the other."
+          errorMessage: "praxis-053: praxis.blueprints.environmentSecret.create=true and praxis.blueprints.existingEnvironmentSecret are mutually exclusive. Use one or the other."
 
   - it: fails when environmentSecret.create=true but environment is empty
     set:
@@ -212,7 +212,7 @@ tests:
     template: templates/validate.yaml
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-054: praxis.blueprints.environmentSecret.create=true but praxis.blueprints.environment is empty. Provide at least one environment variable."
+          errorMessage: "praxis-054: praxis.blueprints.environmentSecret.create=true but praxis.blueprints.environment is empty. Provide at least one environment variable."
 
   # -----------------------------------------------------------------------
   # Existing resources mode (no chart-managed resources rendered)

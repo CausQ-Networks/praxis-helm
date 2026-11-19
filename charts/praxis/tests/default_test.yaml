@@ -79,7 +79,7 @@ tests:
     template: templates/secrets.yaml
     asserts:
       - notEqual:
-          path: data.PANGOLIN_SECRET
+          path: data.praxis_SECRET
           value: Q0hBTkdFLU1FLVBMRUFTRQ==
 
   - it: does not render controller TLS Secret by default

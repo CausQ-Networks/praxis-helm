@@ -187,7 +187,7 @@ tests:
     template: templates/secret-cnpg-connection.yaml
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-CNPG: Cannot generate a PostgreSQL connection string for CloudNativePG without a password. Set database.cloudnativepg.auth.generatedSecret.password, set database.cloudnativepg.auth.existingSecretName, or use database.connection.existingSecretName to reference the CNPG-generated app Secret."
+          errorMessage: "praxis-CNPG: Cannot generate a PostgreSQL connection string for CloudNativePG without a password. Set database.cloudnativepg.auth.generatedSecret.password, set database.cloudnativepg.auth.existingSecretName, or use database.connection.existingSecretName to reference the CNPG-generated app Secret."
 
   - it: uses SQLite value in POSTGRES_CONNECTION_STRING when sqlite mode enabled
     set:

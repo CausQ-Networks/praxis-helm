@@ -9,7 +9,7 @@ tests:
       controller.enabled: false
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-016: deployment.mode=single with deployment.type=controller requires controller.enabled=true."
+          errorMessage: "praxis-016: deployment.mode=single with deployment.type=controller requires controller.enabled=true."
 
   - it: fails when dashboard_url is empty in non-sqlite mode
     set:
@@ -17,7 +17,7 @@ tests:
       praxis.config.app.dashboard_url: ""
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-055: praxis.config.app.dashboard_url must be set (non-empty). For development/testing only, set database.mode=sqlite to bypass this validation."
+          errorMessage: "praxis-055: praxis.config.app.dashboard_url must be set (non-empty). For development/testing only, set database.mode=sqlite to bypass this validation."
 
   - it: fails when domains map is empty in non-sqlite mode
     set:
@@ -25,7 +25,7 @@ tests:
       praxis.config.domains: null
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-056: praxis.config.domains must contain at least one domain entry with base_domain and cert_resolver. For development/testing only, set database.mode=sqlite to bypass this validation."
+          errorMessage: "praxis-056: praxis.config.domains must contain at least one domain entry with base_domain and cert_resolver. For development/testing only, set database.mode=sqlite to bypass this validation."
 
   - it: fails when configured domain entry misses cert_resolver
     set:
@@ -36,7 +36,7 @@ tests:
           cert_resolver: ""
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-059: praxis.config.domains.domain1.cert_resolver must be set (non-empty)."
+          errorMessage: "praxis-059: praxis.config.domains.domain1.cert_resolver must be set (non-empty)."
 
   - it: fails when gerbil base_endpoint is empty in non-sqlite mode
     set:
@@ -44,7 +44,7 @@ tests:
       praxis.config.gerbil.base_endpoint: ""
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-060: praxis.config.gerbil.base_endpoint must be set (non-empty). For development/testing only, set database.mode=sqlite to bypass this validation."
+          errorMessage: "praxis-060: praxis.config.gerbil.base_endpoint must be set (non-empty). For development/testing only, set database.mode=sqlite to bypass this validation."
 
   - it: allows empty required praxis config in sqlite dev/test mode
     set:
@@ -64,7 +64,7 @@ tests:
       cnpg-cluster.fullnameOverride: bar
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-CNPG: cnpg-cluster.fullnameOverride and database.cloudnativepg.cluster.name must match when cnpg-cluster.enabled=true"
+          errorMessage: "praxis-CNPG: cnpg-cluster.fullnameOverride and database.cloudnativepg.cluster.name must match when cnpg-cluster.enabled=true"
 
   - it: allows cnpg-cluster.fullnameOverride to define CNPG name when database cluster name is default
     set:
@@ -80,7 +80,7 @@ tests:
       traefik.config.letsencryptEmail: ""
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-014: traefik.config.letsencryptEmail must be set when traefik.enabled=true"
+          errorMessage: "praxis-014: traefik.config.letsencryptEmail must be set when traefik.enabled=true"
 
   - it: fails when standalone traefik enabled with placeholder router host
     set:
@@ -89,7 +89,7 @@ tests:
       traefik.config.dynamicRouters.host: "example.com"
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-043: traefik.config.dynamicRouters.host must be set to a real hostname (must not be empty or example.com) when traefik.enabled=true"
+          errorMessage: "praxis-043: traefik.config.dynamicRouters.host must be set to a real hostname (must not be empty or example.com) when traefik.enabled=true"
 
   - it: fails when standalone traefik dashboard enabled without persistence
     set:
@@ -100,7 +100,7 @@ tests:
       traefik.persistence.enabled: false
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-015: traefik.persistence.enabled must be true when traefik.config.dashboard=true (ACME state should persist to avoid rate limits on restarts)"
+          errorMessage: "praxis-015: traefik.persistence.enabled must be true when traefik.config.dashboard=true (ACME state should persist to avoid rate limits on restarts)"
 
   - it: fails when enabling traefik dependency outside controller mode
     set:
@@ -108,7 +108,7 @@ tests:
       deployment.installTraefikController: true
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-012: deployment.installTraefikController=true requires deployment.type=controller"
+          errorMessage: "praxis-012: deployment.installTraefikController=true requires deployment.type=controller"
 
   - it: fails when traefik subchart is disabled while being installed
     set:
@@ -117,7 +117,7 @@ tests:
       traefikController.deployment.enabled: false
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-080: traefikController.deployment.enabled=false conflicts with deployment.installTraefikController=true"
+          errorMessage: "praxis-080: traefikController.deployment.enabled=false conflicts with deployment.installTraefikController=true"
 
   - it: fails when traefik subchart disables kubernetesCRD provider
     set:
@@ -126,14 +126,14 @@ tests:
       traefikController.providers.kubernetesCRD.enabled: false
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-081: traefikController.providers.kubernetesCRD.enabled=false is not supported (required by controller mode)"
+          errorMessage: "praxis-081: traefikController.providers.kubernetesCRD.enabled=false is not supported (required by controller mode)"
 
   - it: fails when external mode has no Secret source configured
     set:
       database.mode: external
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-061: database.mode=external requires a database connection Secret. Either set database.connection.existingSecretName (user-managed Secret) or set database.external.generatedSecret.create=true with database.external.generatedSecret.connectionString or host/username/password/port/database values (chart-managed Secret)."
+          errorMessage: "praxis-061: database.mode=external requires a database connection Secret. Either set database.connection.existingSecretName (user-managed Secret) or set database.external.generatedSecret.create=true with database.external.generatedSecret.connectionString or host/username/password/port/database values (chart-managed Secret)."
 
   - it: fails when dashboard ingressroute is enabled and host cannot be derived
     set:
@@ -143,7 +143,7 @@ tests:
       praxis.ingressRoute.dashboard.enabled: true
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-063: praxis.ingressRoute.dashboard.enabled=true requires a host. Set praxis.ingressRoute.dashboard.host or provide a parseable praxis.config.app.dashboard_url."
+          errorMessage: "praxis-063: praxis.ingressRoute.dashboard.enabled=true requires a host. Set praxis.ingressRoute.dashboard.host or provide a parseable praxis.config.app.dashboard_url."
 
   - it: fails when dashboard ingressroute tls mode sets certResolver and secretName together
     set:
@@ -151,7 +151,7 @@ tests:
       praxis.ingressRoute.dashboard.tls.secretName: dashboard-tls
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-065: praxis.ingressRoute.dashboard.tls.certResolver and tls.secretName are mutually exclusive. Set exactly one TLS mode."
+          errorMessage: "praxis-065: praxis.ingressRoute.dashboard.tls.certResolver and tls.secretName are mutually exclusive. Set exactly one TLS mode."
 
   - it: fails when cross-namespace ingressroute service references are not explicitly allowed
     set:
@@ -159,7 +159,7 @@ tests:
       praxis.ingressRoute.dashboard.allowCrossNamespaceServices: false
     asserts:
       - failedTemplate:
-          errorMessage: "PANGOLIN-066: cross-namespace Traefik service references are disabled. Set praxis.ingressRoute.dashboard.allowCrossNamespaceServices=true to allow routes.api.service.namespace=\"other-namespace\" (Traefik kubernetesCRD provider must also allow cross-namespace references)."
+          errorMessage: "praxis-066: cross-namespace Traefik service references are disabled. Set praxis.ingressRoute.dashboard.allowCrossNamespaceServices=true to allow routes.api.service.namespace=\"other-namespace\" (Traefik kubernetesCRD provider must also allow cross-namespace references)."
 
   - it: fails when gerbil startupMode is invalid
     set:
@@ -197,7 +197,7 @@ tests:
               endpoints: []
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-067"
+          errorPattern: "praxis-067"
 
 
   - it: passes when Kubernetes API egress is explicitly opted out
@@ -257,7 +257,7 @@ tests:
                 - ports: [443]
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-067.*has no cidrs"
+          errorPattern: "praxis-067.*has no cidrs"
 
   - it: rejects an address without a prefix length
     set:
@@ -275,7 +275,7 @@ tests:
                 - cidrs: ["10.43.0.1"]
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-067.*not an address/prefix"
+          errorPattern: "praxis-067.*not an address/prefix"
 
   - it: rejects a port outside the valid range
     set:
@@ -294,7 +294,7 @@ tests:
                   ports: [70000]
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-067.*outside 1-65535"
+          errorPattern: "praxis-067.*outside 1-65535"
 
   - it: rejects except combined with more than one cidr
     set:
@@ -313,7 +313,7 @@ tests:
                   except: ["10.1.0.0/16"]
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-067.*combines except with 2 cidrs"
+          errorPattern: "praxis-067.*combines except with 2 cidrs"
 
   - it: rejects a relative SQLite path that would yield a relative mountPath
     set:
@@ -325,7 +325,7 @@ tests:
             enabled: true
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-068"
+          errorPattern: "praxis-068"
 
   - it: rejects a SQLite path with no mountable parent directory
     set:
@@ -337,7 +337,7 @@ tests:
             enabled: true
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-068"
+          errorPattern: "praxis-068"
 
   - it: accepts a deeply nested absolute SQLite path
     set:
@@ -361,7 +361,7 @@ tests:
         replicaCount: 3
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-069"
+          errorPattern: "praxis-069"
 
   - it: allows more than one replica when SQLite is not in use
     set:
@@ -383,7 +383,7 @@ tests:
             emptyDir: {}
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-070"
+          errorPattern: "praxis-070"
 
   - it: rejects an extraVolumeMount that collides with the SQLite mount path
     set:
@@ -398,7 +398,7 @@ tests:
             mountPath: /app/data
     asserts:
       - failedTemplate:
-          errorPattern: "PANGOLIN-070"
+          errorPattern: "praxis-070"
 
   - it: accepts extra volumes that do not collide with the SQLite volume
     set:
