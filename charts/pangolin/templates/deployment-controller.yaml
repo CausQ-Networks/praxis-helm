@@ -8,7 +8,7 @@
 {{- $saName := include "pangolin.serviceAccountName.controller" . -}}
 {{- $replicas := $ctrl.replicaCount | default 1 -}}
 {{- $workloadType := $ctrl.workloadType | default "Deployment" -}}
-{{- $controllerWait := (include "pangolin.wait.config" (dict "root" $root "override" ($ctrl.waitForPangolin | default dict)) | fromYaml) | default dict -}}
+{{- $controllerWait := (include "pangolin.wait.config" (dict "root" $root "override" ($ctrl.waitForPraxis | default dict)) | fromYaml) | default dict -}}
 {{- $controllerWaitUserEnabled := ternary (index $controllerWait "enabled") true (hasKey $controllerWait "enabled") -}}
 {{- $controllerConfigEndpoint := include "pangolin.controller.configEndpoint" $root -}}
 {{- $depMetaAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "controller") | fromYaml) ($ctrl.deployment.annotations | default dict) -}}
@@ -123,8 +123,8 @@ spec:
                   if curl -k -fsS --max-time 5 "${ENDPOINT}" >/dev/null 2>&1; then
                     ready="true"
                   fi
-                elif [ -f /etc/pangolin/tls/ca.crt ]; then
-                  if curl --cacert /etc/pangolin/tls/ca.crt -fsS --max-time 5 "${ENDPOINT}" >/dev/null 2>&1; then
+                elif [ -f /etc/praxis/tls/ca.crt ]; then
+                  if curl --cacert /etc/praxis/tls/ca.crt -fsS --max-time 5 "${ENDPOINT}" >/dev/null 2>&1; then
                     ready="true"
                   fi
                 elif curl -fsS --max-time 5 "${ENDPOINT}" >/dev/null 2>&1; then
@@ -132,25 +132,25 @@ spec:
                 fi
                 if [ "${ready}" = "true" ]; then
                   stable=$((stable + INTERVAL_SECONDS))
-                  echo "Pangolin Traefik config endpoint ready for ${stable}/${STABLE_SECONDS}s"
+                  echo "Praxis Traefik config endpoint ready for ${stable}/${STABLE_SECONDS}s"
                   if [ "${stable}" -ge "${STABLE_SECONDS}" ]; then
                     exit 0
                   fi
                 else
                   stable=0
-                  echo "Pangolin Traefik config endpoint not ready yet"
+                  echo "Praxis Traefik config endpoint not ready yet"
                 fi
                 sleep "${INTERVAL_SECONDS}"
                 elapsed=$((elapsed + INTERVAL_SECONDS))
               done
-              echo "Timed out waiting for stable Pangolin Traefik config endpoint readiness"
+              echo "Timed out waiting for stable Praxis Traefik config endpoint readiness"
               exit 1
           securityContext:
             {{- toYaml (mergeOverwrite (dict "runAsNonRoot" true "runAsUser" 65534 "allowPrivilegeEscalation" false "readOnlyRootFilesystem" true "capabilities" (dict "drop" (list "ALL"))) ($controllerWait.securityContext | default dict)) | nindent 12 }}
           volumeMounts:
             {{- if $tlsEnabled }}
             - name: tls
-              mountPath: /etc/pangolin/tls
+              mountPath: /etc/praxis/tls
               readOnly: true
             {{- end }}
             - name: tmp
@@ -177,7 +177,7 @@ spec:
           volumeMounts:
             {{- if $tlsEnabled }}
             - name: tls
-              mountPath: /etc/pangolin/tls
+              mountPath: /etc/praxis/tls
               readOnly: true
             {{- end }}
             - name: tmp

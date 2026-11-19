@@ -134,7 +134,7 @@ tests:
             name: SITE_METRICS_PROMETHEUS_ENABLED
             value: "true"
 
-  # pangolin-cli.effectiveMetrics used to emit Go's map-print form instead of JSON, so a
+  # praxis-cli.effectiveMetrics used to emit Go's map-print form instead of JSON, so a
   # per-instance metrics block never reached the container it belonged to.
   - it: resolves a per-instance metrics override into the container
     set:

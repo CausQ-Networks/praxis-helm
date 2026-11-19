@@ -2,7 +2,7 @@
 {{- $root := . -}}
 {{- $pangolin := .Values.pangolin -}}
 {{- $svcType := $pangolin.service.type | default "ClusterIP" -}}
-{{- $svcAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) .Values.global.additionalServiceAnnotations (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "pangolin") | fromYaml) (mergeOverwrite (dict) $pangolin.service.annotations) -}}
+{{- $svcAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) .Values.global.additionalServiceAnnotations (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "praxis") | fromYaml) (mergeOverwrite (dict) $pangolin.service.annotations) -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -10,7 +10,7 @@ metadata:
   namespace: {{ include "pangolin.namespace" . }}
   labels:
     {{- include "pangolin.labels" $root | nindent 4 }}
-    {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "pangolin") | nindent 4 }}
+    {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "praxis") | nindent 4 }}
     {{- include "pangolin.renderNonSelectorLabels" (dict "labels" ($root.Values.global.additionalServiceLabels | default dict)) | nindent 4 }}
     {{- include "pangolin.renderNonSelectorLabels" (dict "labels" ($pangolin.service.labels | default dict)) | nindent 4 }}
     app.kubernetes.io/component: pangolin

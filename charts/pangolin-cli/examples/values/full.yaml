@@ -1,7 +1,7 @@
 # Full-ish example for manual testing; includes many common settings
 global:
   image:
-    repository: fosrl/pangolin-cli
+    repository: causq-networks/praxis-cli
     tag: latest
   logLevel: DEBUG
   nativeMode:
@@ -14,7 +14,7 @@ global:
 siteInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: "https://pangolin.example.com"
+    pangolinEndpoint: "https://praxis.example.com"
     id: my-id
     secret: my-secret
     mtu: 1400

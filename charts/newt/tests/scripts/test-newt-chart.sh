@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Comprehensive test suite for Newt Helm chart
-# Mirrors the Pangolin chart test suite and adds CRD-specific checks
+# Mirrors the Praxis chart test suite and adds CRD-specific checks
 
 set -euo pipefail
 

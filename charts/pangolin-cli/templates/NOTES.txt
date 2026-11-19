@@ -1,12 +1,12 @@
-Thank you for installing the Pangolin CLI site chart!
+Thank you for installing the Praxis CLI site chart!
 
 ChartVersion: {{ .Chart.Version }}
 AppVersion: {{ .Chart.AppVersion }}
 
 Quick checks:
-- Pods:     kubectl get pods -n {{ include "pangolin-cli.namespace" . }} -l app.kubernetes.io/component=site
-- Services: kubectl get svc  -n {{ include "pangolin-cli.namespace" . }} -l app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/name={{ .Chart.Name }}
-- Test:     helm test {{ .Release.Name }} -n {{ include "pangolin-cli.namespace" . }}
+- Pods:     kubectl get pods -n {{ include "praxis-cli.namespace" . }} -l app.kubernetes.io/component=site
+- Services: kubectl get svc  -n {{ include "praxis-cli.namespace" . }} -l app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/name={{ .Chart.Name }}
+- Test:     helm test {{ .Release.Name }} -n {{ include "praxis-cli.namespace" . }}
 
 In-cluster access examples over the site tunnel:
 - Direct Service: <service>.<namespace>.svc.<cluster-dns>:<port>
@@ -15,7 +15,7 @@ Services (per instance):
 {{- $root := . -}}
 {{- range $i, $inst := .Values.siteInstances }}
 {{- if $inst.enabled }}
-- {{ $inst.name }}: kubectl get svc -n {{ include "pangolin-cli.namespace" $root }} {{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}
+- {{ $inst.name }}: kubectl get svc -n {{ include "praxis-cli.namespace" $root }} {{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}
 {{- end }}
 {{- end }}
 
@@ -25,19 +25,19 @@ Metrics (optional):
 - Scrape port: {{ .Values.global.metrics.port | default 9090 }}
 {{- if .Values.global.metrics.service.enabled }}
 - Port-forward to metrics Service:
-kubectl port-forward -n {{ include "pangolin-cli.namespace" . }} svc/{{ include "pangolin-cli.fullname" . }}-metrics 9090:{{ .Values.global.metrics.service.port | default 9090 }}
+kubectl port-forward -n {{ include "praxis-cli.namespace" . }} svc/{{ include "praxis-cli.fullname" . }}-metrics 9090:{{ .Values.global.metrics.service.port | default 9090 }}
 {{- end }}
 {{- end }}
 
 Troubleshooting:
-- Events:   kubectl get events -n {{ include "pangolin-cli.namespace" . }}
-- Pods:  kubectl get pods -n {{ include "pangolin-cli.namespace" . }} -l app.kubernetes.io/component=site
-- Services: kubectl get svc -n {{ include "pangolin-cli.namespace" . }} -l app.kubernetes.io/instance={{ .Release.Name }}
+- Events:   kubectl get events -n {{ include "praxis-cli.namespace" . }}
+- Pods:  kubectl get pods -n {{ include "praxis-cli.namespace" . }} -l app.kubernetes.io/component=site
+- Services: kubectl get svc -n {{ include "praxis-cli.namespace" . }} -l app.kubernetes.io/instance={{ .Release.Name }}
 {{- $root := . -}}
 {{- range $i, $inst := .Values.siteInstances }}
 {{- if $inst.enabled }}
-- Logs ({{ $inst.name }}):  kubectl logs deployment/{{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }} -n {{ include "pangolin-cli.namespace" $root }}
-- Describe ({{ $inst.name }}): kubectl describe deploy/{{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }} -n {{ include "pangolin-cli.namespace" $root }}
+- Logs ({{ $inst.name }}):  kubectl logs deployment/{{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }} -n {{ include "praxis-cli.namespace" $root }}
+- Describe ({{ $inst.name }}): kubectl describe deploy/{{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }} -n {{ include "praxis-cli.namespace" $root }}
 {{- end }}
 {{- end }}
 

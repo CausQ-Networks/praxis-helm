@@ -2,7 +2,7 @@ suite: NetworkPolicy opt-outs
 templates:
   - templates/networkpolicy.yaml
 tests:
-  - it: allows the external Pangolin ports by default
+  - it: allows the external Praxis ports by default
     set:
       networkPolicy:
         enabled: true
@@ -17,7 +17,7 @@ tests:
               - port: 3000
                 protocol: TCP
 
-  - it: allowExternalIngress false closes the external Pangolin ports
+  - it: allowExternalIngress false closes the external Praxis ports
     set:
       networkPolicy:
         enabled: true
@@ -33,7 +33,7 @@ tests:
               - port: 3000
                 protocol: TCP
 
-  - it: pangolin.externalIngress.external false closes the external Pangolin ports
+  - it: pangolin.externalIngress.external false closes the external Praxis ports
     set:
       networkPolicy:
         enabled: true

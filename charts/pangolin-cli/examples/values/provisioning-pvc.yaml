@@ -1,7 +1,7 @@
 siteInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: https://pangolin.example.com
+    pangolinEndpoint: https://praxis.example.com
 
     provisioningKey: "YOUR_PROVISIONING_KEY"
     siteName: "my-site"
@@ -10,5 +10,5 @@ siteInstances:
       enabled: true
       type: persistentVolumeClaim
       existingClaim: my-site-config
-      mountPath: /var/lib/pangolin
+      mountPath: /var/lib/praxis
       fileName: config.json

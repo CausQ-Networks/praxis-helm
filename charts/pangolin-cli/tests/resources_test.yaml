@@ -173,7 +173,7 @@ tests:
               memory: 512Mi
         documentSelector:
           path: metadata.name
-          value: RELEASE-NAME-pangolin-cli-one
+          value: RELEASE-NAME-praxis-cli-one
       - equal:
           path: spec.template.spec.containers[0].resources
           value:
@@ -181,4 +181,4 @@ tests:
               memory: 64Mi
         documentSelector:
           path: metadata.name
-          value: RELEASE-NAME-pangolin-cli-two
+          value: RELEASE-NAME-praxis-cli-two

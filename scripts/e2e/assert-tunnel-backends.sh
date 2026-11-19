@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Fail when the controller publishes tunnel-subnet addresses that nothing can route to.
 #
-# Pangolin advertises Newt-site backends as WireGuard peer addresses. The controller
+# Praxis advertises Newt-site backends as WireGuard peer addresses. The controller
 # materialises them into EndpointSlices verbatim, so an address inside the tunnel CIDR is
 # only reachable if a data path exists - today that means Gerbil running in host gateway
 # mode with Traefik co-located on the same node. Publishing such an address without one

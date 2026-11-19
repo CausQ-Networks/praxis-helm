@@ -2,7 +2,7 @@ suite: Site all environment variables
 templates:
   - templates/deployment.yaml
 tests:
-  - it: renders PANGOLIN_ENDPOINT from existing secret
+  - it: renders PRAXIS_ENDPOINT from existing secret
     set:
       siteInstances:
         - name: test-env
@@ -15,7 +15,7 @@ tests:
           of: Deployment
       - equal:
           path: spec.template.spec.containers[0].env[0].name
-          value: PANGOLIN_ENDPOINT
+          value: PRAXIS_ENDPOINT
       - equal:
           path: spec.template.spec.containers[0].env[1].name
           value: SITE_ID
@@ -28,7 +28,7 @@ tests:
       siteInstances:
         - name: test-inline
           enabled: true
-          pangolinEndpoint: https://pangolin.example.com
+          pangolinEndpoint: https://praxis.example.com
           id: my-id
           secret: my-secret
           extraEnv: {}
@@ -37,10 +37,10 @@ tests:
           of: Deployment
       - equal:
           path: spec.template.spec.containers[0].env[0].name
-          value: PANGOLIN_ENDPOINT
+          value: PRAXIS_ENDPOINT
       - equal:
           path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.key
-          value: PANGOLIN_ENDPOINT
+          value: PRAXIS_ENDPOINT
 
   - it: renders PORT when specified
     set:
@@ -162,7 +162,7 @@ tests:
       siteInstances:
         - name: test-blueprint
           enabled: true
-          blueprintFile: /etc/pangolin/blueprint.yaml
+          blueprintFile: /etc/praxis/blueprint.yaml
           blueprintData: |
             # simple blueprint
             routes: []
@@ -172,7 +172,7 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: BLUEPRINT_FILE
-            value: "/etc/pangolin/blueprint.yaml"
+            value: "/etc/praxis/blueprint.yaml"
 
   - it: renders DOCKER_SOCKET env vars when enabled
     set:
@@ -215,14 +215,14 @@ tests:
       siteInstances:
         - name: test-config
           enabled: true
-          configFile: /etc/pangolin/config.yaml
+          configFile: /etc/praxis/config.yaml
           extraEnv: {}
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: CONFIG_FILE
-            value: "/etc/pangolin/config.yaml"
+            value: "/etc/praxis/config.yaml"
 
   - it: renders UPDOWN_SCRIPT when enabled
     set:
@@ -498,27 +498,27 @@ tests:
           configPersistence:
             enabled: true
             type: emptyDir
-            mountPath: /var/lib/pangolin
+            mountPath: /var/lib/praxis
             fileName: config.json
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: CONFIG_FILE
-            value: "/var/lib/pangolin/config.json"
+            value: "/var/lib/praxis/config.json"
 
   - it: falls back to legacy configFile when configPersistence is disabled
     set:
       siteInstances:
         - name: test-legacy-config
           enabled: true
-          configFile: /etc/pangolin/custom-config.yaml
+          configFile: /etc/praxis/custom-config.yaml
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: CONFIG_FILE
-            value: "/etc/pangolin/custom-config.yaml"
+            value: "/etc/praxis/custom-config.yaml"
 
   - it: renders SITE_PPROF_ENABLED when global.metrics.pprofEnabled is true
     set:
@@ -551,7 +551,7 @@ tests:
       siteInstances:
         - name: test-prov-blueprint
           enabled: true
-          provisioningBlueprintFile: /etc/pangolin/provisioning-blueprint.yaml
+          provisioningBlueprintFile: /etc/praxis/provisioning-blueprint.yaml
           provisioningBlueprintData: |
             version: 1
             routes: []
@@ -560,7 +560,7 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: PROVISIONING_BLUEPRINT_FILE
-            value: "/etc/pangolin/provisioning-blueprint.yaml"
+            value: "/etc/praxis/provisioning-blueprint.yaml"
 
   # --- SSH, native main interface and UDP proxy options -----------------------
   - it: renders DISABLE_SSH when enabled

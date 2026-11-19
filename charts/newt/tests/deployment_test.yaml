@@ -26,7 +26,7 @@ tests:
       newtInstances:
         - name: cfg
           enabled: true
-          pangolinEndpoint: "https://pangolin.example.com"
+          pangolinEndpoint: "https://praxis.example.com"
           id: test-id
           secret: test-secret
           port: "7777"
@@ -37,7 +37,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].env[0].name
-          value: PANGOLIN_ENDPOINT
+          value: PRAXIS_ENDPOINT
       - contains:
           path: spec.template.spec.containers[0].env
           content:

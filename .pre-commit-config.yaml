@@ -23,20 +23,20 @@ repos:
         files: ^charts/newt/(values\.yaml|templates/.*\.yaml|Chart\.yaml|README\.md\.gotmpl)$
         pass_filenames: false
       - id: helm-schema
-        name: Generate values.schema.json for charts/pangolin-cli
+        name: Generate values.schema.json for charts/praxis-cli
         args:
           - --config
-          - charts/pangolin-cli/.schema.yaml
+          - charts/praxis-cli/.schema.yaml
           - --values
-          - charts/pangolin-cli/values.yaml
+          - charts/praxis-cli/values.yaml
           - --output
-          - charts/pangolin-cli/values.schema.json
+          - charts/praxis-cli/values.schema.json
           - --draft
           - "7"
           - --k8s-schema-version
           - v1.33.1
           - --use-helm-docs
-        files: ^charts/pangolin-cli/(values\.yaml|templates/.*\.yaml|Chart\.yaml|README\.md\.gotmpl)$
+        files: ^charts/praxis-cli/(values\.yaml|templates/.*\.yaml|Chart\.yaml|README\.md\.gotmpl)$
         pass_filenames: false
 
   - repo: https://github.com/norwoodj/helm-docs

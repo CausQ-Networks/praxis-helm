@@ -6,7 +6,7 @@ siteInstances:
     siteName: ci-site
     configPersistence:
       enabled: true
-    provisioningBlueprintFile: /etc/pangolin/provisioning.yaml
+    provisioningBlueprintFile: /etc/praxis/provisioning.yaml
     provisioningBlueprintData: |
       version: 1
       routes: []

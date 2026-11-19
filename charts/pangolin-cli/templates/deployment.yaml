@@ -47,10 +47,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}
+  name: {{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}
   labels:
-  {{- include "pangolin-cli.labels" $root | nindent 4 }}
-  {{- $md := dict "pangolin-cli.instance" $inst.name "app.kubernetes.io/component" "site" }}
+  {{- include "praxis-cli.labels" $root | nindent 4 }}
+  {{- $md := dict "praxis-cli.instance" $inst.name "app.kubernetes.io/component" "site" }}
   {{- toYaml $md | nindent 4 }}
   {{- range $k, $v := $root.Values.global.deploymentLabels }}
     {{ $k }}: {{ $v | quote }}
@@ -73,15 +73,15 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/instance: {{ $root.Release.Name }}
-      pangolin-cli.instance: {{ $inst.name }}
+      praxis-cli.instance: {{ $inst.name }}
   template:
     metadata:
       labels:
-  {{- $pl := dict "app.kubernetes.io/instance" $root.Release.Name "pangolin-cli.instance" $inst.name "app.kubernetes.io/component" "site" }}
+  {{- $pl := dict "app.kubernetes.io/instance" $root.Release.Name "praxis-cli.instance" $inst.name "app.kubernetes.io/component" "site" }}
   {{- toYaml $pl | nindent 8 }}
   {{- /* Metrics: use effectiveMetrics helper to respect allowGlobalOverride */ -}}
   {{- $gm := (default (dict) $root.Values.global.metrics) -}}
-  {{- $m := (include "pangolin-cli.effectiveMetrics" (list $inst $gm)) | fromJson -}}
+  {{- $m := (include "praxis-cli.effectiveMetrics" (list $inst $gm)) | fromJson -}}
   {{- range $k, $v := $root.Values.global.additionalLabels }}
         {{ $k }}: {{ $v | quote }}
   {{- end }}
@@ -96,7 +96,7 @@ spec:
       {{- /* Default Prometheus annotations if enabled and none provided */}}
       {{- if and $m.enabled (not $m.annotations) }}
       {{- $_ := set $anns "prometheus.io/scrape" "true" }}
-      {{- $_ := set $anns "prometheus.io/port" (include "pangolin-cli.metrics.listenPort" (dict "root" $root "inst" $inst)) }}
+      {{- $_ := set $anns "prometheus.io/port" (include "praxis-cli.metrics.listenPort" (dict "root" $root "inst" $inst)) }}
       {{- $_ := set $anns "prometheus.io/path" (printf "%v" ($m.path | default "/metrics")) }}
       {{- end }}
       {{- $instAnns := $m.annotations | default dict }}
@@ -109,8 +109,8 @@ spec:
       {{- end }}
     spec:
       {{- $canOverride := (default false $inst.allowGlobalOverride) -}}
-      {{- $nativeEnabled := eq (include "pangolin-cli.instance.nativeEnabled" (dict "root" $root "inst" $inst)) "true" -}}
-      {{- $ips := include "pangolin-cli.imagePullSecrets" $root -}}
+      {{- $nativeEnabled := eq (include "praxis-cli.instance.nativeEnabled" (dict "root" $root "inst" $inst)) "true" -}}
+      {{- $ips := include "praxis-cli.imagePullSecrets" $root -}}
       {{- if $ips }}
 {{ $ips | nindent 6 }}
       {{- end }}
@@ -125,9 +125,9 @@ spec:
       {{- $instServiceAccountName := (default "" (get $instServiceAccount "name")) -}}
       {{- $useInstanceServiceAccount := and $canOverride (or $instServiceAccountCreate (ne $instServiceAccountName "")) -}}
       {{- if $useInstanceServiceAccount }}
-      serviceAccountName: {{ include "pangolin-cli.instance.serviceAccountName" (dict "root" $root "inst" $inst) }}
+      serviceAccountName: {{ include "praxis-cli.instance.serviceAccountName" (dict "root" $root "inst" $inst) }}
       {{- else if or $root.Values.serviceAccount.create $root.Values.serviceAccount.name }}
-      serviceAccountName: {{ include "pangolin-cli.serviceAccountName" $root }}
+      serviceAccountName: {{ include "praxis-cli.serviceAccountName" $root }}
       {{- end }}
       {{- with $root.Values.global.priorityClassName }}
       priorityClassName: {{ . }}
@@ -183,7 +183,7 @@ spec:
       {{- end }}
       containers:
         - name: site
-          image: {{ include "pangolin-cli.image" $root }}
+          image: {{ include "praxis-cli.image" $root }}
           {{- $g := $root.Values.global.image -}}
           {{- $l := $root.Values.image -}}
           {{- $digest := default (default "" $l.digest) $g.digest -}}
@@ -191,7 +191,7 @@ spec:
           {{- if and (eq (trim $tag) "latest") (not $digest) }}
           {{- printf "# WARNING: Do not use 'latest' tag for production deployments!" | nindent 10 }}
           {{- end }}
-          imagePullPolicy: {{ include "pangolin-cli.imagePullPolicy" $root }}
+          imagePullPolicy: {{ include "praxis-cli.imagePullPolicy" $root }}
           {{- if $nativeEnabled }}
           securityContext:
             runAsUser: 0
@@ -218,11 +218,11 @@ spec:
                 - ALL
           {{- end }}
           {{- if not $inst.useCommandArgs }}
-          {{- include "pangolin-cli.command" $root | nindent 10 }}
+          {{- include "praxis-cli.command" $root | nindent 10 }}
           env:
-            {{- include "pangolin-cli.instance.env" (dict "root" $root "inst" $inst) | trim | nindent 12 }}
+            {{- include "praxis-cli.instance.env" (dict "root" $root "inst" $inst) | trim | nindent 12 }}
           {{- else }}
-          {{- include "pangolin-cli.instance.commandArgs" (dict "root" $root "inst" $inst) | nindent 10 }}
+          {{- include "praxis-cli.instance.commandArgs" (dict "root" $root "inst" $inst) | nindent 10 }}
           env:
             {{- $auth := default (dict) $inst.auth -}}
             {{- $keys := (default dict (get $auth "keys")) -}}
@@ -231,13 +231,13 @@ spec:
             {{- if hasKey $auth "createSecret" }}{{- $createSecret = (index $auth "createSecret") -}}{{- end -}}
             {{- $envVarsDirect := default false (get $auth "envVarsDirect") -}}
             {{- $hasInlineCredentials := and $inst.pangolinEndpoint $inst.id $inst.secret -}}
-            {{- $endpointKey := default "PANGOLIN_ENDPOINT" (get $keys "endpointKey") -}}
+            {{- $endpointKey := default "PRAXIS_ENDPOINT" (get $keys "endpointKey") -}}
             {{- $idKey := default "SITE_ID" (get $keys "idKey") -}}
             {{- $secretKey := default "SITE_SECRET" (get $keys "secretKey") -}}
-            {{- $generatedSecretName := include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) -}}
+            {{- $generatedSecretName := include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) -}}
             {{- $authSecretName := ternary $existing $generatedSecretName (ne $existing "") -}}
             {{- if or $existing (and $hasInlineCredentials $createSecret (not $envVarsDirect)) }}
-            - name: PANGOLIN_ENDPOINT
+            - name: PRAXIS_ENDPOINT
               valueFrom:
                 secretKeyRef:
                   name: {{ $authSecretName }}
@@ -253,14 +253,14 @@ spec:
                   name: {{ $authSecretName }}
                   key: {{ $secretKey }}
             {{- else if and $envVarsDirect $hasInlineCredentials }}
-            - name: PANGOLIN_ENDPOINT
+            - name: PRAXIS_ENDPOINT
               value: {{ $inst.pangolinEndpoint | quote }}
             - name: SITE_ID
               value: {{ $inst.id | quote }}
             - name: SITE_SECRET
               value: {{ $inst.secret | quote }}
             {{- end }}
-            {{- include "pangolin-cli.instance.extraEnv" (dict "root" $root "inst" $inst) | nindent 12 }}
+            {{- include "praxis-cli.instance.extraEnv" (dict "root" $root "inst" $inst) | nindent 12 }}
           {{- end }}
           ports:
             - name: wg
@@ -271,7 +271,7 @@ spec:
               protocol: UDP
             {{- if $m.enabled }}
             - name: {{ $m.portName | default "metrics" }}
-              containerPort: {{ include "pangolin-cli.metrics.listenPort" $m }}
+              containerPort: {{ include "praxis-cli.metrics.listenPort" $m }}
               protocol: TCP
             {{- end }}
           {{- /* Emit volumeMounts only if we have any */}}
@@ -331,7 +331,7 @@ spec:
             {{- /* Writable config persistence mount */ -}}
             {{- if $hasConfigPersistenceMount }}
             - name: config-persistence
-              mountPath: {{ default "/var/lib/pangolin" $cp.mountPath | quote }}
+              mountPath: {{ default "/var/lib/praxis" $cp.mountPath | quote }}
             {{- end }}
             {{- /* Blueprint file mount */ -}}
             {{- if $inst.blueprintFile }}
@@ -347,7 +347,7 @@ spec:
             {{- end }}
             {{- if and (kindIs "map" $inst.updown) $inst.updown.enabled }}
             - name: updown-script
-              mountPath: {{ default "/opt/pangolin/updown" $inst.updown.mountPath }}
+              mountPath: {{ default "/opt/praxis/updown" $inst.updown.mountPath }}
             {{- end }}
             {{- with $inst.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
@@ -428,7 +428,7 @@ spec:
             secretName: {{ $mtls.secretName }}
           {{- else }}
           secret:
-            secretName: {{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}
+            secretName: {{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}
           {{- end }}
         {{- end }}
         {{- /* PEM mode */ -}}
@@ -463,13 +463,13 @@ spec:
         {{- if $inst.blueprintFile }}
         - name: blueprint-file
           configMap:
-            name: {{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-blueprint
+            name: {{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-blueprint
         {{- end }}
         {{- /* Provisioning blueprint file */ -}}
         {{- if $inst.provisioningBlueprintFile }}
         - name: provisioning-blueprint-file
           configMap:
-            name: {{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-provisioning-blueprint
+            name: {{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-provisioning-blueprint
         {{- end }}
         {{- /* Writable config persistence */ -}}
         {{- if $hasConfigPersistenceVol }}
@@ -485,7 +485,7 @@ spec:
         {{- if and (kindIs "map" $inst.updown) $inst.updown.enabled }}
         - name: updown-script
           configMap:
-            name: {{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-updown
+            name: {{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-updown
             defaultMode: 0755
         {{- end }}
         {{- with $inst.extraVolumes }}

@@ -13,7 +13,7 @@ tests:
       - hasDocuments:
           count: 6
 
-  - it: renders pangolin ingress policy with expected name and type
+  - it: renders praxis ingress policy with expected name and type
     set:
       networkPolicy.enabled: true
     template: templates/networkpolicy.yaml
@@ -28,7 +28,7 @@ tests:
           path: spec.policyTypes[0]
           value: Ingress
 
-  - it: pangolin internal api ingress is restricted to controller by default
+  - it: praxis internal api ingress is restricted to controller by default
     set:
       networkPolicy.enabled: true
     template: templates/networkpolicy.yaml
@@ -41,7 +41,7 @@ tests:
           path: spec.ingress[0].ports[0].port
           value: 3001
 
-  - it: pangolin external ingress exposes only public port by default
+  - it: praxis external ingress exposes only public port by default
     set:
       networkPolicy.enabled: true
     template: templates/networkpolicy.yaml
@@ -53,7 +53,7 @@ tests:
       - notExists:
           path: spec.ingress[2].ports[1]
 
-  - it: pangolin dashboard ingress can be restricted with configured peers
+  - it: praxis dashboard ingress can be restricted with configured peers
     set:
       networkPolicy:
         enabled: true
@@ -80,7 +80,7 @@ tests:
           path: spec.ingress[2].ports[0].port
           value: 3000
 
-  - it: appends extraIngress to pangolin ingress policy
+  - it: appends extraIngress to praxis ingress policy
     set:
       networkPolicy:
         enabled: true
@@ -98,7 +98,7 @@ tests:
               - protocol: TCP
                 port: 9999
 
-  - it: controller egress is rendered by default with dns and pangolin peer
+  - it: controller egress is rendered by default with dns and praxis peer
     set:
       networkPolicy.enabled: true
     template: templates/networkpolicy.yaml
@@ -232,7 +232,7 @@ tests:
       - hasDocuments:
           count: 6
 
-  - it: pangolin cloudnativepg egress uses cnpg pod selector by default
+  - it: praxis cloudnativepg egress uses cnpg pod selector by default
     set:
       networkPolicy.enabled: true
       database.mode: cloudnativepg
@@ -246,7 +246,7 @@ tests:
           path: spec.egress[1].to[0].podSelector.matchLabels["cnpg.io/cluster"]
           value: pangolin-db
 
-  - it: pangolin cloudnativepg egress uses explicit cnpgPeers when configured
+  - it: praxis cloudnativepg egress uses explicit cnpgPeers when configured
     set:
       networkPolicy:
         enabled: true
@@ -274,7 +274,7 @@ tests:
   # DNS configuration tests
   # ---------------------------------------------------------------------------
 
-  - it: default dns egress renders to kube-system on pangolin egress
+  - it: default dns egress renders to kube-system on praxis egress
     set:
       networkPolicy.enabled: true
     template: templates/networkpolicy.yaml
@@ -312,7 +312,7 @@ tests:
           path: spec.egress[0].to[0].namespaceSelector.matchLabels["kubernetes.io/metadata.name"]
           value: kube-system
 
-  - it: custom dns peer renders correctly on pangolin egress
+  - it: custom dns peer renders correctly on praxis egress
     set:
       networkPolicy:
         enabled: true
@@ -382,7 +382,7 @@ tests:
   # Component-scoped extra rules tests
   # ---------------------------------------------------------------------------
 
-  - it: pangolin-only extraEgress applies only to pangolin egress policy
+  - it: pangolin-only extraEgress applies only to praxis egress policy
     set:
       networkPolicy:
         enabled: true
@@ -472,7 +472,7 @@ tests:
               - ipBlock:
                   cidr: 192.168.1.0/24
 
-  - it: controller-only extraEgress does not apply to pangolin egress policy
+  - it: controller-only extraEgress does not apply to praxis egress policy
     set:
       networkPolicy:
         enabled: true
@@ -512,7 +512,7 @@ tests:
           path: spec.egress[3].ports[0].port
           value: 9000
 
-  - it: gerbil-only extraEgress does not apply to pangolin egress policy
+  - it: gerbil-only extraEgress does not apply to praxis egress policy
     set:
       networkPolicy:
         enabled: true
@@ -530,7 +530,7 @@ tests:
       - notExists:
           path: spec.egress[3]
 
-  - it: global extraEgress still applies to pangolin egress policy
+  - it: global extraEgress still applies to praxis egress policy
     set:
       networkPolicy:
         enabled: true
@@ -593,7 +593,7 @@ tests:
           path: spec.egress[3].ports[0].port
           value: 443
 
-  - it: pangolin-only extraIngress applies only to pangolin ingress policy
+  - it: pangolin-only extraIngress applies only to praxis ingress policy
     set:
       networkPolicy:
         enabled: true
@@ -653,7 +653,7 @@ tests:
           path: spec.ingress[2].ports[0].port
           value: 6666
 
-  - it: Pangolin service has correct ports
+  - it: Praxis service has correct ports
     template: templates/service-pangolin.yaml
     asserts:
       - equal:

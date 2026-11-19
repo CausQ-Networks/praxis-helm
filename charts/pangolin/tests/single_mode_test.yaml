@@ -13,7 +13,7 @@ templates:
   - templates/service-traefik.yaml
   - templates/networkpolicy.yaml
 tests:
-  - it: renders single controller workload with pangolin + gerbil + controller
+  - it: renders single controller workload with praxis + gerbil + controller
     set:
       deployment.mode: single
       deployment.type: controller
@@ -69,7 +69,7 @@ tests:
           path: spec.template.spec.containers[2].securityContext.runAsNonRoot
           value: false
 
-  - it: renders single standalone workload with pangolin + gerbil + traefik
+  - it: renders single standalone workload with praxis + gerbil + traefik
     set:
       deployment.mode: single
       deployment.type: standalone

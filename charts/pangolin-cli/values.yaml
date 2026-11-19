@@ -1,4 +1,4 @@
-# Default values for the Pangolin CLI site chart.
+# Default values for the Praxis CLI site chart.
 # This is a YAML-formatted file.
 # yaml-language-server: $schema=./values.schema.json
 # Declare variables to be passed into templates.
@@ -20,8 +20,8 @@ global:
   image: # @schema type: object ; additionalProperties: false
     # -- Container image registry (e.g., docker.io, ghcr.io, registry.example.com).
     registry: "docker.io" # @schema type: string ; minLength: 1
-    # -- Container image repository (e.g., fosrl/pangolin-cli).
-    repository: "fosrl/pangolin-cli" # @schema type: string ; minLength: 1
+    # -- Container image repository (e.g., causq-networks/praxis-cli).
+    repository: "causq-networks/praxis-cli" # @schema type: string ; minLength: 1
     # -- Image tag (defaults to Chart.appVersion if empty).
     tag: "" # @schema type: string
     # -- Image digest (overrides tag when set). Format: sha256:<64-hex>.
@@ -553,7 +553,7 @@ serviceAccount:
 
 # @section Site instances
 # @schema type: array ; item: object
-# -- List of site tunnel instances (pangolin-cli up site) to deploy. Each instance can optionally override
+# -- List of site tunnel instances (praxis-cli up site) to deploy. Each instance can optionally override
 siteInstances:
   - name: "main-tunnel" # @schema pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$ ; minLength: 1 ; maxLength: 63
     # @schema type: boolean
@@ -608,8 +608,8 @@ siteInstances:
       # -- Key mappings used inside Secrets.
       # IMPORTANT: auth.keys.* are key names, not credential values.
       keys:
-        # -- Key name for the Pangolin endpoint (default: PANGOLIN_ENDPOINT)
-        endpointKey: PANGOLIN_ENDPOINT
+        # -- Key name for the Praxis endpoint (default: PRAXIS_ENDPOINT)
+        endpointKey: PRAXIS_ENDPOINT
         # -- Key name for the site ID (default: SITE_ID)
         idKey: SITE_ID
         # -- Key name for the site secret (default: SITE_SECRET)
@@ -617,14 +617,14 @@ siteInstances:
     # Alternative (inline): provide full credentials directly.
     # These are intended for convenience/testing and can leak via Helm release history.
     # @schema type: string ; pattern: ^$|^https?://[a-zA-Z0-9.-]+(/.*)?$
-    # -- Pangolin control-plane endpoint URL (e.g., https://pangolin.example.com)
+    # -- Praxis control-plane endpoint URL (e.g., https://praxis.example.com)
     pangolinEndpoint: ""
     # @schema type: string ; pattern: ^$|^[a-zA-Z0-9_-]+$
     # @schema description: Inline values are for convenience/testing. Use auth.existingSecretName for production.
-    # -- Site ID issued by Pangolin (must be set with pangolinEndpoint and secret)
+    # -- Site ID issued by Praxis (must be set with pangolinEndpoint and secret)
     id: ""
     # @schema type: string ; pattern: ^$|^[a-zA-Z0-9_-]+$
-    # -- Site secret issued by Pangolin (must be set with pangolinEndpoint and id) - WARNING: Use auth.existingSecretName for production.
+    # -- Site secret issued by Praxis (must be set with pangolinEndpoint and id) - WARNING: Use auth.existingSecretName for production.
     secret: ""
     # -- Provisioning key (SITE_PROVISIONING_KEY env). When set, the site can bootstrap credentials and persist them to CONFIG_FILE.
     provisioningKey: "" # @schema type: string
@@ -654,7 +654,7 @@ siteInstances:
     # with NET_ADMIN and SYS_MODULE.
     useNativeInterface: false
     # -- WireGuard interface name in the pod
-    interface: "pangolin"
+    interface: "praxis"
     # -- Optional config file path for the site (CONFIG_FILE env)
     configFile: ""
     # -- Writable config persistence (recommended for provisioning-based installs).
@@ -664,14 +664,14 @@ siteInstances:
       # -- Enable writable config persistence.
       enabled: false # @schema type: boolean
       # -- Directory mount path for config persistence.
-      mountPath: "/var/lib/pangolin" # @schema type: string ; minLength: 1 ; pattern: ^/.*
+      mountPath: "/var/lib/praxis" # @schema type: string ; minLength: 1 ; pattern: ^/.*
       # -- File name inside mountPath for the persisted config.
       fileName: "config.json" # @schema type: string ; minLength: 1
       # -- Storage type. Use emptyDir for ephemeral persistence or persistentVolumeClaim for durable persistence.
       type: emptyDir # @schema type: string ; enum: [emptyDir, persistentVolumeClaim]
       # -- Existing PVC name when type=persistentVolumeClaim.
       existingClaim: "" # @schema type: string ; pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-    # -- Disable cloud connectivity (NO_CLOUD env). When enabled, the site operates without connecting to Pangolin cloud.
+    # -- Disable cloud connectivity (NO_CLOUD env). When enabled, the site operates without connecting to Praxis cloud.
     noCloud: false
     # -- Disable client connections (DISABLE_CLIENTS env). When enabled, the site does not accept incoming client connections.
     disableClients: false
@@ -682,7 +682,7 @@ siteInstances:
     # the chart then grants this instance the same privileges as useNativeInterface.
     useNativeMainInterface: false
     # -- Name of the native main WireGuard interface (INTERFACE_MAIN).
-    interfaceMain: "pangolin"
+    interfaceMain: "praxis"
     # -- Prefer this endpoint when several are advertised (--prefer-endpoint).
     # The site reads this only as a command-line flag, so it requires useCommandArgs: true on this
     # instance; the chart rejects the combination rather than letting it no-op.
@@ -690,7 +690,7 @@ siteInstances:
     # -- Idle timeout for proxied UDP flows, e.g. "90s"
     # (SITE_UDP_PROXY_IDLE_TIMEOUT). Empty uses the built-in default.
     udpProxyIdleTimeout: ""
-    # -- Restrict the local endpoints the site reports to Pangolin to these network
+    # -- Restrict the local endpoints the site reports to Praxis to these network
     # interface names, e.g. ["eth0"] (LOCAL_ENDPOINT_INTERFACES). Clients on the same
     # network use those addresses to connect directly. Empty reports every interface.
     # Mostly useful with hostNetwork: true, where the pod sees all node interfaces.
@@ -753,7 +753,7 @@ siteInstances:
       # -- inline script content (prefer updownScripts map)
       script: ""
       # -- Container mount path for up/down script files
-      mountPath: "/opt/pangolin/updown"
+      mountPath: "/opt/praxis/updown"
       # --filename for the single up/down script
       fileName: "updown.sh"
 

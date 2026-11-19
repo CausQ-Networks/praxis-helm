@@ -20,8 +20,8 @@ global:
   image: # @schema type: object ; additionalProperties: false
     # -- Container image registry (e.g., docker.io, ghcr.io, registry.example.com).
     registry: "docker.io" # @schema type: string ; minLength: 1
-    # -- Container image repository (e.g., fosrl/newt).
-    repository: "fosrl/newt" # @schema type: string ; minLength: 1
+    # -- Container image repository (e.g., causq-networks/praxis-newt).
+    repository: "causq-networks/praxis-newt" # @schema type: string ; minLength: 1
     # -- Image tag (defaults to Chart.appVersion if empty).
     tag: "" # @schema type: string
     # -- Image digest (overrides tag when set). Format: sha256:<64-hex>.
@@ -608,8 +608,8 @@ newtInstances:
       # -- Key mappings used inside Secrets.
       # IMPORTANT: auth.keys.* are key names, not credential values.
       keys:
-        # -- Key name for the Pangolin endpoint (default: PANGOLIN_ENDPOINT)
-        endpointKey: PANGOLIN_ENDPOINT
+        # -- Key name for the Praxis endpoint (default: PRAXIS_ENDPOINT)
+        endpointKey: PRAXIS_ENDPOINT
         # -- Key name for the Newt ID (default: NEWT_ID)
         idKey: NEWT_ID
         # -- Key name for the Newt secret (default: NEWT_SECRET)
@@ -617,14 +617,14 @@ newtInstances:
     # Alternative (inline): provide full credentials directly.
     # These are intended for convenience/testing and can leak via Helm release history.
     # @schema type: string ; pattern: ^$|^https?://[a-zA-Z0-9.-]+(/.*)?$
-    # -- Pangolin control-plane endpoint URL (e.g., https://pangolin.example.com)
+    # -- Praxis control-plane endpoint URL (e.g., https://praxis.example.com)
     pangolinEndpoint: ""
     # @schema type: string ; pattern: ^$|^[a-zA-Z0-9_-]+$
     # @schema description: Inline values are for convenience/testing. Use auth.existingSecretName for production.
-    # -- Newt instance ID issued by Pangolin (must be set with pangolinEndpoint and secret)
+    # -- Newt instance ID issued by Praxis (must be set with pangolinEndpoint and secret)
     id: ""
     # @schema type: string ; pattern: ^$|^[a-zA-Z0-9_-]+$
-    # -- Newt instance secret issued by Pangolin (must be set with pangolinEndpoint and id) - WARNING: Use auth.existingSecretName for production.
+    # -- Newt instance secret issued by Praxis (must be set with pangolinEndpoint and id) - WARNING: Use auth.existingSecretName for production.
     secret: ""
     # -- Provisioning key (NEWT_PROVISIONING_KEY env). When set, Newt can bootstrap credentials and persist them to CONFIG_FILE.
     provisioningKey: "" # @schema type: string
@@ -682,7 +682,7 @@ newtInstances:
     # GENERATE_AND_SAVE_KEY_TO variable in any release this chart can select. Kept so
     # existing values files stay valid; it renders nothing.
     generateAndSaveKeyTo: ""
-    # -- Disable cloud connectivity (NO_CLOUD env). When enabled, Newt operates without connecting to Pangolin cloud.
+    # -- Disable cloud connectivity (NO_CLOUD env). When enabled, Newt operates without connecting to Praxis cloud.
     noCloud: false
     # -- Disable client connections (DISABLE_CLIENTS env). When enabled, Newt does not accept incoming client connections.
     disableClients: false
@@ -703,7 +703,7 @@ newtInstances:
     # -- Idle timeout for proxied UDP flows, e.g. "90s"
     # (NEWT_UDP_PROXY_IDLE_TIMEOUT). Empty uses the Newt default.
     udpProxyIdleTimeout: ""
-    # -- Restrict the local endpoints Newt reports to Pangolin to these network
+    # -- Restrict the local endpoints Newt reports to Praxis to these network
     # interface names, e.g. ["eth0"] (LOCAL_ENDPOINT_INTERFACES). Clients on the same
     # network use those addresses to connect directly. Empty reports every interface.
     # Mostly useful with hostNetwork: true, where the pod sees all node interfaces.

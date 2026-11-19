@@ -11,7 +11,7 @@ output: values.schema.json
 useHelmDocs: true
 
 schemaRoot:
-  id: https://github.com/fosrl/helm-charts/charts/pangolin/values.schema.json
-  title: Pangolin values schema
-  description: Values schema for the Pangolin Helm chart
+  id: https://github.com/CausQ-Networks/praxis-helm/charts/praxis/values.schema.json
+  title: Praxis values schema
+  description: Values schema for the Praxis Helm chart
   additionalProperties: false

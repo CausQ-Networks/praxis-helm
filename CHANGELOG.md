@@ -7,16 +7,16 @@ This changelog is chart-scoped to support multiple charts over time.
 
 ---
 
-## Pangolin Chart (`charts/pangolin`)
+## Praxis Chart (`charts/praxis`)
 
 ### 0.1.0 - 2026-11-18
 
 #### Fixed
 
-- Pangolin can reach Gerbil's HTTP API under the chart's own NetworkPolicy. The Pangolin
+- Praxis can reach Gerbil's HTTP API under the chart's own NetworkPolicy. The Praxis
   egress policy had no rule for `gerbil.ports.internalApi`, so every peer registration
   failed with `ECONNREFUSED` and no tunnel could come up
-  ([#39](https://github.com/fosrl/helm-charts/issues/39)). In host gateway mode the rule
+  ([#39](https://github.com/CausQ-Networks/praxis-helm/issues/39)). In host gateway mode the rule
   targets `networkPolicy.gerbil.hostGateway.nodeCIDRs`.
 - The chart-managed Traefik starts and stays up. Its probes target `/ping` on
   `traefik.config.adminPort`, but the `traefik` entrypoint was never bound there and
@@ -50,17 +50,17 @@ This changelog is chart-scoped to support multiple charts over time.
   of the bare Service name. Badger resolves it from inside the Traefik Pod, so with
   `deployment.traefikNamespace` set it did not resolve at all and Badger answered
   `404 page not found` for every request while the Traefik dashboard still reported the
-  router healthy. The same value drives the Pangolin UI and AI gateway URLs
-  ([#20](https://github.com/fosrl/helm-charts/issues/20)).
+  router healthy. The same value drives the Praxis UI and AI gateway URLs
+  ([#20](https://github.com/CausQ-Networks/praxis-helm/issues/20)).
 - `pangolin.extraVolumes` / `pangolin.extraVolumeMounts` no longer abort `helm template`.
   The `- {{- toYaml . | nindent N }}` pattern let the whitespace strip eat the list dash
-  ([#25](https://github.com/fosrl/helm-charts/issues/25)).
+  ([#25](https://github.com/CausQ-Networks/praxis-helm/issues/25)).
 - `networkPolicy.controller.egress.kubernetesApi` now renders a rule by default, so
   `deployment.type=controller` no longer ships with the controller unable to reach the
-  Kubernetes API ([#22](https://github.com/fosrl/helm-charts/issues/22)).
+  Kubernetes API ([#22](https://github.com/CausQ-Networks/praxis-helm/issues/22)).
 - The dashboard `next` port (3002) is now allowed whenever the chart-managed dashboard
   IngressRoute targets it, instead of being blocked by a default that could drift
-  ([#22](https://github.com/fosrl/helm-charts/issues/22)).
+  ([#22](https://github.com/CausQ-Networks/praxis-helm/issues/22)).
 - `gerbil.startupMode=disabledUntilSetup` is accepted again. A duplicate PANGOLIN-062
   check rejected the value its own schema enum advertised.
 - The three Traefik-controller validations no longer share error code `PANGOLIN-012`, so
@@ -76,10 +76,10 @@ This changelog is chart-scoped to support multiple charts over time.
 
 #### Added
 
-- The Pangolin 1.23-1.26 configuration surface: `server.trust_ips` and
-  `server.custom_ip_header` (Badger's trusted proxies, Pangolin >= 1.26) and
-  `offline_checker.*` (offline thresholds and check interval, Pangolin >= 1.25). Each is
-  emitted only when set, so Pangolin's defaults apply otherwise.
+- The Praxis 1.23-1.26 configuration surface: `server.trust_ips` and
+  `server.custom_ip_header` (Badger's trusted proxies, Praxis >= 1.26) and
+  `offline_checker.*` (offline thresholds and check interval, Praxis >= 1.25). Each is
+  emitted only when set, so Praxis's defaults apply otherwise.
 - `traefik.runInGerbilPod` (default `true`). See the breaking change below.
 - `controller.config.ingressClass` (default `traefik`) and
   `controller.config.resyncInterval` (default `10m`) for pangolin-kube-controller 0.1.0.
@@ -88,17 +88,17 @@ This changelog is chart-scoped to support multiple charts over time.
 - `database.sqlite.persistence.*` is implemented: it renders a PVC and mounts the
   directory holding `database.sqlite.path` in both `multi` and `single` mode. The values
   existed and were documented but no template read them
-  ([#25](https://github.com/fosrl/helm-charts/issues/25)).
+  ([#25](https://github.com/CausQ-Networks/praxis-helm/issues/25)).
 - `networkPolicy.controller.egress.kubernetesApi.endpoints` accepts CIDR groups with
   their own port lists, covering both pre-DNAT (Service ClusterIP:443) and post-DNAT
   (node IP:6443) CNI behaviour.
 - `PANGOLIN-067` fails the render when Kubernetes API egress is enabled with no
   destination configured.
-- The Pangolin 1.22 configuration surface: `server.{ai_gateway_port, ai_gateway_override,
+- The Praxis 1.22 configuration surface: `server.{ai_gateway_port, ai_gateway_override,
   badger_override, remote_headers.*, enable_ai_gateway_client_ip_header, maxmind_db_path,
   maxmind_asn_path}`, `flags.{disable_virtual_api_keys_ui, enable_acme_cert_sync,
   disable_private_http_placeholder}` and `traefik.{site_types, static_domains,
-  rate_limit}`. Optional keys are emitted only when set so Pangolin's defaults apply.
+  rate_limit}`. Optional keys are emitted only when set so Praxis's defaults apply.
 - `pangolin.service.ports.aiGateway` (3005), exposed on the Service and the workload. The
   rendered `server.*_port` values now derive from these ports so they cannot drift.
 - `networkPolicy.pangolin.ingress.aiGateway` grants the AI gateway port to the Traefik
@@ -115,12 +115,12 @@ This changelog is chart-scoped to support multiple charts over time.
   `traefik.colocateWithGerbil` to pin the chart-managed Traefik to that node and
   `networkPolicy.gerbil.hostGateway.nodeCIDRs` for the node-sourced NetworkPolicy rule.
   `PANGOLIN-071`..`075` reject the combinations that cannot work. This is a workaround,
-  not the portable fix: [#20](https://github.com/fosrl/helm-charts/issues/20) stays open.
+  not the portable fix: [#20](https://github.com/CausQ-Networks/praxis-helm/issues/20) stays open.
 - `global.clusterDomain` for clusters that do not use `cluster.local`.
 
 #### Changed
 
-- Bumped Pangolin appVersion to `1.26.0`, Gerbil to `1.6.0`, pangolin-kube-controller to
+- Bumped Praxis appVersion to `1.26.0`, Gerbil to `1.6.0`, pangolin-kube-controller to
   `0.1.0`, Badger to `v1.8.0` (permanent redirects need it), and the chart to `0.1.0`. The
   chart and the controller leave prerelease. pangolin-kube-controller 0.1.0 is required:
   earlier builds produced TraefikServices the API server stripped of their servers, and
@@ -128,7 +128,7 @@ This changelog is chart-scoped to support multiple charts over time.
 - **BREAKING (standalone, multi mode):** the chart-managed Traefik runs as a container in
   the Gerbil Pod instead of its own Deployment, so it shares Gerbil's network namespace
   and reaches tunnel backends; a separate Traefik Pod returned `502` for every
-  tunnel-backed resource ([#20](https://github.com/fosrl/helm-charts/issues/20)). On
+  tunnel-backed resource ([#20](https://github.com/CausQ-Networks/praxis-helm/issues/20)). On
   upgrade the `<release>-pangolin-traefik` Deployment and its PDB are removed, the
   Traefik Service selects the Gerbil Pod, the Traefik ClusterRoleBinding moves to the
   Gerbil ServiceAccount, and the Gerbil egress NetworkPolicy is no longer rendered.
@@ -139,7 +139,7 @@ This changelog is chart-scoped to support multiple charts over time.
 - `images.traefik.tag` moves from `v3.6.15` to `v3.7.13`. The v3.6 line is out of upstream
   security support, and the bundled Traefik chart already installs v3.7.13, so the two ways
   this chart can run Traefik no longer sit on different minors.
-- **BREAKING:** `pangolin.config.gerbil.use_subdomain` is removed - Pangolin dropped it
+- **BREAKING:** `pangolin.config.gerbil.use_subdomain` is removed - Praxis dropped it
   from its config schema, so the chart was emitting a key upstream no longer knows.
 - **BREAKING:** the top-level `monitoring.*` tree and `runtime.hostNetwork` are removed.
   No template ever read either of them. The two removals fail differently on upgrade
@@ -159,12 +159,12 @@ This changelog is chart-scoped to support multiple charts over time.
   switch, and a NetworkPolicy rule with no `from` is every source: turning it on to let
   Traefik through would hand every Pod in the cluster the model providers behind the
   gateway. Use `networkPolicy.pangolin.ingress.aiGateway` instead.
-- The chart-managed Traefik (`deployment.type=standalone`) now receives Pangolin's
+- The chart-managed Traefik (`deployment.type=standalone`) now receives Praxis's
   generated configuration. It declares the Badger plugin in static configuration
   (`traefik.badger.*`), polls `/api/v1/traefik-config` over the HTTP provider
   (`traefik.config.httpProvider.*`), gets the RBAC its Kubernetes providers need, and is
-  allowed through the chart's own NetworkPolicy to Pangolin's internal API. Without these
-  the mode started healthy and served nothing Pangolin created.
+  allowed through the chart's own NetworkPolicy to Praxis's internal API. Without these
+  the mode started healthy and served nothing Praxis created.
 - `deployment.installTraefikController=true` now installs a Traefik. The value and
   `traefikController` were documented as installing a bundled subchart, but `Chart.yaml`
   declared no such dependency, so both were inert. The official Traefik chart 41.5.0 is now
@@ -181,8 +181,8 @@ This changelog is chart-scoped to support multiple charts over time.
 
 #### Changed
 
-- Bumped Pangolin chart version to `0.1.0-alpha.1` and app version to `1.18.3`.
-- Updated Artifact Hub image references to Pangolin `1.18.3` (including PostgreSQL variant) for both Docker Hub and GHCR.
+- Bumped Praxis chart version to `0.1.0-alpha.1` and app version to `1.18.3`.
+- Updated Artifact Hub image references to Praxis `1.18.3` (including PostgreSQL variant) for both Docker Hub and GHCR.
 
 ---
 
@@ -190,20 +190,20 @@ This changelog is chart-scoped to support multiple charts over time.
 
 #### Added
 
-- Initial alpha release of the Pangolin Helm chart (`charts/pangolin`).
+- Initial alpha release of the Praxis Helm chart (`charts/praxis`).
 
 ---
 
-## Pangolin CLI Chart (`charts/pangolin-cli`)
+## Praxis CLI Chart (`charts/praxis-cli`)
 
 ### 0.1.0 - 2026-11-18
 
 #### Added
 
-- New chart that runs Pangolin sites with the Pangolin CLI (`pangolin-cli up site`,
-  image `docker.io/fosrl/pangolin-cli`, also `ghcr.io/fosrl/cli`). Each entry in
+- New chart that runs Praxis sites with the Praxis CLI (`praxis-cli up site`,
+  image `docker.io/causq-networks/praxis-cli`, also `ghcr.io/causq-networks/praxis-cli`). Each entry in
   `siteInstances` becomes a Deployment.
-- The container command is always `pangolin-cli up site`. The image entrypoint is skipped
+- The container command is always `praxis-cli up site`. The image entrypoint is skipped
   because it runs `update-ca-certificates` under `set -e`, which exits 1 as uid 65534 on a
   read-only root filesystem, and it only reaches `up site` when both `SITE_ID` and
   `SITE_SECRET` are set.
@@ -224,13 +224,13 @@ This changelog is chart-scoped to support multiple charts over time.
   `NEWT_METRICS_PROMETHEUS_ENABLED`, the Service published 2112 while targeting 9090, and
   `newt.effectiveMetrics` returned Go's map-print form instead of JSON so the metrics
   container port was never declared and per-instance metrics overrides were inert
-  ([#16](https://github.com/fosrl/helm-charts/issues/16)).
+  ([#16](https://github.com/CausQ-Networks/praxis-helm/issues/16)).
 - `newtInstances[].resources` is honoured again. It was gated behind
   `allowGlobalOverride` while `global.resources` shipped non-empty, so the documented
   per-instance key was a no-op on every default install
-  ([#23](https://github.com/fosrl/helm-charts/issues/23)).
+  ([#23](https://github.com/CausQ-Networks/praxis-helm/issues/23)).
 - `newtInstances[].extraVolumes` / `extraVolumeMounts` no longer render stray bare list
-  dashes ([#25](https://github.com/fosrl/helm-charts/issues/25)).
+  dashes ([#25](https://github.com/CausQ-Networks/praxis-helm/issues/25)).
 - `--secret-env=NEWT_SECRET` is no longer passed in `useCommandArgs` mode. No Newt release
   defines that flag, and Newt exits 2 on an unknown flag; it reads `NEWT_SECRET` from the
   environment, which the chart still injects.
@@ -253,7 +253,7 @@ This changelog is chart-scoped to support multiple charts over time.
   1.16. `authDaemon.keySecretName`/`keySecretKey` reference the pre-shared key from a
   Secret; it is never inlined into the manifest.
 - Per-instance `localEndpointInterfaces` (Newt 1.17.0). It limits the local endpoints
-  Newt reports to Pangolin to the listed interfaces and renders as
+  Newt reports to Praxis to the listed interfaces and renders as
   `LOCAL_ENDPOINT_INTERFACES` or `--local-endpoint-interfaces`. Empty keeps Newt's default
   of reporting every interface.
 
@@ -274,7 +274,7 @@ This changelog is chart-scoped to support multiple charts over time.
 - `global.resources` and `newtInstances[].resources` default to `{}`. The chart no longer
   imposes CPU or memory requests/limits, and the `resources` key is omitted entirely when
   both are empty so LimitRange and namespace defaults apply. Commented examples are
-  provided in `values.yaml` ([#23](https://github.com/fosrl/helm-charts/issues/23)).
+  provided in `values.yaml` ([#23](https://github.com/CausQ-Networks/praxis-helm/issues/23)).
 - The resources schema accepts an empty map, `null`, requests-only, limits-only,
   fractional CPU and extended resources. It previously typed every field as a bare string
   with a `^[0-9]+m?$` pattern, which rejected `null`.

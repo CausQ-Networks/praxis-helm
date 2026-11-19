@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://github.com/fosrl/helm-charts/charts/newt/values.schema.json",
+    "$id": "https://github.com/CausQ-Networks/praxis-helm/charts/newt/values.schema.json",
     "title": "Newt values schema",
     "description": "Values schema for the Newt Helm chart",
     "type": "object",
@@ -137,7 +137,7 @@
                             "minLength": 1
                         },
                         "repository": {
-                            "description": "Container image repository (e.g., fosrl/newt).",
+                            "description": "Container image repository (e.g., causq-networks/praxis-newt).",
                             "type": "string",
                             "minLength": 1
                         },
@@ -1088,7 +1088,7 @@
                                 "type": "object",
                                 "properties": {
                                     "endpointKey": {
-                                        "description": "Key name for the Pangolin endpoint (default: PANGOLIN_ENDPOINT)",
+                                        "description": "Key name for the Praxis endpoint (default: PRAXIS_ENDPOINT)",
                                         "type": "string"
                                     },
                                     "idKey": {
@@ -1283,7 +1283,7 @@
                         "type": "object"
                     },
                     "localEndpointInterfaces": {
-                        "description": "Restrict the local endpoints Newt reports to Pangolin to these network interface names, e.g. [\"eth0\"] (LOCAL_ENDPOINT_INTERFACES). Clients on the same network use those addresses to connect directly. Empty reports every interface. Mostly useful with hostNetwork: true, where the pod sees all node interfaces. Requires Newt \u003e= 1.17.0.",
+                        "description": "Restrict the local endpoints Newt reports to Praxis to these network interface names, e.g. [\"eth0\"] (LOCAL_ENDPOINT_INTERFACES). Clients on the same network use those addresses to connect directly. Empty reports every interface. Mostly useful with hostNetwork: true, where the pod sees all node interfaces. Requires Newt \u003e= 1.17.0.",
                         "default": [],
                         "type": "array",
                         "items": {
@@ -1772,7 +1772,7 @@
                         "type": "string"
                     },
                     "noCloud": {
-                        "description": "Disable cloud connectivity (NO_CLOUD env). When enabled, Newt operates without connecting to Pangolin cloud.",
+                        "description": "Disable cloud connectivity (NO_CLOUD env). When enabled, Newt operates without connecting to Praxis cloud.",
                         "type": "boolean"
                     },
                     "nodeSelector": {
@@ -1780,7 +1780,7 @@
                         "type": "object"
                     },
                     "pangolinEndpoint": {
-                        "description": "Pangolin control-plane endpoint URL (e.g., https://pangolin.example.com)",
+                        "description": "Praxis control-plane endpoint URL (e.g., https://praxis.example.com)",
                         "type": "string",
                         "pattern": "^$|^https?://[a-zA-Z0-9.-]+(/.*)?$"
                     },
@@ -1855,7 +1855,7 @@
                         }
                     },
                     "secret": {
-                        "description": "Newt instance secret issued by Pangolin (must be set with pangolinEndpoint and id) - WARNING: Use auth.existingSecretName for production.",
+                        "description": "Newt instance secret issued by Praxis (must be set with pangolinEndpoint and id) - WARNING: Use auth.existingSecretName for production.",
                         "type": "string",
                         "pattern": "^$|^[a-zA-Z0-9_-]+$"
                     },

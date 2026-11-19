@@ -1,4 +1,4 @@
-suite: Pangolin 1.26 configuration surface
+suite: Praxis 1.26 configuration surface
 templates:
   - templates/configmap-pangolin.yaml
   - templates/configmap-controller.yaml

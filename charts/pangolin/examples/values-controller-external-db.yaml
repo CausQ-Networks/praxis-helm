@@ -4,7 +4,7 @@
 # Database:  database.mode=external
 #
 # Use this when you already have a PostgreSQL server (RDS, Cloud SQL, self-managed,
-# etc.) and you want Pangolin to connect to it.
+# etc.) and you want Praxis to connect to it.
 #
 # IMPORTANT: database.mode=external requires a database Secret source. Helm will fail
 # with PANGOLIN-061 if none of the options below is configured.
@@ -20,7 +20,7 @@
 #
 #   Create the Secret first:
 #     kubectl create secret generic pangolin-ext-db \
-#       --from-literal=connectionString="postgresql://pangolin:<REPLACE_WITH_ACTUAL_PASSWORD>@db.example.test:5432/pangolin?sslmode=require"
+#       --from-literal=connectionString="postgresql://praxis:<REPLACE_WITH_ACTUAL_PASSWORD>@db.example.test:5432/praxis?sslmode=require"
 #
 # Option B: Chart-managed Secret from a full connection string:
 #   database:
@@ -28,7 +28,7 @@
 #     external:
 #       generatedSecret:
 #         create: true
-#         connectionString: "postgresql://pangolin:<REPLACE_WITH_ACTUAL_PASSWORD>@db.example.test:5432/pangolin?sslmode=require"
+#         connectionString: "postgresql://praxis:<REPLACE_WITH_ACTUAL_PASSWORD>@db.example.test:5432/praxis?sslmode=require"
 #
 # Option C: Chart-managed Secret from individual connection parameters:
 #   database:
@@ -51,9 +51,9 @@
 #   2. Traefik installed in the cluster with CRDs
 #
 # Usage:
-#   helm install pangolin charts/pangolin \
+#   helm install praxis charts/praxis \
 #     -f examples/values-controller-external-db.yaml \
-#     --namespace pangolin --create-namespace
+#     --namespace praxis --create-namespace
 
 deployment:
   type: controller
@@ -66,7 +66,7 @@ deployment:
 database:
   mode: external
   # Reference the pre-existing Secret that holds the connection string.
-  # Pangolin will read POSTGRES_CONNECTION_STRING from this Secret.
+  # Praxis will read POSTGRES_CONNECTION_STRING from this Secret.
   connection:
     existingSecretName: pangolin-ext-db        # name of your pre-existing Secret
     existingSecretKey: connectionString         # key inside the Secret
@@ -78,14 +78,14 @@ cnpg-cluster:
   enabled: false
 
 # ---------------------------------------------------------------------------
-# Pangolin application settings
+# Praxis application settings
 # ---------------------------------------------------------------------------
 pangolin:
   replicaCount: 1
   config:
     app:
-      # REPLACE: set to the actual public URL of your Pangolin dashboard.
-      dashboard_url: "https://pangolin.yourdomain.example"
+      # REPLACE: set to the actual public URL of your Praxis dashboard.
+      dashboard_url: "https://praxis.yourdomain.example"
       log_level: info
     gerbil:
       # REPLACE: set to the hostname/IP where external WireGuard peers reach Gerbil.
@@ -114,8 +114,8 @@ gerbil:
 # ---------------------------------------------------------------------------
 networkPolicy:
   enabled: true
-  # Add the external DB endpoint as an egress CIDR so Pangolin can reach it.
-  # externalCIDRs only apply to Pangolin → DB egress rules.
+  # Add the external DB endpoint as an egress CIDR so Praxis can reach it.
+  # externalCIDRs only apply to Praxis → DB egress rules.
   database:
     enabled: true
     # externalCIDRs:

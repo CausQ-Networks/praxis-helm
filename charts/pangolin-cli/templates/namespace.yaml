@@ -6,11 +6,11 @@
 {{- $namespaces := dict -}}
 {{- range $idx, $inst := .Values.siteInstances }}
 {{- if $inst.enabled }}
-{{- $nsName := include "pangolin-cli.effectiveNamespace" (dict "root" $root "inst" $inst) -}}
-{{- $nsCreate := include "pangolin-cli.effectiveNamespaceCreate" (dict "root" $root "inst" $inst) -}}
+{{- $nsName := include "praxis-cli.effectiveNamespace" (dict "root" $root "inst" $inst) -}}
+{{- $nsCreate := include "praxis-cli.effectiveNamespaceCreate" (dict "root" $root "inst" $inst) -}}
 {{- if eq $nsCreate "true" }}
-{{- $instLabels := (include "pangolin-cli.effectiveNamespaceLabels" (dict "root" $root "inst" $inst "namespaceName" $nsName)) | fromJson -}}
-{{- $instPsa := (include "pangolin-cli.effectivePodSecurity" (dict "root" $root "inst" $inst)) | fromJson -}}
+{{- $instLabels := (include "praxis-cli.effectiveNamespaceLabels" (dict "root" $root "inst" $inst "namespaceName" $nsName)) | fromJson -}}
+{{- $instPsa := (include "praxis-cli.effectivePodSecurity" (dict "root" $root "inst" $inst)) | fromJson -}}
 {{- if hasKey $namespaces $nsName }}
 {{- $existing := get $namespaces $nsName -}}
 {{- $mergedLabels := mergeOverwrite (deepCopy (default (dict) $existing.labels)) (default (dict) $instLabels) -}}

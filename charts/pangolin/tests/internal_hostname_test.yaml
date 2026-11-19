@@ -8,7 +8,7 @@ tests:
   # only resolves when Traefik shares the namespace, which deployment.traefikNamespace
   # explicitly does not require - so Badger answered 404 for every request while the
   # Traefik dashboard still reported the router healthy.
-  - it: derives an in-cluster FQDN for the Pangolin internal API
+  - it: derives an in-cluster FQDN for the Praxis internal API
     set:
       database:
         mode: sqlite
@@ -84,7 +84,7 @@ tests:
           path: data.CONFIG_ENDPOINT
           value: http://RELEASE-NAME-pangolin.NAMESPACE.svc.cluster.local:3001/api/v1/traefik-config
 
-  # badger_override remains the escape hatch when Badger must reach Pangolin some
+  # badger_override remains the escape hatch when Badger must reach Praxis some
   # other way; it is emitted verbatim and does not disturb internal_hostname.
   - it: emits badger_override alongside the derived hostname
     set:
@@ -93,12 +93,12 @@ tests:
       pangolin:
         config:
           server:
-            badger_override: http://pangolin.other:3001/api/v1
+            badger_override: http://praxis.other:3001/api/v1
     template: templates/configmap-pangolin.yaml
     asserts:
       - matchRegex:
           path: data["config.yml"]
-          pattern: 'badger_override: "http://pangolin\.other:3001/api/v1"'
+          pattern: 'badger_override: "http://praxis\.other:3001/api/v1"'
       - matchRegex:
           path: data["config.yml"]
           pattern: 'internal_hostname: "RELEASE-NAME-pangolin\.NAMESPACE\.svc\.cluster\.local"'

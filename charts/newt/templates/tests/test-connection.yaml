@@ -97,19 +97,19 @@ spec:
                 echo "Service/$SVC type=$TYPE (external check skipped)"
               fi
 
-              # Pangolin endpoint reachability (best effort)
+              # Praxis endpoint reachability (best effort)
               ENDPOINT="{{ $inst.pangolinEndpoint }}"
               if [ -n "$ENDPOINT" ]; then
-                echo "Checking Pangolin endpoint reachability: $ENDPOINT"
+                echo "Checking Praxis endpoint reachability: $ENDPOINT"
                 if command -v curl >/dev/null 2>&1; then
-                  curl -skf --max-time 10 "$ENDPOINT" >/dev/null || { echo "Pangolin endpoint not reachable: $ENDPOINT" ; exit 1; }
+                  curl -skf --max-time 10 "$ENDPOINT" >/dev/null || { echo "Praxis endpoint not reachable: $ENDPOINT" ; exit 1; }
                 elif command -v wget >/dev/null 2>&1; then
-                  wget -q --spider "$ENDPOINT" || { echo "Pangolin endpoint not reachable: $ENDPOINT" ; exit 1; }
+                  wget -q --spider "$ENDPOINT" || { echo "Praxis endpoint not reachable: $ENDPOINT" ; exit 1; }
                 else
-                  echo "No curl/wget in test image; skipping Pangolin endpoint check"
+                  echo "No curl/wget in test image; skipping Praxis endpoint check"
                 fi
               else
-                echo "No inline Pangolin endpoint configured (likely using Secret); skipping endpoint check"
+                echo "No inline Praxis endpoint configured (likely using Secret); skipping endpoint check"
               fi
           resources:
             requests:

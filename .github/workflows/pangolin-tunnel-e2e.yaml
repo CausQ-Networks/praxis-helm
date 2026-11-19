@@ -1,4 +1,4 @@
-name: Pangolin tunnel data path
+name: Praxis tunnel data path
 
 # What this covers, and what it does not.
 #
@@ -8,7 +8,7 @@ name: Pangolin tunnel data path
 # input - the two ways a check like this passes without checking anything.
 #
 # The host-gateway job needs a cluster and is therefore label-gated. It verifies the parts
-# of the data path a cluster can confirm without a live Pangolin/Newt pair: that Gerbil
+# of the data path a cluster can confirm without a live Praxis/Newt pair: that Gerbil
 # really lands in the node network namespace, that the WireGuard route exists there, and
 # that Traefik is scheduled onto the same node.
 #
@@ -111,14 +111,14 @@ jobs:
           helm repo update
 
       - name: Build chart dependencies
-        run: helm dependency build charts/pangolin
+        run: helm dependency build charts/praxis
 
       - name: Install the chart in host gateway mode
         run: |
           set -euo pipefail
           kubectl create namespace pangolin-e2e
           kubectl label namespace pangolin-e2e pod-security.kubernetes.io/enforce=privileged --overwrite
-          helm install pangolin charts/pangolin \
+          helm install praxis charts/praxis \
             --namespace pangolin-e2e \
             -f .github/e2e/values-host-gateway.yaml \
             --wait --timeout 10m
@@ -126,7 +126,7 @@ jobs:
       - name: Gerbil must run in the node network namespace
         run: |
           set -euo pipefail
-          kubectl -n pangolin-e2e rollout status deploy/pangolin-gerbil --timeout=5m
+          kubectl -n pangolin-e2e rollout status deploy/praxis-gerbil --timeout=5m
           gerbil_pods=$(kubectl -n pangolin-e2e get pods -l app.kubernetes.io/component=gerbil \
             -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}')
           if [ -z "${gerbil_pods}" ]; then
@@ -142,7 +142,7 @@ jobs:
           dns_policy=$(kubectl -n pangolin-e2e get pods -l app.kubernetes.io/component=gerbil \
             -o jsonpath='{.items[0].spec.dnsPolicy}')
           if [ "$dns_policy" != "ClusterFirstWithHostNet" ]; then
-            echo "ERROR: dnsPolicy is '${dns_policy}'; Gerbil could not resolve the Pangolin Service"
+            echo "ERROR: dnsPolicy is '${dns_policy}'; Gerbil could not resolve the Praxis Service"
             exit 1
           fi
           echo "Gerbil: hostNetwork=true dnsPolicy=${dns_policy}"

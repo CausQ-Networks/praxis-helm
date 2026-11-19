@@ -1,11 +1,11 @@
-suite: standalone Traefik Pangolin wiring
+suite: standalone Traefik Praxis wiring
 templates:
   - templates/deployment-traefik.yaml
   - templates/deployment-single.yaml
   - templates/rbac-traefik.yaml
   - templates/networkpolicy.yaml
 tests:
-  - it: polls the generated configuration from Pangolin
+  - it: polls the generated configuration from Praxis
     template: templates/deployment-traefik.yaml
     set:
       deployment.type: standalone
@@ -25,9 +25,9 @@ tests:
           path: spec.template.spec.containers[0].args
           content: "--providers.http.pollinterval=5s"
 
-  # Pangolin hardcodes "badger" as both the middleware name and the plugin type, so the
+  # Praxis hardcodes "badger" as both the middleware name and the plugin type, so the
   # static alias has to match or every generated router fails with `unknown plugin type`.
-  - it: declares the Badger plugin under the alias Pangolin references
+  - it: declares the Badger plugin under the alias Praxis references
     template: templates/deployment-traefik.yaml
     set:
       deployment.type: standalone
@@ -42,7 +42,7 @@ tests:
     asserts:
       - contains:
           path: spec.template.spec.containers[0].args
-          content: "--experimental.plugins.badger.modulename=github.com/fosrl/badger"
+          content: "--experimental.plugins.badger.modulename=github.com/CausQ-Networks/praxis-badger"
       - contains:
           path: spec.template.spec.containers[0].args
           content: "--experimental.plugins.badger.version=v1.8.0"
@@ -83,7 +83,7 @@ tests:
     asserts:
       - notContains:
           path: spec.template.spec.containers[0].args
-          content: "--experimental.plugins.badger.modulename=github.com/fosrl/badger"
+          content: "--experimental.plugins.badger.modulename=github.com/CausQ-Networks/praxis-badger"
 
   - it: honours an explicit config endpoint
     template: templates/deployment-traefik.yaml
@@ -98,11 +98,11 @@ tests:
           dynamicRouters:
             host: pangolin.example.com
           httpProvider:
-            endpoint: http://pangolin.other.svc:3001/api/v1/traefik-config
+            endpoint: http://praxis.other.svc:3001/api/v1/traefik-config
     asserts:
       - contains:
           path: spec.template.spec.containers[0].args
-          content: "--providers.http.endpoint=http://pangolin.other.svc:3001/api/v1/traefik-config"
+          content: "--providers.http.endpoint=http://praxis.other.svc:3001/api/v1/traefik-config"
 
   - it: drops the HTTP provider when it is turned off
     template: templates/deployment-traefik.yaml
@@ -138,7 +138,7 @@ tests:
     asserts:
       - contains:
           path: spec.template.spec.containers[?(@.name=='traefik')].args
-          content: "--experimental.plugins.badger.modulename=github.com/fosrl/badger"
+          content: "--experimental.plugins.badger.modulename=github.com/CausQ-Networks/praxis-badger"
           any: true
 
   # --providers.kubernetescrd and --providers.kubernetesingress cannot read anything

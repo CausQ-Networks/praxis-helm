@@ -16,7 +16,7 @@ tests:
       - hasDocuments:
           count: 3
 
-  - it: pangolin PDB selects pangolin pods
+  - it: praxis PDB selects praxis pods
     set:
       highAvailability.podDisruptionBudget.enabled: true
     template: templates/pdb.yaml

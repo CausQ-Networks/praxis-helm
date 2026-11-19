@@ -5,7 +5,7 @@
 global:
   image:
     registry: "ghcr.io"
-    repository: "fosrl/newt"
+    repository: "causq-networks/praxis-newt"
     digest: "sha256:dc3a6ce4c290d36393a9db6662afd826260e3c8552b19359193a6b311988d3d2"
   logLevel: "DEBUG"
   metrics:
@@ -22,7 +22,7 @@ global:
 newtInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: https://pangolin.example.com
+    pangolinEndpoint: https://praxis.example.com
     id: test-id
     secret: test-secret
     # Minimal env map so `templates/configmap-env.yaml` can render

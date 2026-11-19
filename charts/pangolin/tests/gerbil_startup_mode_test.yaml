@@ -68,7 +68,7 @@ tests:
 
   - it: can disable Gerbil wait initContainer explicitly
     set:
-      gerbil.waitForPangolin.enabled: false
+      gerbil.waitForPraxis.enabled: false
     template: templates/deployment-gerbil.yaml
     asserts:
       - isNull:

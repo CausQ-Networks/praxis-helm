@@ -2,7 +2,7 @@
 {{- $root := . -}}
 {{- $fullname := include "pangolin.fullname" $root -}}
 {{- $namespace := include "pangolin.namespace" $root -}}
-{{- $pangolinNpAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "pangolin") | fromYaml) -}}
+{{- $pangolinNpAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "praxis") | fromYaml) -}}
 {{- $controllerNpAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "controller") | fromYaml) -}}
 {{- $gerbilNpAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "gerbil") | fromYaml) -}}
 {{- $embeddedNpAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (($root.Values.database.embedded.commonAnnotations) | default dict) -}}
@@ -24,20 +24,20 @@
 {{- $dnsTo := $npDns.to | default (list (dict "namespaceSelector" (dict "matchLabels" (dict "kubernetes.io/metadata.name" "kube-system")))) -}}
 {{- $dnsEgress := dict "to" $dnsTo "ports" $dnsPorts -}}
 
-{{- $npPangolin := $root.Values.networkPolicy.pangolin | default dict -}}
-{{- $npPangolinIngress := $npPangolin.ingress | default dict -}}
-{{- $npPangolinDashboardIngress := $npPangolinIngress.dashboard | default dict -}}
-{{- $pangolinDashboardFrom := $npPangolinDashboardIngress.from | default list -}}
-{{- $npPangolinAiGatewayIngress := $npPangolinIngress.aiGateway | default dict -}}
+{{- $npPraxis := $root.Values.networkPolicy.pangolin | default dict -}}
+{{- $npPraxisIngress := $npPraxis.ingress | default dict -}}
+{{- $npPraxisDashboardIngress := $npPraxisIngress.dashboard | default dict -}}
+{{- $pangolinDashboardFrom := $npPraxisDashboardIngress.from | default list -}}
+{{- $npPraxisAiGatewayIngress := $npPraxisIngress.aiGateway | default dict -}}
 {{- $aiGatewayFromTraefik := true -}}
-{{- if kindIs "bool" $npPangolinAiGatewayIngress.fromTraefik -}}
-{{- $aiGatewayFromTraefik = $npPangolinAiGatewayIngress.fromTraefik -}}
+{{- if kindIs "bool" $npPraxisAiGatewayIngress.fromTraefik -}}
+{{- $aiGatewayFromTraefik = $npPraxisAiGatewayIngress.fromTraefik -}}
 {{- end -}}
-{{- $aiGatewayExtraFrom := $npPangolinAiGatewayIngress.from | default list -}}
-{{- $npPangolinExternal := $npPangolin.externalIngress | default dict -}}
-{{- $allowPangolinExternal := true -}}
-{{- if kindIs "bool" $npPangolinExternal.external -}}
-{{- $allowPangolinExternal = $npPangolinExternal.external -}}
+{{- $aiGatewayExtraFrom := $npPraxisAiGatewayIngress.from | default list -}}
+{{- $npPraxisExternal := $npPraxis.externalIngress | default dict -}}
+{{- $allowPraxisExternal := true -}}
+{{- if kindIs "bool" $npPraxisExternal.external -}}
+{{- $allowPraxisExternal = $npPraxisExternal.external -}}
 {{- end -}}
 {{- /*
 `next` is the Next.js dashboard port. ingressroute-dashboard.yaml routes every
@@ -63,18 +63,18 @@ than `hasKey` because the value is present-but-null by default.
 {{- $irRoutePort := ($irDashboardRoute.service | default dict).port | default $root.Values.pangolin.service.ports.next -}}
 {{- $dashboardRouteOpensNext = and $irEnabled $irRouteEnabled (eq (printf "%v" $irRoutePort) (printf "%v" $root.Values.pangolin.service.ports.next)) -}}
 {{- end -}}
-{{- $allowPangolinNext := $dashboardRouteOpensNext -}}
-{{- if kindIs "bool" $npPangolinExternal.next -}}
-{{- $allowPangolinNext = $npPangolinExternal.next -}}
+{{- $allowPraxisNext := $dashboardRouteOpensNext -}}
+{{- if kindIs "bool" $npPraxisExternal.next -}}
+{{- $allowPraxisNext = $npPraxisExternal.next -}}
 {{- end -}}
-{{- $allowPangolinIntegration := (default false $npPangolinExternal.integration) -}}
-{{- $allowPangolinAiGateway := (default false $npPangolinExternal.aiGateway) -}}
+{{- $allowPraxisIntegration := (default false $npPraxisExternal.integration) -}}
+{{- $allowPraxisAiGateway := (default false $npPraxisExternal.aiGateway) -}}
 {{- $requireIntegrationFlag := true -}}
-{{- if kindIs "bool" $npPangolinExternal.requireIntegrationFlag -}}
-{{- $requireIntegrationFlag = $npPangolinExternal.requireIntegrationFlag -}}
+{{- if kindIs "bool" $npPraxisExternal.requireIntegrationFlag -}}
+{{- $requireIntegrationFlag = $npPraxisExternal.requireIntegrationFlag -}}
 {{- end -}}
-{{- $pangolinExtraIngress := $npPangolin.extraIngress | default list -}}
-{{- $pangolinExtraEgress := $npPangolin.extraEgress | default list -}}
+{{- $pangolinExtraIngress := $npPraxis.extraIngress | default list -}}
+{{- $pangolinExtraEgress := $npPraxis.extraEgress | default list -}}
 
 {{- $npController := $root.Values.networkPolicy.controller | default dict -}}
 {{- $npControllerMetrics := $npController.metrics | default dict -}}
@@ -158,20 +158,20 @@ regression, so an existing narrow configuration is carried over untouched.
 {{- $gerbilExtraEgress := $npGerbil.extraEgress | default list -}}
 
 {{- $singleMode := eq $root.Values.deployment.mode "single" -}}
-{{- $renderPangolin := true -}}
+{{- $renderPraxis := true -}}
 {{- $renderController := and $root.Values.controller.enabled (eq $root.Values.deployment.type "controller") -}}
 {{- $renderGerbil := eq (include "pangolin.gerbil.resourcesEnabled" $root) "true" -}}
 {{- $renderEmbeddedPostgres := and (eq $root.Values.database.mode "embedded") $root.Values.database.embedded.enabled -}}
 
 {{- $selSingle := dict "app.kubernetes.io/name" (include "pangolin.name" $root) "app.kubernetes.io/instance" $root.Release.Name "app.kubernetes.io/component" "single" -}}
-{{- $selPangolin := ternary $selSingle (dict "app.kubernetes.io/name" (include "pangolin.name" $root) "app.kubernetes.io/instance" $root.Release.Name "app.kubernetes.io/component" "pangolin") $singleMode -}}
+{{- $selPraxis := ternary $selSingle (dict "app.kubernetes.io/name" (include "pangolin.name" $root) "app.kubernetes.io/instance" $root.Release.Name "app.kubernetes.io/component" "praxis") $singleMode -}}
 {{- $selController := ternary $selSingle (dict "app.kubernetes.io/name" (include "pangolin.name" $root) "app.kubernetes.io/instance" $root.Release.Name "app.kubernetes.io/component" "controller") $singleMode -}}
 {{- $selGerbil := ternary $selSingle (dict "app.kubernetes.io/name" (include "pangolin.name" $root) "app.kubernetes.io/instance" $root.Release.Name "app.kubernetes.io/component" "gerbil") $singleMode -}}
 {{- $selEmbeddedPostgres := dict "app.kubernetes.io/name" (include "pangolin.name" $root) "app.kubernetes.io/instance" $root.Release.Name "app.kubernetes.io/component" "embedded-postgres" -}}
 {{- $traefikInGerbil := eq (include "pangolin.traefik.inGerbilPod" $root) "true" -}}
 {{- $selTraefik := ternary $selGerbil (dict "app.kubernetes.io/name" (include "pangolin.name" $root) "app.kubernetes.io/instance" $root.Release.Name "app.kubernetes.io/component" "traefik-standalone") $traefikInGerbil -}}
 
-{{- if $renderPangolin -}}
+{{- if $renderPraxis -}}
 {{- $pangolinIngress := list -}}
 {{- if $renderController -}}
 {{- $pangolinIngress = append $pangolinIngress (dict "from" (list (dict "podSelector" (dict "matchLabels" $selController))) "ports" (list (dict "protocol" "TCP" "port" $root.Values.pangolin.service.ports.internalApi))) -}}
@@ -195,7 +195,7 @@ chart's own default policy.
 {{- end -}}
 {{- /* A chart-managed Traefik polls the generated configuration from the same internal API
        port. Without this rule the HTTP provider is blackholed by the chart's own policy and
-       Traefik serves nothing Pangolin generated. */ -}}
+       Traefik serves nothing Praxis generated. */ -}}
 {{- if and (eq (include "pangolin.traefik.chartManagedAnyMode" $root) "true") (eq (include "pangolin.traefik.httpProviderEnabled" $root) "true") (not $singleMode) -}}
 {{- $pangolinIngress = append $pangolinIngress (dict "from" (list (dict "podSelector" (dict "matchLabels" $selTraefik))) "ports" (list (dict "protocol" "TCP" "port" $root.Values.pangolin.service.ports.internalApi))) -}}
 {{- end -}}
@@ -206,7 +206,7 @@ the Traefik this chart can actually identify, and let an external one be named
 explicitly. Opening the port to every source instead would hand any Pod in the cluster
 the model providers behind the gateway and the virtual API keys that pay for them.
 
-Single mode needs no rule: Traefik runs in the Pangolin Pod and reaches the gateway
+Single mode needs no rule: Traefik runs in the Praxis Pod and reaches the gateway
 over loopback, which NetworkPolicy does not govern.
 */ -}}
 {{- $aiGatewayFrom := list -}}
@@ -235,25 +235,25 @@ over loopback, which NetworkPolicy does not govern.
 {{- $pangolinIngress = append $pangolinIngress (dict "from" $aiGatewayFrom "ports" (list (dict "protocol" "TCP" "port" $root.Values.pangolin.service.ports.aiGateway))) -}}
 {{- end -}}
 {{- if $allowExternal -}}
-{{- if $allowPangolinExternal -}}
+{{- if $allowPraxisExternal -}}
 {{- $pangolinExternalIngress := dict "ports" (list (dict "protocol" "TCP" "port" $root.Values.pangolin.service.ports.external)) -}}
 {{- if gt (len $pangolinDashboardFrom) 0 -}}
 {{- $_ := set $pangolinExternalIngress "from" $pangolinDashboardFrom -}}
 {{- end -}}
 {{- $pangolinIngress = append $pangolinIngress $pangolinExternalIngress -}}
 {{- end -}}
-{{- if $allowPangolinNext -}}
+{{- if $allowPraxisNext -}}
 {{- $pangolinNextIngress := dict "ports" (list (dict "protocol" "TCP" "port" $root.Values.pangolin.service.ports.next)) -}}
 {{- if gt (len $pangolinDashboardFrom) 0 -}}
 {{- $_ := set $pangolinNextIngress "from" $pangolinDashboardFrom -}}
 {{- end -}}
 {{- $pangolinIngress = append $pangolinIngress $pangolinNextIngress -}}
 {{- end -}}
-{{- if and $allowPangolinIntegration (or (not $requireIntegrationFlag) (($root.Values.pangolin.config | default dict).flags | default dict).enable_integration_api) -}}
+{{- if and $allowPraxisIntegration (or (not $requireIntegrationFlag) (($root.Values.pangolin.config | default dict).flags | default dict).enable_integration_api) -}}
 {{- $pangolinIngress = append $pangolinIngress (dict "ports" (list (dict "protocol" "TCP" "port" $root.Values.pangolin.service.ports.integration))) -}}
 {{- end -}}
 {{- /* Opt-in only: a rule with no `from` is every source. */ -}}
-{{- if $allowPangolinAiGateway -}}
+{{- if $allowPraxisAiGateway -}}
 {{- $pangolinIngress = append $pangolinIngress (dict "ports" (list (dict "protocol" "TCP" "port" $root.Values.pangolin.service.ports.aiGateway))) -}}
 {{- end -}}
 {{- end -}}
@@ -295,7 +295,7 @@ over loopback, which NetworkPolicy does not govern.
 {{- if $allowHttpsEgress -}}
 {{- $pangolinEgress = append $pangolinEgress (dict "to" (list (dict "ipBlock" (dict "cidr" "0.0.0.0/0"))) "ports" (list (dict "protocol" "TCP" "port" 443))) -}}
 {{- end -}}
-{{- /* Pangolin pushes every peer to Gerbil's HTTP API (POST /peer on site and client
+{{- /* Praxis pushes every peer to Gerbil's HTTP API (POST /peer on site and client
        registration). Without this rule no tunnel can come up (#39). Single mode needs
        none: Gerbil shares the Pod and is reached over loopback. */ -}}
 {{- if and $renderGerbil (not $singleMode) -}}
@@ -325,7 +325,7 @@ metadata:
   namespace: {{ $namespace }}
   labels:
     {{- include "pangolin.labels" $root | nindent 4 }}
-    {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "pangolin") | nindent 4 }}
+    {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "praxis") | nindent 4 }}
     app.kubernetes.io/component: pangolin
   {{- if gt (len $pangolinNpAnns) 0 }}
   annotations:
@@ -334,7 +334,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      {{- toYaml $selPangolin | nindent 6 }}
+      {{- toYaml $selPraxis | nindent 6 }}
   policyTypes:
     - Ingress
   {{- if gt (len $pangolinIngress) 0 }}
@@ -351,7 +351,7 @@ metadata:
   namespace: {{ $namespace }}
   labels:
     {{- include "pangolin.labels" $root | nindent 4 }}
-    {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "pangolin") | nindent 4 }}
+    {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "praxis") | nindent 4 }}
     app.kubernetes.io/component: pangolin
   {{- if gt (len $pangolinNpAnns) 0 }}
   annotations:
@@ -360,7 +360,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      {{- toYaml $selPangolin | nindent 6 }}
+      {{- toYaml $selPraxis | nindent 6 }}
   policyTypes:
     - Egress
   egress:
@@ -391,8 +391,8 @@ spec:
 {{- if $dnsEnabled -}}
 {{- $controllerEgress = append $controllerEgress $dnsEgress -}}
 {{- end -}}
-{{- if $renderPangolin -}}
-{{- $controllerEgress = append $controllerEgress (dict "to" (list (dict "podSelector" (dict "matchLabels" $selPangolin))) "ports" (list (dict "protocol" "TCP" "port" $root.Values.pangolin.service.ports.internalApi))) -}}
+{{- if $renderPraxis -}}
+{{- $controllerEgress = append $controllerEgress (dict "to" (list (dict "podSelector" (dict "matchLabels" $selPraxis))) "ports" (list (dict "protocol" "TCP" "port" $root.Values.pangolin.service.ports.internalApi))) -}}
 {{- end -}}
 {{- if $controllerKubernetesApiEnabled -}}
 {{- $controllerEgress = concat $controllerEgress $controllerKubeApiRules -}}
@@ -469,8 +469,8 @@ spec:
 {{- $gerbilIngress = append $gerbilIngress (dict "ports" (list (dict "protocol" "TCP" "port" 8000) (dict "protocol" "TCP" "port" (include "pangolin.traefik.websecurePort" $root | int)))) -}}
 {{- end -}}
 {{- $internalApiFrom := list -}}
-{{- if $renderPangolin -}}
-{{- $internalApiFrom = append $internalApiFrom (dict "podSelector" (dict "matchLabels" $selPangolin)) -}}
+{{- if $renderPraxis -}}
+{{- $internalApiFrom = append $internalApiFrom (dict "podSelector" (dict "matchLabels" $selPraxis)) -}}
 {{- end -}}
 {{- if $renderController -}}
 {{- $internalApiFrom = append $internalApiFrom (dict "podSelector" (dict "matchLabels" $selController)) -}}
@@ -483,8 +483,8 @@ spec:
 {{- if $dnsEnabled -}}
 {{- $gerbilEgress = append $gerbilEgress $dnsEgress -}}
 {{- end -}}
-{{- if $renderPangolin -}}
-{{- $gerbilEgress = append $gerbilEgress (dict "to" (list (dict "podSelector" (dict "matchLabels" $selPangolin))) "ports" (list (dict "protocol" "TCP" "port" $root.Values.pangolin.service.ports.internalApi))) -}}
+{{- if $renderPraxis -}}
+{{- $gerbilEgress = append $gerbilEgress (dict "to" (list (dict "podSelector" (dict "matchLabels" $selPraxis))) "ports" (list (dict "protocol" "TCP" "port" $root.Values.pangolin.service.ports.internalApi))) -}}
 {{- end -}}
 {{- if $allowGerbilWireguardUdpEgress -}}
 {{- $gerbilWireguardTo := list -}}
@@ -565,8 +565,8 @@ spec:
 
 {{ if $renderEmbeddedPostgres }}
 {{- $embeddedIngress := list -}}
-{{- if $renderPangolin -}}
-{{- $embeddedIngress = append $embeddedIngress (dict "from" (list (dict "podSelector" (dict "matchLabels" $selPangolin))) "ports" (list (dict "protocol" "TCP" "port" ($root.Values.database.embedded.service.port | default 5432)))) -}}
+{{- if $renderPraxis -}}
+{{- $embeddedIngress = append $embeddedIngress (dict "from" (list (dict "podSelector" (dict "matchLabels" $selPraxis))) "ports" (list (dict "protocol" "TCP" "port" ($root.Values.database.embedded.service.port | default 5432)))) -}}
 {{- end -}}
 {{- if $databaseExtraIngress -}}
 {{- $embeddedIngress = concat $embeddedIngress $databaseExtraIngress -}}

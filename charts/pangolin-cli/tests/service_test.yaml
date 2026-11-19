@@ -14,7 +14,7 @@ tests:
       - isKind:
           of: Service
       - equal:
-          path: spec.selector["pangolin-cli.instance"]
+          path: spec.selector["praxis-cli.instance"]
           value: main-tunnel
       - equal:
           path: spec.ports[0].port
@@ -129,5 +129,5 @@ tests:
       - isKind:
           of: Service
       - equal:
-          path: spec.selector["pangolin-cli.instance"]
+          path: spec.selector["praxis-cli.instance"]
           value: accept-clients-service

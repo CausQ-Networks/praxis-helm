@@ -7,7 +7,7 @@ tests:
       siteInstances:
         - name: test-missing-prov-blueprint-data
           enabled: true
-          provisioningBlueprintFile: /etc/pangolin/provisioning-blueprint.yaml
+          provisioningBlueprintFile: /etc/praxis/provisioning-blueprint.yaml
     asserts:
       - failedTemplate:
           errorPattern: "provisioningBlueprintFile is set but provisioningBlueprintData is empty"
@@ -22,7 +22,7 @@ tests:
             enabled: true
             type: persistentVolumeClaim
             existingClaim: ""
-            mountPath: /var/lib/pangolin
+            mountPath: /var/lib/praxis
             fileName: config.json
     asserts:
       - failedTemplate:

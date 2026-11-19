@@ -12,7 +12,7 @@ tests:
   - it: derives host from dashboard_url and routes api/dashboard to expected ports and priorities
     set:
       deployment.type: controller
-      pangolin.config.app.dashboard_url: https://pangolin-e2e.cloud.mschaeferger.org
+      pangolin.config.app.dashboard_url: https://praxis-e2e.cloud.mschaeferger.org
       pangolin.service.ports.external: 3000
       pangolin.service.ports.next: 3002
     asserts:

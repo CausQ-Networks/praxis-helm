@@ -3,7 +3,7 @@
 # Topology: deployment.type=standalone + deployment.mode=single
 # Database:  database.mode=cloudnativepg
 #
-# This profile demonstrates single-mode standalone behavior where Pangolin +
+# This profile demonstrates single-mode standalone behavior where Praxis +
 # Gerbil + Traefik run in one Pod. It is convenient for labs, but less
 # fault-tolerant and less recommended for production than controller/multi mode.
 
@@ -40,7 +40,7 @@ cnpg-cluster:
 pangolin:
   config:
     app:
-      dashboard_url: "https://pangolin.yourdomain.example"
+      dashboard_url: "https://praxis.yourdomain.example"
     gerbil:
       base_endpoint: "vpn.yourdomain.example"
 

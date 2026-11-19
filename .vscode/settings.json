@@ -8,8 +8,8 @@
     "${workspaceFolder}/charts/newt/values.schema.json": [
       "charts/newt/values.yaml"
     ],
-    "${workspaceFolder}/charts/pangolin/values.schema.json": [
-      "charts/pangolin/values.yaml"
+    "${workspaceFolder}/charts/praxis/values.schema.json": [
+      "charts/praxis/values.yaml"
     ]
   }
 }

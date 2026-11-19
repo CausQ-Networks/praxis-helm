@@ -1,4 +1,4 @@
-# Values for the host gateway data-path check in .github/workflows/pangolin-tunnel-e2e.yaml.
+# Values for the host gateway data-path check in .github/workflows/praxis-tunnel-e2e.yaml.
 #
 # Standalone + multi so the chart renders its own Traefik and the co-location affinity is
 # actually exercised. SQLite keeps the install to a single workload with no database
@@ -24,7 +24,7 @@ namespace:
 pangolin:
   config:
     app:
-      dashboard_url: https://pangolin.example.test
+      dashboard_url: https://praxis.example.test
     domains:
       domain1:
         base_domain: example.test
@@ -38,7 +38,7 @@ gerbil:
   replicaCount: 1
   hostGateway:
     enabled: true
-  waitForPangolin:
+  waitForPraxis:
     enabled: false
   persistence:
     enabled: false

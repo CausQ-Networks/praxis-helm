@@ -17,7 +17,7 @@
 # the Gerbil Pod is rescheduled.
 #
 # Usage:
-#   helm install pangolin charts/pangolin \
+#   helm install praxis charts/praxis \
 #     -f examples/values-gerbil-loadbalancer.yaml \
 #     --namespace pangolin
 
@@ -48,14 +48,14 @@ cnpg-cluster:
   enabled: true
 
 # ---------------------------------------------------------------------------
-# Pangolin application settings
+# Praxis application settings
 # ---------------------------------------------------------------------------
 pangolin:
   replicaCount: 1
   config:
     app:
-      # REPLACE: set to the actual public URL of your Pangolin dashboard.
-      dashboard_url: "https://pangolin.yourdomain.example"
+      # REPLACE: set to the actual public URL of your Praxis dashboard.
+      dashboard_url: "https://praxis.yourdomain.example"
       log_level: info
     gerbil:
       # REPLACE: set to the external hostname/IP of the Gerbil LoadBalancer.

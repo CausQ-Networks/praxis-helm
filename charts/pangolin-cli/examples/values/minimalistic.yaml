@@ -2,7 +2,7 @@
 global:
   logLevel: DEBUG
   image:
-    repository: fosrl/pangolin-cli
+    repository: causq-networks/praxis-cli
     tag: latest
 siteInstances:
   - name: main-tunnel

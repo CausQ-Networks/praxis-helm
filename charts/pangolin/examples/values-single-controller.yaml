@@ -3,7 +3,7 @@
 # Topology: deployment.type=controller + deployment.mode=single
 # Database:  database.mode=cloudnativepg
 #
-# This profile demonstrates single-mode behavior where Pangolin + Gerbil +
+# This profile demonstrates single-mode behavior where Praxis + Gerbil +
 # pangolin-kube-controller run in one Pod. This is simpler, but less resilient
 # than multi mode and is generally not the preferred production topology.
 
@@ -40,7 +40,7 @@ cnpg-cluster:
 pangolin:
   config:
     app:
-      dashboard_url: "https://pangolin.yourdomain.example"
+      dashboard_url: "https://praxis.yourdomain.example"
     gerbil:
       base_endpoint: "vpn.yourdomain.example"
 

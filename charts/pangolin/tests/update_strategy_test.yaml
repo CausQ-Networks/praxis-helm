@@ -54,7 +54,7 @@ tests:
           path: spec.strategy.type
           value: RollingUpdate
 
-  - it: switches Pangolin to Recreate when the SQLite volume is ReadWriteOnce
+  - it: switches Praxis to Recreate when the SQLite volume is ReadWriteOnce
     template: templates/deployment-pangolin.yaml
     set:
       database:
@@ -69,7 +69,7 @@ tests:
       - notExists:
           path: spec.strategy.rollingUpdate
 
-  - it: leaves Pangolin on RollingUpdate when the SQLite volume is ReadWriteMany
+  - it: leaves Praxis on RollingUpdate when the SQLite volume is ReadWriteMany
     template: templates/deployment-pangolin.yaml
     set:
       database:
@@ -84,7 +84,7 @@ tests:
           path: spec.strategy.type
           value: RollingUpdate
 
-  - it: leaves Pangolin on RollingUpdate when SQLite is not persisted
+  - it: leaves Praxis on RollingUpdate when SQLite is not persisted
     template: templates/deployment-pangolin.yaml
     set:
       database:

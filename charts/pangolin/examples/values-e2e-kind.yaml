@@ -1,8 +1,8 @@
-# GitHub Actions install smoke-test values for the Pangolin chart.
+# GitHub Actions install smoke-test values for the Praxis chart.
 #
 # This file targets the deterministic kind-based install smoke test used by
-# `.github/workflows/pangolin-e2e.yaml`. Talos remains the preferred real-world
-# target for Pangolin, and a separate Talos-Docker workflow can be added later.
+# `.github/workflows/praxis-e2e.yaml`. Talos remains the preferred real-world
+# target for Praxis, and a separate Talos-Docker workflow can be added later.
 # This workflow intentionally avoids Talos VM-style testing on GitHub-hosted
 # runners.
 #
@@ -39,23 +39,23 @@ pangolin:
     stableSeconds: 30
   config:
     app:
-      dashboard_url: https://pangolin.example.test
+      dashboard_url: https://praxis.example.test
     gerbil:
       base_endpoint: gerbil.example.test
 
 controller:
-  waitForPangolin:
+  waitForPraxis:
     enabled: true
     stableSeconds: 30
   config:
     targetNamespace: pangolin-e2e
 
 gerbil:
-  # Fresh Pangolin installs can return "Exit node not found" to Gerbil until setup is completed.
+  # Fresh Praxis installs can return "Exit node not found" to Gerbil until setup is completed.
   # Keep Gerbil rendered but not started for smoke tests; enable later with:
-  # helm upgrade pangolin-e2e charts/pangolin -f charts/pangolin/examples/values-e2e-kind.yaml --namespace pangolin-e2e --set gerbil.startupMode=normal
+  # helm upgrade pangolin-e2e charts/praxis -f charts/praxis/examples/values-e2e-kind.yaml --namespace pangolin-e2e --set gerbil.startupMode=normal
   startupMode: delayed
-  waitForPangolin:
+  waitForPraxis:
     enabled: true
   service:
     type: ClusterIP

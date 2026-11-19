@@ -17,7 +17,7 @@
   {{- else -}}
     {{- range $i, $inst := (get $vals "siteInstances" | default list) -}}
       {{- if (get $inst "enabled") -}}
-        {{- $eff := (include "pangolin-cli.effectiveMetrics" (list $inst $gm)) | fromJson -}}
+        {{- $eff := (include "praxis-cli.effectiveMetrics" (list $inst $gm)) | fromJson -}}
         {{- $effPR := (get $eff "prometheusRule") | default dict -}}
         {{- if (get $effPR "enabled") -}}
           {{- $shouldPR = true -}}
@@ -32,14 +32,14 @@
 apiVersion: {{ (get $mPR "apiVersion") | default "monitoring.coreos.com/v1" }}
 kind: PrometheusRule
 metadata:
-  name: {{ include "pangolin-cli.fullname" . }}
+  name: {{ include "praxis-cli.fullname" . }}
   {{- with (get $mPR "namespace") }}
   {{- if . }}
   namespace: {{ . }}
   {{- end }}
   {{- end }}
   labels:
-    {{- include "pangolin-cli.labels" . | nindent 4 }}
+    {{- include "praxis-cli.labels" . | nindent 4 }}
     {{- with (get $mPR "labels") }}
     {{- toYaml . | nindent 4 }}
     {{- end }}

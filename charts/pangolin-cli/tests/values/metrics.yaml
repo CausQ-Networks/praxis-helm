@@ -1,4 +1,4 @@
-# Metrics values for pangolin-cli chart rendering
+# Metrics values for praxis-cli chart rendering
 # - Metrics enabled
 # - Metrics Service enabled
 # - ServiceMonitor enabled (PodMonitor disabled)

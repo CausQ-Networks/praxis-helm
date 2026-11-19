@@ -46,7 +46,7 @@ tests:
       - failedTemplate:
           errorMessage: "PANGOLIN-060: pangolin.config.gerbil.base_endpoint must be set (non-empty). For development/testing only, set database.mode=sqlite to bypass this validation."
 
-  - it: allows empty required pangolin config in sqlite dev/test mode
+  - it: allows empty required praxis config in sqlite dev/test mode
     set:
       database.mode: sqlite
       pangolin.config.app.dashboard_url: ""
@@ -320,7 +320,7 @@ tests:
       database:
         mode: sqlite
         sqlite:
-          path: data/pangolin.db
+          path: data/praxis.db
           persistence:
             enabled: true
     asserts:
@@ -332,7 +332,7 @@ tests:
       database:
         mode: sqlite
         sqlite:
-          path: /pangolin.db
+          path: /praxis.db
           persistence:
             enabled: true
     asserts:
@@ -344,13 +344,13 @@ tests:
       database:
         mode: sqlite
         sqlite:
-          path: /var/lib/pangolin/nested/deep/p.db
+          path: /var/lib/praxis/nested/deep/p.db
           persistence:
             enabled: true
     asserts:
       - notFailedTemplate: {}
 
-  - it: rejects more than one Pangolin replica on a persisted SQLite database
+  - it: rejects more than one Praxis replica on a persisted SQLite database
     set:
       database:
         mode: sqlite

@@ -1,4 +1,4 @@
-# Minimal values for pangolin-cli chart rendering
+# Minimal values for praxis-cli chart rendering
 # - One enabled instance using an existing Secret for credentials
 # - Metrics disabled by default
 # - No Services created (acceptClients=false or service.enabledWhenAcceptClients true but not accepting)

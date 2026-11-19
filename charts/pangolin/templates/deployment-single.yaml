@@ -12,8 +12,8 @@
 {{- $fullname := include "pangolin.fullname" . -}}
 {{- $namespace := include "pangolin.namespace" . -}}
 {{- $saName := include "pangolin.serviceAccountName.single" . -}}
-{{- $depMetaAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "pangolin") | fromYaml) ($pangolin.deployment.annotations | default dict) -}}
-{{- $podMetaAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) ($root.Values.global.additionalPodAnnotations | default dict) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "pangolin") | fromYaml) ($pangolin.deployment.podAnnotations | default dict) -}}
+{{- $depMetaAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "praxis") | fromYaml) ($pangolin.deployment.annotations | default dict) -}}
+{{- $podMetaAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) ($root.Values.global.additionalPodAnnotations | default dict) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "praxis") | fromYaml) ($pangolin.deployment.podAnnotations | default dict) -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -21,7 +21,7 @@ metadata:
   namespace: {{ $namespace }}
   labels:
     {{- include "pangolin.labels" $root | nindent 4 }}
-    {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "pangolin") | nindent 4 }}
+    {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "praxis") | nindent 4 }}
     {{- include "pangolin.renderNonSelectorLabels" (dict "labels" ($pangolin.deployment.labels | default dict)) | nindent 4 }}
     app.kubernetes.io/component: single
   {{- if gt (len $depMetaAnns) 0 }}
@@ -42,7 +42,7 @@ spec:
     metadata:
       labels:
         {{- include "pangolin.labels" $root | nindent 8 }}
-        {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "pangolin") | nindent 8 }}
+        {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "praxis") | nindent 8 }}
         {{- include "pangolin.renderNonSelectorLabels" (dict "labels" ($root.Values.global.additionalPodLabels | default dict)) | nindent 8 }}
         {{- include "pangolin.renderNonSelectorLabels" (dict "labels" ($pangolin.deployment.podLabels | default dict)) | nindent 8 }}
         app.kubernetes.io/component: single
@@ -327,7 +327,7 @@ spec:
           volumeMounts:
             {{- if $tlsEnabled }}
             - name: tls
-              mountPath: /etc/pangolin/tls
+              mountPath: /etc/praxis/tls
               readOnly: true
             {{- end }}
             - name: tmp

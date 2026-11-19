@@ -22,7 +22,7 @@
 {{- if hasKey $dashboardRoute "enabled" -}}
 {{- $dashboardEnabled = (get $dashboardRoute "enabled") -}}
 {{- end -}}
-{{- $metadataAnnotations := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "pangolin") | fromYaml) (mergeOverwrite (dict) (default (dict) (get $dashboardIngress "annotations"))) -}}
+{{- $metadataAnnotations := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "praxis") | fromYaml) (mergeOverwrite (dict) (default (dict) (get $dashboardIngress "annotations"))) -}}
 {{- $ingressClassName := trim (default "" (get $dashboardIngress "ingressClassName")) -}}
 {{- if $ingressClassName -}}
 {{- $_ := set $metadataAnnotations "kubernetes.io/ingress.class" $ingressClassName -}}
@@ -35,7 +35,7 @@ metadata:
   namespace: {{ default (include "pangolin.namespace" .) (get $dashboardIngress "namespace") }}
   labels:
     {{- include "pangolin.labels" $root | nindent 4 }}
-    {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "pangolin") | nindent 4 }}
+    {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "praxis") | nindent 4 }}
     {{- include "pangolin.renderNonSelectorLabels" (dict "labels" (default (dict) (get $dashboardIngress "labels"))) | nindent 4 }}
     {{- include "pangolin.renderNonSelectorLabels" (dict "labels" (default (dict) (get $dashboardIngress "traefikSelectorLabels"))) | nindent 4 }}
     app.kubernetes.io/component: dashboard-ingressroute

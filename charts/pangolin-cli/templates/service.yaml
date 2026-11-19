@@ -5,16 +5,16 @@
 {{- $enabledWhenAcceptClients := default false $svc.enabledWhenAcceptClients -}}
 {{- $svcEnabled := or $enabledByFlag (and $enabledWhenAcceptClients (default false $inst.acceptClients)) -}}
 {{- if and $inst.enabled $svcEnabled }}
-{{- $nsName := include "pangolin-cli.effectiveNamespace" (dict "root" $root "inst" $inst) }}
+{{- $nsName := include "praxis-cli.effectiveNamespace" (dict "root" $root "inst" $inst) }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}
+  name: {{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}
   namespace: {{ $nsName }}
   labels:
-    {{- include "pangolin-cli.labels" $root | nindent 4 }}
-    pangolin-cli.instance: {{ $inst.name }}
+    {{- include "praxis-cli.labels" $root | nindent 4 }}
+    praxis-cli.instance: {{ $inst.name }}
     {{- /* Global extra labels for external Services */}}
     {{- range $k,$v := $root.Values.global.additionalServiceLabels }}
     {{ $k }}: {{ $v | quote }}
@@ -61,9 +61,9 @@ spec:
   {{- end }}
   selector:
     app.kubernetes.io/instance: {{ $root.Release.Name }}
-    pangolin-cli.instance: {{ $inst.name }}
+    praxis-cli.instance: {{ $inst.name }}
   {{- /* Determine tester port enabled */ -}}
-  {{- $testerEnabled := (include "pangolin-cli.effectiveTestsEnabled" (dict "root" $root "inst" $inst)) | eq "true" -}}
+  {{- $testerEnabled := (include "praxis-cli.effectiveTestsEnabled" (dict "root" $root "inst" $inst)) | eq "true" -}}
   {{- /* Legacy: check testerPort for backward compatibility */ -}}
   {{- $testerPortVal := int (default 0 $svc.testerPort) -}}
   {{- if and (not $testerEnabled) (gt $testerPortVal 0) -}}

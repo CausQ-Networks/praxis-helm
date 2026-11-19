@@ -22,7 +22,7 @@ Namespace in examples below: `newt-ns`
     Example content for `newt-cred.env`:
 
     ```env
-    PANGOLIN_ENDPOINT=https://pangolin.yourdomain.com
+    PRAXIS_ENDPOINT=https://praxis.yourdomain.com
     NEWT_ID=yourNewtID
     NEWT_SECRET=yourSecretPassword
     ```
@@ -75,7 +75,7 @@ export NEWT_SECRET='<your-secret-here>'   # Set securely
 helm install newt fossorial/newt -n newt-ns --create-namespace \
   --set newtInstances[0].name=main \
   --set newtInstances[0].enabled=true \
-  --set newtInstances[0].pangolinEndpoint=https://pangolin.yourdomain.com \
+  --set newtInstances[0].pangolinEndpoint=https://praxis.yourdomain.com \
   --set newtInstances[0].id=XXXX \
   --set-string newtInstances[0].secret="$NEWT_SECRET"
 ```
@@ -90,7 +90,7 @@ Example `myvalues.yaml` (ephemeral persistence via emptyDir):
 newtInstances:
   - name: main
     enabled: true
-    pangolinEndpoint: https://pangolin.yourdomain.com
+    pangolinEndpoint: https://praxis.yourdomain.com
 
     provisioningKey: "YOUR_PROVISIONING_KEY"
     newtName: "my-site"

@@ -27,7 +27,7 @@ tests:
       - matchSnapshot:
           path: spec.template.spec.initContainers[0].securityContext
 
-  - it: wait-for-db initContainer uses same Secret/key as Pangolin container env
+  - it: wait-for-db initContainer uses same Secret/key as Praxis container env
     template: templates/deployment-pangolin.yaml
     set:
       database.mode: cloudnativepg

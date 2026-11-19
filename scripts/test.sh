@@ -142,7 +142,7 @@ run_helm_lint() {
   local chart="$1"
   log_info "Running helm lint on: $chart"
   local lint_args=()
-  # Not every chart ships a values.dev.yaml; charts/pangolin does not, and passing a
+  # Not every chart ships a values.dev.yaml; charts/praxis does not, and passing a
   # missing -f made lint fail before it ever rendered.
   if [ -f "$chart/values.dev.yaml" ]; then
     lint_args+=(-f "$chart/values.dev.yaml")
@@ -524,8 +524,8 @@ newtInstances:
           - alert: NewtDown
             expr: up == 0
 EOF
-  # The pangolin-cli chart names its instance list siteInstances.
-  if [ "$(basename "$chart")" = "pangolin-cli" ]; then
+  # The praxis-cli chart names its instance list siteInstances.
+  if [ "$(basename "$chart")" = "praxis-cli" ]; then
     sed -i.bak 's/^newtInstances:/siteInstances:/; s/newt-cred/site-cred/; s/NewtDown/SiteDown/' "$metrics_tmp/c-values.yaml"
   fi
   helm template test-c "$chart" -f "$metrics_tmp/c-values.yaml" > "$metrics_tmp/c.yaml" 2>/dev/null || true
@@ -619,7 +619,7 @@ main() {
     run_yamllint "$chart"
     run_matrix_render "$chart"
     
-    if [ "$RUN_METRICS" = "true" ] && { [ "$(basename "$chart")" = "newt" ] || [ "$(basename "$chart")" = "pangolin-cli" ]; }; then
+    if [ "$RUN_METRICS" = "true" ] && { [ "$(basename "$chart")" = "newt" ] || [ "$(basename "$chart")" = "praxis-cli" ]; }; then
       run_metrics_override_tests "$chart"
     fi
     

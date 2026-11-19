@@ -1,10 +1,10 @@
-suite: Pangolin to Gerbil API NetworkPolicy (#39)
+suite: Praxis to Gerbil API NetworkPolicy (#39)
 templates:
   - templates/networkpolicy.yaml
 tests:
-  # Pangolin registers every site and client peer with POST /peer on Gerbil's HTTP API.
+  # Praxis registers every site and client peer with POST /peer on Gerbil's HTTP API.
   # Without this egress rule no tunnel can come up under the chart's own policy.
-  - it: lets Pangolin reach the Gerbil API
+  - it: lets Praxis reach the Gerbil API
     set:
       networkPolicy:
         enabled: true

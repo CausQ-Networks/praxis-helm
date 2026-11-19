@@ -2,16 +2,16 @@
 {{- range $idx, $inst := .Values.siteInstances }}
 {{- $inst := $inst | default dict -}}
 {{- if and $inst.enabled $inst.blueprintFile }}
-{{- $nsName := include "pangolin-cli.effectiveNamespace" (dict "root" $root "inst" $inst) }}
+{{- $nsName := include "praxis-cli.effectiveNamespace" (dict "root" $root "inst" $inst) }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-blueprint
+  name: {{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-blueprint
   namespace: {{ $nsName }}
   labels:
-    {{- include "pangolin-cli.labels" $root | nindent 4 }}
-    pangolin-cli.instance: {{ $inst.name }}
+    {{- include "praxis-cli.labels" $root | nindent 4 }}
+    praxis-cli.instance: {{ $inst.name }}
   {{- with $root.Values.global.additionalAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

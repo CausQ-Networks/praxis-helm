@@ -1,9 +1,9 @@
-# E2E Test Values for Pangolin Helm Chart
+# E2E Test Values for Praxis Helm Chart
 #
 # Install:
-# helm dependency build charts/pangolin
-# helm install pangolin-e2e charts/pangolin \
-#   -f charts/pangolin/examples/values-e2e-cnpg.yaml \
+# helm dependency build charts/praxis
+# helm install pangolin-e2e charts/praxis \
+#   -f charts/praxis/examples/values-e2e-cnpg.yaml \
 #   --namespace pangolin-e2e \
 #   --wait \
 #   --timeout 10m
@@ -36,7 +36,7 @@ namespace:
 pangolin:
   config:
     app:
-      dashboard_url: "https://pangolin.example.com"
+      dashboard_url: "https://praxis.example.com"
       log_level: info
       save_logs: false
       log_failed_attempts: true

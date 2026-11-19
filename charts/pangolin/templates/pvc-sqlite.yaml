@@ -4,7 +4,7 @@
 {{- if and $persistence.enabled (not $persistence.existingClaim) }}
 {{- $root := . -}}
 {{- $storageClass := $persistence.storageClass | default $root.Values.global.storageClass -}}
-{{- $metaAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "pangolin") | fromYaml) ($persistence.annotations | default dict) -}}
+{{- $metaAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "praxis") | fromYaml) ($persistence.annotations | default dict) -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -12,7 +12,7 @@ metadata:
   namespace: {{ include "pangolin.namespace" $root }}
   labels:
     {{- include "pangolin.labels" $root | nindent 4 }}
-    {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "pangolin") | nindent 4 }}
+    {{- include "pangolin.component.commonLabels" (dict "root" $root "component" "praxis") | nindent 4 }}
     {{- include "pangolin.renderNonSelectorLabels" (dict "labels" ($persistence.labels | default dict)) | nindent 4 }}
     app.kubernetes.io/component: pangolin
   {{- if gt (len $metaAnns) 0 }}

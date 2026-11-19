@@ -7,7 +7,7 @@
 {{- $namespaces := dict -}}
 {{- range $idx, $inst := .Values.siteInstances }}
 {{- if $inst.enabled }}
-{{- $nsName := include "pangolin-cli.effectiveNamespace" (dict "root" $root "inst" $inst) -}}
+{{- $nsName := include "praxis-cli.effectiveNamespace" (dict "root" $root "inst" $inst) -}}
 {{- if not (hasKey $namespaces $nsName) }}
 {{- $_ := set $namespaces $nsName true -}}
 {{- end }}
@@ -19,9 +19,9 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "pangolin-cli.fullname" . }}
+  name: {{ include "praxis-cli.fullname" . }}
   labels:
-    {{- include "pangolin-cli.labels" . | nindent 4 }}
+    {{- include "praxis-cli.labels" . | nindent 4 }}
   {{- with .Values.rbac.labels }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -37,9 +37,9 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "pangolin-cli.fullname" . }}
+  name: {{ include "praxis-cli.fullname" . }}
   labels:
-    {{- include "pangolin-cli.labels" . | nindent 4 }}
+    {{- include "praxis-cli.labels" . | nindent 4 }}
   {{- with .Values.rbac.labels }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -49,12 +49,12 @@ metadata:
   {{- end }}
 subjects:
   - kind: ServiceAccount
-    name: {{ include "pangolin-cli.serviceAccountName" . }}
+    name: {{ include "praxis-cli.serviceAccountName" . }}
     namespace: {{ .Release.Namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "pangolin-cli.fullname" . }}
+  name: {{ include "praxis-cli.fullname" . }}
 {{- else }}
 {{- /* Role/RoleBinding - one per namespace */ -}}
 {{- range $nsName, $_ := $namespaces }}
@@ -62,10 +62,10 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ include "pangolin-cli.fullname" $root }}
+  name: {{ include "praxis-cli.fullname" $root }}
   namespace: {{ $nsName }}
   labels:
-    {{- include "pangolin-cli.labels" $root | nindent 4 }}
+    {{- include "praxis-cli.labels" $root | nindent 4 }}
   {{- with $root.Values.rbac.labels }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -81,10 +81,10 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ include "pangolin-cli.fullname" $root }}
+  name: {{ include "praxis-cli.fullname" $root }}
   namespace: {{ $nsName }}
   labels:
-    {{- include "pangolin-cli.labels" $root | nindent 4 }}
+    {{- include "praxis-cli.labels" $root | nindent 4 }}
   {{- with $root.Values.rbac.labels }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -94,12 +94,12 @@ metadata:
   {{- end }}
 subjects:
   - kind: ServiceAccount
-    name: {{ include "pangolin-cli.serviceAccountName" $root }}
+    name: {{ include "praxis-cli.serviceAccountName" $root }}
     namespace: {{ $nsName }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ include "pangolin-cli.fullname" $root }}
+  name: {{ include "praxis-cli.fullname" $root }}
 {{- end }}
 {{- end }}
 {{- end }}

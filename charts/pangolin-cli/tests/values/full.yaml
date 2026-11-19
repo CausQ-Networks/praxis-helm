@@ -1,4 +1,4 @@
-# Full values for pangolin-cli chart rendering (differs from defaults)
+# Full values for praxis-cli chart rendering (differs from defaults)
 # - Exercises extraEnv, up/down scripts, inline secret, mTLS, metrics service, client Service, NetworkPolicies
 
 global:

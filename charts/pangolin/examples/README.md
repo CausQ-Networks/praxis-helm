@@ -1,4 +1,4 @@
-# Pangolin chart example install profiles
+# Praxis chart example install profiles
 
 These values files are intended to be copy/pasteable starting points.
 
@@ -29,8 +29,8 @@ These values files are intended to be copy/pasteable starting points.
 From repository root:
 
 ```bash
-helm dependency build charts/pangolin
-helm install demo charts/pangolin --namespace pangolin-demo -f charts/pangolin/examples/values-controller-cnpg.yaml
+helm dependency build charts/praxis
+helm install demo charts/praxis --namespace pangolin-demo -f charts/praxis/examples/values-controller-cnpg.yaml
 ```
 
 Swap the values file for your scenario.  
@@ -48,7 +48,7 @@ If your selected values file does **not** set `namespace.create=true`, add `--cr
 - Gerbil requires `NET_ADMIN`; examples that set `namespace.create=true` include PSA labels with `enforce=privileged`.
 - E2E profile sets `gerbil.startupMode=delayed` to reduce first-run instability during deterministic CI/kind installs.
 - After first-run setup, switch Gerbil to normal startup:
-  `helm upgrade pangolin-e2e charts/pangolin -f charts/pangolin/examples/values-e2e-kind.yaml --namespace pangolin-e2e --set gerbil.startupMode=normal`
+  `helm upgrade pangolin-e2e charts/praxis -f charts/praxis/examples/values-e2e-kind.yaml --namespace pangolin-e2e --set gerbil.startupMode=normal`
 - Keep Gerbil persistence enabled unless you intentionally want ephemeral WireGuard keys (dev/CI only).
 
 ## Readiness checks
@@ -75,7 +75,7 @@ kubectl rollout status deployment/<release>-pangolin-gerbil -n <namespace> --tim
 CloudNativePG cluster path:
 
 ```bash
-kubectl wait --for=condition=Ready cluster.postgresql.cnpg.io/pangolin-db -n <namespace> --timeout=15m
+kubectl wait --for=condition=Ready cluster.postgresql.cnpg.io/praxis-db -n <namespace> --timeout=15m
 ```
 
 ## Uninstall
@@ -92,7 +92,7 @@ kubectl delete namespace <namespace>
 ## Host gateway mode
 
 `values-host-gateway.yaml` is the transitional workaround for
-[#20](https://github.com/fosrl/helm-charts/issues/20): Gerbil runs with `hostNetwork` so
+[#20](https://github.com/CausQ-Networks/praxis-helm/issues/20): Gerbil runs with `hostNetwork` so
 tunnel routes land in the node namespace, and Traefik is pinned to that node. Read the
 limitations at the top of the file before using it - notably that it only helps Pods on
 the Gerbil node and depends on your CNI masquerading Pod egress.

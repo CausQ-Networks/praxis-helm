@@ -4,17 +4,17 @@ templates:
 tests:
   - it: shows configured dashboard URL and setup token command
     set:
-      pangolin.config.app.dashboard_url: https://pangolin-e2e.cloud.mschaeferger.org
+      pangolin.config.app.dashboard_url: https://praxis-e2e.cloud.mschaeferger.org
     asserts:
       - matchRegex:
           path: raw
-          pattern: 'Pangolin dashboard URL:\n  https://pangolin-e2e\.cloud\.mschaeferger\.org'
+          pattern: 'Praxis dashboard URL:\n  https://praxis-e2e\.cloud\.mschaeferger\.org'
       - matchRegex:
           path: raw
-          pattern: 'kubectl logs -n [^ ]+ deploy/[^ ]+ -c pangolin \| sed -n ''/SETUP TOKEN GENERATED/,/================================/p'''
+          pattern: 'kubectl logs -n [^ ]+ deploy/[^ ]+ -c praxis \| sed -n ''/SETUP TOKEN GENERATED/,/================================/p'''
       - matchRegex:
           path: raw
-          pattern: 'kubectl logs -n [^ ]+ deploy/[^ ]+ -c pangolin \| grep -A2 "SETUP TOKEN GENERATED"'
+          pattern: 'kubectl logs -n [^ ]+ deploy/[^ ]+ -c praxis \| grep -A2 "SETUP TOKEN GENERATED"'
 
   - it: shows local port-forward fallback when dashboard URL is empty
     set:
@@ -46,7 +46,7 @@ tests:
     asserts:
       - matchRegex:
           path: raw
-          pattern: 'Nothing may reach the Pangolin AI gateway port \(3005\)\.'
+          pattern: 'Nothing may reach the Praxis AI gateway port \(3005\)\.'
       - matchRegex:
           path: raw
           pattern: 'networkPolicy\.pangolin\.ingress\.aiGateway\.from'
@@ -58,7 +58,7 @@ tests:
     asserts:
       - notMatchRegex:
           path: raw
-          pattern: 'Nothing may reach the Pangolin AI gateway port'
+          pattern: 'Nothing may reach the Praxis AI gateway port'
 
   - it: stays quiet when an external Traefik is named explicitly
     set:
@@ -70,4 +70,4 @@ tests:
     asserts:
       - notMatchRegex:
           path: raw
-          pattern: 'Nothing may reach the Pangolin AI gateway port'
+          pattern: 'Nothing may reach the Praxis AI gateway port'

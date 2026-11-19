@@ -2,21 +2,21 @@ apiVersion: v2
 version: 0.1.0
 appVersion: "0.20.0"
 kubeVersion: ">=1.30.14-0"
-name: pangolin-cli
-description: Helm chart to run Pangolin sites with the Pangolin CLI (fosrl/cli)
+name: praxis-cli
+description: Helm chart to run Praxis sites with the Praxis CLI (causq-networks/praxis-cli)
 type: application
 keywords:
   - pangolin
-  - pangolin-cli
+  - praxis-cli
   - site
   - vpn
   - wireguard
   - networking
 home: https://digpangolin.com/
-icon: https://raw.githubusercontent.com/fosrl/pangolin/refs/heads/main/public/logo/pangolin_orange.svg
+icon: https://raw.githubusercontent.com/causq-networks/praxis/refs/heads/main/public/logo/praxis_orange.svg
 sources:
-  - https://github.com/fosrl/helm-charts
-  - https://github.com/fosrl/cli
+  - https://github.com/CausQ-Networks/praxis-helm
+  - https://github.com/CausQ-Networks/praxis-cli
 maintainers:
   - name: Fossorial Inc
     email: contact@pangolin.net
@@ -24,18 +24,18 @@ annotations:
   artifacthub.io/category: networking
   artifacthub.io/changes: |
     - kind: added
-      description: "Initial release. Runs Pangolin sites with `pangolin-cli up site`, configured through SITE_* environment variables or CLI flags."
+      description: "Initial release. Runs Praxis sites with `praxis-cli up site`, configured through SITE_* environment variables or CLI flags."
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/images: |
-    - name: pangolin-cli-dockerhub
-      image: docker.io/fosrl/pangolin-cli:0.20.0
+    - name: praxis-cli-dockerhub
+      image: docker.io/causq-networks/praxis-cli:0.20.0
       whitelisted: false
       platforms:
         - linux/amd64
         - linux/arm64
         - linux/arm/v7
-    - name: pangolin-cli-ghcr
-      image: ghcr.io/fosrl/cli:0.20.0
+    - name: praxis-cli-ghcr
+      image: ghcr.io/causq-networks/praxis-cli:0.20.0
       whitelisted: false
       platforms:
         - linux/amd64
@@ -44,7 +44,7 @@ annotations:
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: support
-      url: https://github.com/fosrl/helm-charts/issues
+      url: https://github.com/CausQ-Networks/praxis-helm/issues
     - name: documentation
       url: https://docs.digpangolin.com/self-host/manual/kubernetes
   artifacthub.io/prerelease: "false"
@@ -74,5 +74,5 @@ annotations:
 #
 #
 # artifacthub.io/screenshots: |
-#   - title: Pangolin CLI
-#     url: https://raw.githubusercontent.com/fosrl/pangolin/refs/heads/main/public/logo/pangolin_orange.svg
+#   - title: Praxis CLI
+#     url: https://raw.githubusercontent.com/causq-networks/praxis/refs/heads/main/public/logo/praxis_orange.svg

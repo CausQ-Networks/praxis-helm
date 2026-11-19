@@ -9,9 +9,9 @@
 {{- $namespace := include "pangolin.namespace" . -}}
 {{- $saName := include "pangolin.serviceAccountName.gerbil" . -}}
 {{- $replicas := $gerbil.replicaCount | default 1 -}}
-{{- $gerbilWait := (include "pangolin.wait.config" (dict "root" $root "override" ($gerbil.waitForPangolin | default dict)) | fromYaml) | default dict -}}
+{{- $gerbilWait := (include "pangolin.wait.config" (dict "root" $root "override" ($gerbil.waitForPraxis | default dict)) | fromYaml) | default dict -}}
 {{- $gerbilWaitUserEnabled := ternary (index $gerbilWait "enabled") true (hasKey $gerbilWait "enabled") -}}
-{{- $gerbilWaitEndpoint := default (printf "http://%s:%v/api/v1/" (include "pangolin.fullname" $root) ($root.Values.pangolin.service.ports.internalApi | default 3001)) ($gerbil.waitForPangolin.endpoint | default "") -}}
+{{- $gerbilWaitEndpoint := default (printf "http://%s:%v/api/v1/" (include "pangolin.fullname" $root) ($root.Values.pangolin.service.ports.internalApi | default 3001)) ($gerbil.waitForPraxis.endpoint | default "") -}}
 {{- $depMetaAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "gerbil") | fromYaml) ($gerbil.deployment.annotations | default dict) -}}
 {{- $podMetaAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) ($root.Values.global.additionalPodAnnotations | default dict) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "gerbil") | fromYaml) ($gerbil.deployment.podAnnotations | default dict) -}}
 {{- if eq $startupMode "delayed" -}}
@@ -60,7 +60,7 @@ spec:
       # Host gateway mode: Gerbil creates wg0 and its connected route in the node network
       # namespace, so Pods scheduled onto this node can reach the tunnel subnet.
       # ClusterFirstWithHostNet is mandatory here - Gerbil still has to resolve the
-      # Pangolin Service for --remoteConfig.
+      # Praxis Service for --remoteConfig.
       hostNetwork: true
       dnsPolicy: {{ include "pangolin.gerbil.hostGateway.dnsPolicy" $root }}
       {{- end }}
@@ -108,18 +108,18 @@ spec:
               while [ "${elapsed}" -lt "${TIMEOUT_SECONDS}" ]; do
                 if curl -fsS --max-time 5 "${ENDPOINT}" >/dev/null 2>&1; then
                   stable=$((stable + INTERVAL_SECONDS))
-                  echo "Pangolin API ready for ${stable}/${STABLE_SECONDS}s"
+                  echo "Praxis API ready for ${stable}/${STABLE_SECONDS}s"
                   if [ "${stable}" -ge "${STABLE_SECONDS}" ]; then
                     exit 0
                   fi
                 else
                   stable=0
-                  echo "Pangolin API not ready yet"
+                  echo "Praxis API not ready yet"
                 fi
                 sleep "${INTERVAL_SECONDS}"
                 elapsed=$((elapsed + INTERVAL_SECONDS))
               done
-              echo "Timed out waiting for stable Pangolin API readiness"
+              echo "Timed out waiting for stable Praxis API readiness"
               exit 1
           securityContext:
             {{- toYaml (mergeOverwrite (dict "runAsNonRoot" true "runAsUser" 65534 "allowPrivilegeEscalation" false "readOnlyRootFilesystem" true "capabilities" (dict "drop" (list "ALL"))) ($gerbilWait.securityContext | default dict)) | nindent 12 }}

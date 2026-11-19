@@ -6,10 +6,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-provisioning-blueprint
+  name: {{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-provisioning-blueprint
   labels:
-    {{- include "pangolin-cli.labels" $root | nindent 4 }}
-    pangolin-cli.instance: {{ $inst.name }}
+    {{- include "praxis-cli.labels" $root | nindent 4 }}
+    praxis-cli.instance: {{ $inst.name }}
   {{- with $root.Values.global.additionalAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

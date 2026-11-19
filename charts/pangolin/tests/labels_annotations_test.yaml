@@ -15,7 +15,7 @@ tests:
         team: platform
       global.commonAnnotations:
         owner: sre
-      pangolin.config.app.dashboard_url: https://pangolin.example.com
+      pangolin.config.app.dashboard_url: https://praxis.example.com
     template: templates/service-pangolin.yaml
     asserts:
       - equal:
@@ -31,7 +31,7 @@ tests:
         team: platform
       global.commonAnnotations:
         owner: sre
-      pangolin.config.app.dashboard_url: https://pangolin.example.com
+      pangolin.config.app.dashboard_url: https://praxis.example.com
     template: templates/configmap-pangolin.yaml
     asserts:
       - equal:
@@ -103,7 +103,7 @@ tests:
           path: metadata.annotations.component-annotation
           value: gerbil-only
 
-  - it: does not leak gerbil component labels to pangolin resources
+  - it: does not leak gerbil component labels to praxis resources
     set:
       gerbil.commonLabels:
         component-scope: gerbil-only

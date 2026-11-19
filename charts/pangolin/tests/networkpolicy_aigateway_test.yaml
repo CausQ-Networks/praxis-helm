@@ -174,7 +174,7 @@ tests:
                 protocol: TCP
           any: true
 
-  # In single mode Traefik is a container in the Pangolin Pod and talks to the gateway
+  # In single mode Traefik is a container in the Praxis Pod and talks to the gateway
   # over loopback, which NetworkPolicy does not govern. A rule here would be noise.
   - it: renders no AI gateway rule in single mode
     set:

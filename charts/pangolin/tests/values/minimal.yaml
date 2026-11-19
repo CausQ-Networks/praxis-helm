@@ -1,4 +1,4 @@
-# Minimal test values for pangolin chart
+# Minimal test values for praxis chart
 deployment:
   type: controller
   mode: multi

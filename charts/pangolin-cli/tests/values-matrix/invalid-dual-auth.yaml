@@ -2,7 +2,7 @@
 siteInstances:
   - name: dual-auth
     enabled: true
-    pangolinEndpoint: https://pangolin.example.com
+    pangolinEndpoint: https://praxis.example.com
     id: my-id
     secret: inline-secret
     auth:

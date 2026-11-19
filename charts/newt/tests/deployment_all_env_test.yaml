@@ -2,7 +2,7 @@ suite: Newt all environment variables
 templates:
   - templates/deployment.yaml
 tests:
-  - it: renders PANGOLIN_ENDPOINT from existing secret
+  - it: renders PRAXIS_ENDPOINT from existing secret
     set:
       newtInstances:
         - name: test-env
@@ -15,7 +15,7 @@ tests:
           of: Deployment
       - equal:
           path: spec.template.spec.containers[0].env[0].name
-          value: PANGOLIN_ENDPOINT
+          value: PRAXIS_ENDPOINT
       - equal:
           path: spec.template.spec.containers[0].env[1].name
           value: NEWT_ID
@@ -28,7 +28,7 @@ tests:
       newtInstances:
         - name: test-inline
           enabled: true
-          pangolinEndpoint: https://pangolin.example.com
+          pangolinEndpoint: https://praxis.example.com
           id: my-id
           secret: my-secret
           extraEnv: {}
@@ -37,10 +37,10 @@ tests:
           of: Deployment
       - equal:
           path: spec.template.spec.containers[0].env[0].name
-          value: PANGOLIN_ENDPOINT
+          value: PRAXIS_ENDPOINT
       - equal:
           path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.key
-          value: PANGOLIN_ENDPOINT
+          value: PRAXIS_ENDPOINT
 
   - it: renders PORT when specified
     set:

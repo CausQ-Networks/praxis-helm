@@ -13,10 +13,10 @@ This file tracks chart versions, default app versions, and related defaults for 
 
 Sources:
 
-- [Newt chart source](https://github.com/fosrl/helm-charts/tree/main/charts/newt)
-- [Newt on Artifact Hub](https://artifacthub.io/packages/helm/fosrl/newt)
+- [Newt chart source](https://github.com/CausQ-Networks/praxis-helm/tree/main/charts/newt)
+- [Newt on Artifact Hub](https://artifacthub.io/packages/helm/causq-networks/praxis-newt)
 
-## Pangolin CLI (Site)
+## Praxis CLI (Site)
 
 | Item | Value |
 | --- | --- |
@@ -27,18 +27,18 @@ Sources:
 
 Sources:
 
-- [Pangolin CLI chart source](https://github.com/fosrl/helm-charts/tree/main/charts/pangolin-cli)
-- [Pangolin CLI on GitHub](https://github.com/fosrl/cli)
+- [Praxis CLI chart source](https://github.com/CausQ-Networks/praxis-helm/tree/main/charts/praxis-cli)
+- [Praxis CLI on GitHub](https://github.com/CausQ-Networks/praxis-cli)
 
-## Pangolin
+## Praxis
 
 | Item | Value |
 | --- | --- |
 | Chart version | `0.1.0` |
 | App version | `1.26.0` |
 | Kubernetes version | `>=1.30.14-0` |
-| Pangolin default image tag | `1.26.0` |
-| Pangolin PostgreSQL image tag | `postgresql-1.26.0` |
+| Praxis default image tag | `1.26.0` |
+| Praxis PostgreSQL image tag | `postgresql-1.26.0` |
 | pangolin-kube-controller tag | `0.1.0` |
 | Gerbil tag | `1.6.0` |
 | Traefik tag | `v3.7.19` |
@@ -51,15 +51,15 @@ is the chart-managed standalone Traefik; the bundled official Traefik chart
 
 Sources:
 
-- [Pangolin chart source](https://github.com/fosrl/helm-charts/tree/main/charts/pangolin)
-- [Pangolin on Artifact Hub](https://artifacthub.io/packages/helm/fosrl/pangolin)
+- [Praxis chart source](https://github.com/CausQ-Networks/praxis-helm/tree/main/charts/praxis)
+- [Praxis on Artifact Hub](https://artifacthub.io/packages/helm/causq-networks/praxis)
 
 ## Component compatibility
 
-Pangolin's components are released independently and carry hard minimum versions.
+Praxis's components are released independently and carry hard minimum versions.
 These are upstream requirements, not chart policy.
 
-| Pangolin | Newt | Gerbil | Badger | Notes |
+| Praxis | Newt | Gerbil | Badger | Notes |
 | --- | --- | --- | --- | --- |
 | `>= 1.19.0` | `>= 1.13.0` | — | `>= v1.4.1` | Browser-based RDP/SSH/VNC and the SSH resource type. |
 | `>= 1.22.0` | `>= 1.13.0` | `>= 1.5.0` | `>= v1.6.0` | AI gateway. Gerbil `1.5.0` is required only for **private** AI gateway resources. |
@@ -72,8 +72,8 @@ made here about why the tags were cut - the commit messages do not say.
 
 > [!IMPORTANT]
 > Badger is a Traefik plugin, so it is loaded by your Traefik installation rather than by
-> this chart. Upgrading Pangolin does not upgrade Badger — check its version in your
-> Traefik static configuration when moving to Pangolin `1.22`.
+> this chart. Upgrading Praxis does not upgrade Badger — check its version in your
+> Traefik static configuration when moving to Praxis `1.22`.
 
-Private AI gateway resources additionally require Pangolin clients released after
+Private AI gateway resources additionally require Praxis clients released after
 2026-08-19.

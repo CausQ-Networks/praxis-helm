@@ -86,7 +86,7 @@ Options:
   --set key=val            Additional Helm set (repeatable)
 
 Newt-specific (required for install/verify):
-  --secret-name NAME       Name of existing Secret holding PANGOLIN_ENDPOINT, NEWT_ID, NEWT_SECRET
+  --secret-name NAME       Name of existing Secret holding PRAXIS_ENDPOINT, NEWT_ID, NEWT_SECRET
   --instance-name NAME     Instance name (default: ${DEFAULT_INSTANCE_NAME})
 
 Hetzner LoadBalancer (required when accepting clients):

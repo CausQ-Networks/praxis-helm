@@ -1,7 +1,7 @@
 newtInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: https://pangolin.example.com
+    pangolinEndpoint: https://praxis.example.com
 
     provisioningKey: "YOUR_PROVISIONING_KEY"
     newtName: "my-site"

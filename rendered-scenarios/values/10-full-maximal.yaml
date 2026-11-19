@@ -4,7 +4,7 @@ global:
   image:
     digest: "sha256:0000000000000000000000000000000000000000000000000000000000000000"
     registry: "ghcr.io"
-    repository: "fosrl/newt"
+    repository: "causq-networks/praxis-newt"
     imagePullSecrets:
       - name: "pull-secret"
   logLevel: "DEBUG"

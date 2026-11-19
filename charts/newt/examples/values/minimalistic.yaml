@@ -2,7 +2,7 @@
 global:
   logLevel: DEBUG
   image:
-    repository: fosrl/newt
+    repository: causq-networks/praxis-newt
     tag: latest
 newtInstances:
   - name: main-tunnel

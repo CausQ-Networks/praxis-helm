@@ -92,7 +92,7 @@ tests:
       - isKind:
           of: Deployment
 
-  - it: pangolin deployment renders in multi mode
+  - it: praxis deployment renders in multi mode
     set:
       deployment.mode: multi
     template: templates/deployment-pangolin.yaml

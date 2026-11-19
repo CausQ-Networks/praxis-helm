@@ -13,7 +13,7 @@
 # dev/CI environments only.
 #
 # Usage:
-#   helm install pangolin charts/pangolin \
+#   helm install praxis charts/praxis \
 #     -f examples/values-controller-sqlite-dev.yaml \
 #     --namespace pangolin-dev
 
@@ -35,7 +35,7 @@ namespace:
 database:
   mode: sqlite
   sqlite:
-    path: /app/data/pangolin.db
+    path: /app/data/praxis.db
     persistence:
       # Enable persistence to survive Pod restarts in dev environments.
       # Leave disabled for ephemeral/CI use.
@@ -48,7 +48,7 @@ cnpg-cluster:
   enabled: false
 
 # ---------------------------------------------------------------------------
-# Pangolin – reduced resource limits for dev environments
+# Praxis – reduced resource limits for dev environments
 # ---------------------------------------------------------------------------
 pangolin:
   replicaCount: 1

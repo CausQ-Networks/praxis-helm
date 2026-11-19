@@ -7,7 +7,7 @@
 
 ![Version: 1.6.0](https://img.shields.io/badge/Version-1.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.20.0](https://img.shields.io/badge/AppVersion-1.20.0-informational?style=flat-square)
 
-Helm chart to deploy Newt (fosrl/newt) client instance
+Helm chart to deploy Newt (causq-networks/praxis-newt) client instance
 
 ## ✨ Features
 
@@ -30,7 +30,7 @@ Helm chart to deploy Newt (fosrl/newt) client instance
 - Kubernetes >= 1.30.14
 - Helm 3.x
 - kubectl >= v1.30.14
-- Newt Credentials from Pangolin
+- Newt Credentials from Praxis
 
 ## Quick Start
 
@@ -49,7 +49,7 @@ See [QUICKSTART-NEWT.md](../QUICKSTART-NEWT.md) for detailed instructions.
 newtInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: https://pangolin.example.com
+    pangolinEndpoint: https://praxis.example.com
     provisioningKey: "YOUR_PROVISIONING_KEY"
     newtName: "my-site"
 
@@ -67,7 +67,7 @@ newtInstances:
 newtInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: https://pangolin.example.com
+    pangolinEndpoint: https://praxis.example.com
     provisioningKey: "YOUR_PROVISIONING_KEY"
     newtName: "my-site"
 
@@ -85,7 +85,7 @@ newtInstances:
 newtInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: https://pangolin.example.com
+    pangolinEndpoint: https://praxis.example.com
     provisioningKey: "YOUR_PROVISIONING_KEY"
     newtName: "my-site"
 
@@ -126,12 +126,12 @@ global:
 | global.health | object | `{"enabled":false,"path":"/tmp/healthy","readinessFailureThreshold":3}` | --------------------------------------------------------------------------- |
 | global.health.path | string | `"/tmp/healthy"` | Health file path checked by probes |
 | global.health.readinessFailureThreshold | int | `3` | Readiness probe failure threshold |
-| global.image | object | `{"digest":"","imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"registry":"docker.io","repository":"fosrl/newt","tag":""}` | Global container image configuration used by all chart components. |
+| global.image | object | `{"digest":"","imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"registry":"docker.io","repository":"causq-networks/praxis-newt","tag":""}` | Global container image configuration used by all chart components. |
 | global.image.digest | string | `""` | Image digest (overrides tag when set). Format: sha256:<64-hex>. |
 | global.image.imagePullPolicy | string | `"IfNotPresent"` | Image pull policy. |
 | global.image.imagePullSecrets | list | `[]` | Image pull secrets (list of Kubernetes Secret references). Each entry should be an object like: { name: "my-secret" } |
 | global.image.registry | string | `"docker.io"` | Container image registry (e.g., docker.io, ghcr.io, registry.example.com). |
-| global.image.repository | string | `"fosrl/newt"` | Container image repository (e.g., fosrl/newt). |
+| global.image.repository | string | `"causq-networks/praxis-newt"` | Container image repository (e.g., causq-networks/praxis-newt). |
 | global.image.tag | string | `""` | Image tag (defaults to Chart.appVersion if empty). |
 | global.logLevel | string | `"INFO"` | Global log level |
 | global.metrics | object | `{"adminAddr":":2112","annotations":{},"asyncBytes":false,"enabled":false,"otel":{"exporterOtlpEndpoint":"","exporterOtlpHeaders":"","exporterOtlpProtocol":"","serviceName":""},"otlpEnabled":false,"path":"/metrics","podMonitor":{"annotations":{},"apiVersion":"monitoring.coreos.com/v1","enabled":false,"honorLabels":true,"interval":"30s","labels":{},"metricRelabelings":[],"namespace":"","path":"/metrics","portName":"metrics","relabelings":[],"scheme":"http","scrapeTimeout":"10s"},"port":9090,"portName":"metrics","pprofEnabled":false,"prometheusRule":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"labels":{},"namespace":"","rules":[]},"region":"","service":{"annotations":{},"enabled":false,"port":2112,"portName":"metrics","type":"ClusterIP"},"serviceMonitor":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"interval":"30s","jobLabel":"","labels":{},"metricRelabelings":[],"namespace":"","relabelings":[],"sampleLimit":0,"scheme":"http","scrapeTimeout":"10s","targetLabels":[]},"targetPortName":""}` | --------------------------------------------------------------------------- @section Global Metrics |
@@ -241,7 +241,7 @@ global:
 | namespace.podSecurity.audit | string | `""` | Pod Security Admission audit level. |
 | namespace.podSecurity.enforce | string | `""` | Pod Security Admission enforce level. |
 | namespace.podSecurity.warn | string | `""` | Pod Security Admission warn level. |
-| newtInstances | list | `[{"acceptClients":false,"affinity":{"nodeAffinity":{},"podAffinity":{},"podAntiAffinity":{}},"allowGlobalOverride":false,"auth":{"createSecret":true,"envVarsDirect":false,"existingSecretName":"","keys":{"endpointKey":"PANGOLIN_ENDPOINT","idKey":"NEWT_ID","secretKey":"NEWT_SECRET"}},"authDaemon":{"caCertPath":"","generateRandomPassword":false,"keySecretKey":"","keySecretName":"","principalsFile":""},"blueprintData":"","blueprintFile":"","configFile":"","configPersistence":{"enabled":false,"existingClaim":"","fileName":"config.json","mountPath":"/var/lib/newt","type":"emptyDir"},"disableClients":false,"disableSSH":false,"dns":"","dockerSocket":{"enabled":false,"enforceNetworkValidation":false,"path":"/var/run/docker.sock"},"enabled":true,"enforceHcCert":false,"extraContainers":[],"extraEnv":{},"extraVolumeMounts":[],"extraVolumes":[],"generateAndSaveKeyTo":"","healthFile":"/tmp/healthy","hostNetwork":false,"hostPID":false,"id":"","initContainers":[],"interface":"newt","interfaceMain":"newt","keepInterface":false,"lifecycle":{},"localEndpointInterfaces":[],"logLevel":"INFO","metrics":{"annotations":{},"enabled":false,"path":"/metrics","podMonitor":{"annotations":{},"apiVersion":"monitoring.coreos.com/v1","enabled":false,"honorLabels":true,"interval":"30s","labels":{},"metricRelabelings":[],"namespace":"","path":"/metrics","portName":"metrics","relabelings":[],"scheme":"http","scrapeTimeout":"10s"},"port":9090,"portName":"metrics","prometheusRule":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"labels":{},"namespace":"","rules":[]},"service":{"annotations":{},"enabled":false,"port":9090,"portName":"metrics","type":"ClusterIP"},"serviceMonitor":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"interval":"30s","jobLabel":"","labels":{},"metricRelabelings":[],"namespace":"","relabelings":[],"sampleLimit":0,"scheme":"http","scrapeTimeout":"10s","targetLabels":[]},"targetPortName":""},"mtls":{"certPath":"/certs/client.p12","enabled":false,"mode":"pkcs12","p12Base64":"","pem":{"caPath":"/certs/ca.crt","clientCertPath":"/certs/client.crt","clientKeyPath":"/certs/client.key","secretName":""},"secretName":""},"mtu":1280,"name":"main-tunnel","namespace":{"create":null,"labels":{},"name":"","podSecurity":{"audit":"","enforce":"","warn":""}},"networkPolicy":{"components":{"custom":{"egress":[],"enabled":false,"ingress":[],"policyTypes":["Ingress","Egress"]},"defaultApp":{"egress":[],"enabled":false,"ingress":[],"policyTypes":[]},"dns":{"egress":[],"enabled":false},"kubeApi":{"egress":[],"enabled":false}},"enabled":null,"includeRuleSets":[],"mode":"merge","useGlobalComponents":{"custom":true,"defaultApp":true,"dns":false,"kubeApi":false}},"newtName":"","noCloud":false,"nodeSelector":{},"pangolinEndpoint":"","pingInterval":"","pingTimeout":"","podDisruptionBudget":{},"podSecurityContext":{},"port":"","preferEndpoint":"","provisioningBlueprintData":"","provisioningBlueprintFile":"","provisioningKey":"","replicas":1,"resources":{},"secret":"","securityContext":{},"service":{"annotations":{},"enabled":true,"enabledWhenAcceptClients":true,"externalTrafficPolicy":"","labels":{},"loadBalancerClass":"","loadBalancerIP":"","loadBalancerSourceRanges":[],"nodePorts":{"tester":"","wg":""},"port":51820,"testerPort":51821,"type":"ClusterIP"},"serviceAccount":{"annotations":{},"automountServiceAccountToken":false,"create":null,"name":""},"tolerations":[],"topologySpreadConstraints":[],"udpProxyIdleTimeout":"","updown":{"enabled":false,"fileName":"updown.sh","mountPath":"/opt/newt/updown","script":""},"useCommandArgs":false,"useNativeInterface":false,"useNativeMainInterface":false}]` | List of Newt instances to deploy. Each instance can optionally override |
+| newtInstances | list | `[{"acceptClients":false,"affinity":{"nodeAffinity":{},"podAffinity":{},"podAntiAffinity":{}},"allowGlobalOverride":false,"auth":{"createSecret":true,"envVarsDirect":false,"existingSecretName":"","keys":{"endpointKey":"PRAXIS_ENDPOINT","idKey":"NEWT_ID","secretKey":"NEWT_SECRET"}},"authDaemon":{"caCertPath":"","generateRandomPassword":false,"keySecretKey":"","keySecretName":"","principalsFile":""},"blueprintData":"","blueprintFile":"","configFile":"","configPersistence":{"enabled":false,"existingClaim":"","fileName":"config.json","mountPath":"/var/lib/newt","type":"emptyDir"},"disableClients":false,"disableSSH":false,"dns":"","dockerSocket":{"enabled":false,"enforceNetworkValidation":false,"path":"/var/run/docker.sock"},"enabled":true,"enforceHcCert":false,"extraContainers":[],"extraEnv":{},"extraVolumeMounts":[],"extraVolumes":[],"generateAndSaveKeyTo":"","healthFile":"/tmp/healthy","hostNetwork":false,"hostPID":false,"id":"","initContainers":[],"interface":"newt","interfaceMain":"newt","keepInterface":false,"lifecycle":{},"localEndpointInterfaces":[],"logLevel":"INFO","metrics":{"annotations":{},"enabled":false,"path":"/metrics","podMonitor":{"annotations":{},"apiVersion":"monitoring.coreos.com/v1","enabled":false,"honorLabels":true,"interval":"30s","labels":{},"metricRelabelings":[],"namespace":"","path":"/metrics","portName":"metrics","relabelings":[],"scheme":"http","scrapeTimeout":"10s"},"port":9090,"portName":"metrics","prometheusRule":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"labels":{},"namespace":"","rules":[]},"service":{"annotations":{},"enabled":false,"port":9090,"portName":"metrics","type":"ClusterIP"},"serviceMonitor":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"interval":"30s","jobLabel":"","labels":{},"metricRelabelings":[],"namespace":"","relabelings":[],"sampleLimit":0,"scheme":"http","scrapeTimeout":"10s","targetLabels":[]},"targetPortName":""},"mtls":{"certPath":"/certs/client.p12","enabled":false,"mode":"pkcs12","p12Base64":"","pem":{"caPath":"/certs/ca.crt","clientCertPath":"/certs/client.crt","clientKeyPath":"/certs/client.key","secretName":""},"secretName":""},"mtu":1280,"name":"main-tunnel","namespace":{"create":null,"labels":{},"name":"","podSecurity":{"audit":"","enforce":"","warn":""}},"networkPolicy":{"components":{"custom":{"egress":[],"enabled":false,"ingress":[],"policyTypes":["Ingress","Egress"]},"defaultApp":{"egress":[],"enabled":false,"ingress":[],"policyTypes":[]},"dns":{"egress":[],"enabled":false},"kubeApi":{"egress":[],"enabled":false}},"enabled":null,"includeRuleSets":[],"mode":"merge","useGlobalComponents":{"custom":true,"defaultApp":true,"dns":false,"kubeApi":false}},"newtName":"","noCloud":false,"nodeSelector":{},"pangolinEndpoint":"","pingInterval":"","pingTimeout":"","podDisruptionBudget":{},"podSecurityContext":{},"port":"","preferEndpoint":"","provisioningBlueprintData":"","provisioningBlueprintFile":"","provisioningKey":"","replicas":1,"resources":{},"secret":"","securityContext":{},"service":{"annotations":{},"enabled":true,"enabledWhenAcceptClients":true,"externalTrafficPolicy":"","labels":{},"loadBalancerClass":"","loadBalancerIP":"","loadBalancerSourceRanges":[],"nodePorts":{"tester":"","wg":""},"port":51820,"testerPort":51821,"type":"ClusterIP"},"serviceAccount":{"annotations":{},"automountServiceAccountToken":false,"create":null,"name":""},"tolerations":[],"topologySpreadConstraints":[],"udpProxyIdleTimeout":"","updown":{"enabled":false,"fileName":"updown.sh","mountPath":"/opt/newt/updown","script":""},"useCommandArgs":false,"useNativeInterface":false,"useNativeMainInterface":false}]` | List of Newt instances to deploy. Each instance can optionally override |
 | newtInstances[0].acceptClients | bool | `false` | Gate the client Service and the automatic client ingress NetworkPolicy rule. This is a chart-side switch only: it no longer sets any Newt environment variable, because ACCEPT_CLIENTS was removed upstream in Newt 1.7.0 and replaced by DISABLE_CLIENTS. To actually refuse client connections set `disableClients: true`. |
 | newtInstances[0].affinity | object | `{"nodeAffinity":{},"podAffinity":{},"podAntiAffinity":{}}` | Pod affinity and anti-affinity |
 | newtInstances[0].affinity.nodeAffinity | object | `{}` | Node affinity rules |
@@ -251,8 +251,8 @@ global:
 | newtInstances[0].auth.createSecret | bool | `true` | Create a Secret from inline credentials (pangolinEndpoint/id/secret) when provided. Set false to disable secret creation from inline credentials. |
 | newtInstances[0].auth.envVarsDirect | bool | `false` | Inject inline credentials directly as env vars instead of Secret refs. Use only for local/dev testing because credentials are visible in rendered manifests. |
 | newtInstances[0].auth.existingSecretName | string | `""` | Name of an existing Secret containing endpoint/id/secret keys. The Secret must contain keys from auth.keys.endpointKey/auth.keys.idKey/auth.keys.secretKey. |
-| newtInstances[0].auth.keys | object | `{"endpointKey":"PANGOLIN_ENDPOINT","idKey":"NEWT_ID","secretKey":"NEWT_SECRET"}` | Key mappings used inside Secrets. IMPORTANT: auth.keys.* are key names, not credential values. |
-| newtInstances[0].auth.keys.endpointKey | string | `"PANGOLIN_ENDPOINT"` | Key name for the Pangolin endpoint (default: PANGOLIN_ENDPOINT) |
+| newtInstances[0].auth.keys | object | `{"endpointKey":"PRAXIS_ENDPOINT","idKey":"NEWT_ID","secretKey":"NEWT_SECRET"}` | Key mappings used inside Secrets. IMPORTANT: auth.keys.* are key names, not credential values. |
+| newtInstances[0].auth.keys.endpointKey | string | `"PRAXIS_ENDPOINT"` | Key name for the Praxis endpoint (default: PRAXIS_ENDPOINT) |
 | newtInstances[0].auth.keys.idKey | string | `"NEWT_ID"` | Key name for the Newt ID (default: NEWT_ID) |
 | newtInstances[0].auth.keys.secretKey | string | `"NEWT_SECRET"` | Key name for the Newt secret (default: NEWT_SECRET) |
 | newtInstances[0].authDaemon.caCertPath | string | `""` | Path to the SSH CA certificate (AD_CA_CERT_PATH). |
@@ -283,12 +283,12 @@ global:
 | newtInstances[0].healthFile | string | `"/tmp/healthy"` | Health file path used by liveness/readiness probes |
 | newtInstances[0].hostNetwork | bool | `false` | Enable host networking (useful with native mode) |
 | newtInstances[0].hostPID | bool | `false` | Enable sharing host PID namespace (rarely needed) |
-| newtInstances[0].id | string | `""` | Newt instance ID issued by Pangolin (must be set with pangolinEndpoint and secret) |
+| newtInstances[0].id | string | `""` | Newt instance ID issued by Praxis (must be set with pangolinEndpoint and secret) |
 | newtInstances[0].initContainers | list | `[]` | Additional init containers to add to the pod |
 | newtInstances[0].interface | string | `"newt"` | WireGuard interface name in the pod |
 | newtInstances[0].interfaceMain | string | `"newt"` | Name of the native main WireGuard interface (INTERFACE_MAIN). Requires Newt >= 1.14.0. |
 | newtInstances[0].lifecycle | object | `{}` | Container lifecycle hooks (e.g., preStop for graceful WireGuard shutdown) |
-| newtInstances[0].localEndpointInterfaces | list | `[]` | Restrict the local endpoints Newt reports to Pangolin to these network interface names, e.g. ["eth0"] (LOCAL_ENDPOINT_INTERFACES). Clients on the same network use those addresses to connect directly. Empty reports every interface. Mostly useful with hostNetwork: true, where the pod sees all node interfaces. Requires Newt >= 1.17.0. |
+| newtInstances[0].localEndpointInterfaces | list | `[]` | Restrict the local endpoints Newt reports to Praxis to these network interface names, e.g. ["eth0"] (LOCAL_ENDPOINT_INTERFACES). Clients on the same network use those addresses to connect directly. Empty reports every interface. Mostly useful with hostNetwork: true, where the pod sees all node interfaces. Requires Newt >= 1.17.0. |
 | newtInstances[0].logLevel | string | `"INFO"` | Per-instance log level (falls back to global.logLevel when empty) |
 | newtInstances[0].metrics.annotations | object | `{}` | Override or add custom metrics annotations |
 | newtInstances[0].metrics.enabled | bool | `false` | Enable Prometheus metrics |
@@ -361,9 +361,9 @@ global:
 | newtInstances[0].networkPolicy.useGlobalComponents.dns | bool | `false` | Include global dns component (if enabled globally). |
 | newtInstances[0].networkPolicy.useGlobalComponents.kubeApi | bool | `false` | Include global kubeApi component (if enabled globally). |
 | newtInstances[0].newtName | string | `""` | Provisioning site name (NEWT_NAME env). Use newtName to avoid colliding with newtInstances[].name (instance identifier). |
-| newtInstances[0].noCloud | bool | `false` | Disable cloud connectivity (NO_CLOUD env). When enabled, Newt operates without connecting to Pangolin cloud. |
+| newtInstances[0].noCloud | bool | `false` | Disable cloud connectivity (NO_CLOUD env). When enabled, Newt operates without connecting to Praxis cloud. |
 | newtInstances[0].nodeSelector | object | `{}` | Node selection constraints |
-| newtInstances[0].pangolinEndpoint | string | `""` | Pangolin control-plane endpoint URL (e.g., https://pangolin.example.com) |
+| newtInstances[0].pangolinEndpoint | string | `""` | Praxis control-plane endpoint URL (e.g., https://praxis.example.com) |
 | newtInstances[0].pingInterval | string | `""` | Optional ping interval (e.g., "3s"). Leave empty to use default NOTE: Newt 1.11.0 changed upstream default ping timings. If you rely on the legacy 1.10.1 behavior, set pingInterval/pingTimeout explicitly. |
 | newtInstances[0].pingTimeout | string | `""` | Optional ping timeout (e.g., "5s"). Leave empty to use default |
 | newtInstances[0].podDisruptionBudget | object | `{}` | Pod Disruption Budget override for this instance |
@@ -375,7 +375,7 @@ global:
 | newtInstances[0].provisioningKey | string | `""` | Provisioning key (NEWT_PROVISIONING_KEY env). When set, Newt can bootstrap credentials and persist them to CONFIG_FILE. |
 | newtInstances[0].replicas | int | `1` | Number of replicas for this instance (default: 1) |
 | newtInstances[0].resources | object | `{}` | Per-instance resource requests/limits. Overrides `global.resources` whenever it is non-empty, independently of `allowGlobalOverride`. Empty by default so the chart imposes no sizing; see `global.resources` for an example. |
-| newtInstances[0].secret | string | `""` | Newt instance secret issued by Pangolin (must be set with pangolinEndpoint and id) - WARNING: Use auth.existingSecretName for production. |
+| newtInstances[0].secret | string | `""` | Newt instance secret issued by Praxis (must be set with pangolinEndpoint and id) - WARNING: Use auth.existingSecretName for production. |
 | newtInstances[0].securityContext | object | `{}` | Container-level securityContext override SECURITY NOTE: By default Newt runs as non-root. Newt runs as root with privileges only when global.nativeMode.enabled=true AND the instance sets useNativeInterface or useNativeMainInterface. IMPORTANT: Do NOT set capabilities.drop when running as root - this is invalid. |
 | newtInstances[0].service.annotations | object | `{}` | Service annotations |
 | newtInstances[0].service.enabled | bool | `true` | Create a Service for this instance |

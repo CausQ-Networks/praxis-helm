@@ -3,19 +3,19 @@
 <!-- markdownlint-disable MD056 -->
 <!-- markdownlint-disable MD060 -->
 
-# Pangolin CLI Helm Chart
+# Praxis CLI Helm Chart
 
 ![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.20.0](https://img.shields.io/badge/AppVersion-0.20.0-informational?style=flat-square)
 
-Helm chart to run Pangolin sites with the Pangolin CLI (fosrl/cli)
+Helm chart to run Praxis sites with the Praxis CLI (causq-networks/praxis-cli)
 
-Each entry in `siteInstances` becomes a Deployment running `pangolin-cli up site`,
-which connects a Pangolin site from inside the cluster.
+Each entry in `siteInstances` becomes a Deployment running `praxis-cli up site`,
+which connects a Praxis site from inside the cluster.
 
 ## How the site is configured
 
-- Image: `docker.io/fosrl/pangolin-cli` (also published as `ghcr.io/fosrl/cli`).
-- Command: the container always runs `pangolin-cli up site`. The image entrypoint is
+- Image: `docker.io/causq-networks/praxis-cli` (also published as `ghcr.io/causq-networks/praxis-cli`).
+- Command: the container always runs `praxis-cli up site`. The image entrypoint is
   not used, because it calls `update-ca-certificates` and exits as the chart's default
   non-root user on a read-only root filesystem.
 - Settings are passed as environment variables by default, or as command-line flags with
@@ -23,10 +23,10 @@ which connects a Pangolin site from inside the cluster.
   `SITE_SECRET`, `SITE_PROVISIONING_KEY`, `SITE_NAME`, `SITE_UDP_PROXY_IDLE_TIMEOUT`,
   `SITE_METRICS_PROMETHEUS_ENABLED`, `SITE_METRICS_OTLP_ENABLED`,
   `SITE_METRICS_ASYNC_BYTES`, `SITE_ADMIN_ADDR`, `SITE_REGION`, `SITE_PPROF_ENABLED`).
-  The rest (`PANGOLIN_ENDPOINT`, `LOG_LEVEL`, `MTU`, ...) have no prefix.
-- Credentials come from a Secret with the keys `PANGOLIN_ENDPOINT`, `SITE_ID` and
+  The rest (`PRAXIS_ENDPOINT`, `LOG_LEVEL`, `MTU`, ...) have no prefix.
+- Credentials come from a Secret with the keys `PRAXIS_ENDPOINT`, `SITE_ID` and
   `SITE_SECRET`. Use `auth.keys` if your Secret names them differently.
-- Pods carry `app.kubernetes.io/component: site` and `pangolin-cli.instance: <name>`,
+- Pods carry `app.kubernetes.io/component: site` and `praxis-cli.instance: <name>`,
   and the container is named `site`.
 
 ## ✨ Features
@@ -50,7 +50,7 @@ which connects a Pangolin site from inside the cluster.
 - Kubernetes >= 1.30.14
 - Helm 3.x
 - kubectl >= v1.30.14
-- Site credentials (ID and secret) or a provisioning key from Pangolin
+- Site credentials (ID and secret) or a provisioning key from Praxis
 
 ## Quick Start
 
@@ -58,18 +58,18 @@ which connects a Pangolin site from inside the cluster.
 helm repo add fossorial https://charts.fossorial.io
 helm repo update fossorial
 
-kubectl create secret generic pangolin-site \
-  --from-literal=PANGOLIN_ENDPOINT=https://pangolin.example.com \
+kubectl create secret generic praxis-site \
+  --from-literal=PRAXIS_ENDPOINT=https://praxis.example.com \
   --from-literal=SITE_ID=<site-id> \
   --from-literal=SITE_SECRET=<site-secret>
 
-helm install my-site fossorial/pangolin-cli \
+helm install my-site fossorial/praxis-cli \
   --set siteInstances[0].name=main-tunnel \
   --set siteInstances[0].enabled=true \
-  --set siteInstances[0].auth.existingSecretName=pangolin-site
+  --set siteInstances[0].auth.existingSecretName=praxis-site
 ```
 
-Replace the `<site-id>` and `<site-secret>` placeholders with the credentials Pangolin
+Replace the `<site-id>` and `<site-secret>` placeholders with the credentials Praxis
 shows when you create the site. To have the site created for you instead, use a
 provisioning key as in the examples below.
 
@@ -81,7 +81,7 @@ provisioning key as in the examples below.
 siteInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: https://pangolin.example.com
+    pangolinEndpoint: https://praxis.example.com
     provisioningKey: "YOUR_PROVISIONING_KEY"
     siteName: "my-site"
 
@@ -89,7 +89,7 @@ siteInstances:
     configPersistence:
       enabled: true
       type: emptyDir
-      mountPath: /var/lib/pangolin
+      mountPath: /var/lib/praxis
       fileName: config.json
 ```
 
@@ -99,7 +99,7 @@ siteInstances:
 siteInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: https://pangolin.example.com
+    pangolinEndpoint: https://praxis.example.com
     provisioningKey: "YOUR_PROVISIONING_KEY"
     siteName: "my-site"
 
@@ -107,7 +107,7 @@ siteInstances:
       enabled: true
       type: persistentVolumeClaim
       existingClaim: my-site-config
-      mountPath: /var/lib/pangolin
+      mountPath: /var/lib/praxis
       fileName: config.json
 ```
 
@@ -117,7 +117,7 @@ siteInstances:
 siteInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: https://pangolin.example.com
+    pangolinEndpoint: https://praxis.example.com
     provisioningKey: "YOUR_PROVISIONING_KEY"
     siteName: "my-site"
 
@@ -125,7 +125,7 @@ siteInstances:
       enabled: true
       type: emptyDir
 
-    provisioningBlueprintFile: /etc/pangolin/provisioning-blueprint.yaml
+    provisioningBlueprintFile: /etc/praxis/provisioning-blueprint.yaml
     provisioningBlueprintData: |
       version: 1
       routes: []
@@ -158,12 +158,12 @@ global:
 | global.health | object | `{"enabled":false,"path":"/tmp/healthy","readinessFailureThreshold":3}` | --------------------------------------------------------------------------- |
 | global.health.path | string | `"/tmp/healthy"` | Health file path checked by probes |
 | global.health.readinessFailureThreshold | int | `3` | Readiness probe failure threshold |
-| global.image | object | `{"digest":"","imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"registry":"docker.io","repository":"fosrl/pangolin-cli","tag":""}` | Global container image configuration used by all chart components. |
+| global.image | object | `{"digest":"","imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"registry":"docker.io","repository":"causq-networks/praxis-cli","tag":""}` | Global container image configuration used by all chart components. |
 | global.image.digest | string | `""` | Image digest (overrides tag when set). Format: sha256:<64-hex>. |
 | global.image.imagePullPolicy | string | `"IfNotPresent"` | Image pull policy. |
 | global.image.imagePullSecrets | list | `[]` | Image pull secrets (list of Kubernetes Secret references). Each entry should be an object like: { name: "my-secret" } |
 | global.image.registry | string | `"docker.io"` | Container image registry (e.g., docker.io, ghcr.io, registry.example.com). |
-| global.image.repository | string | `"fosrl/pangolin-cli"` | Container image repository (e.g., fosrl/pangolin-cli). |
+| global.image.repository | string | `"causq-networks/praxis-cli"` | Container image repository (e.g., causq-networks/praxis-cli). |
 | global.image.tag | string | `""` | Image tag (defaults to Chart.appVersion if empty). |
 | global.logLevel | string | `"INFO"` | Global log level |
 | global.metrics | object | `{"adminAddr":":2112","annotations":{},"asyncBytes":false,"enabled":false,"otel":{"exporterOtlpEndpoint":"","exporterOtlpHeaders":"","exporterOtlpProtocol":"","serviceName":""},"otlpEnabled":false,"path":"/metrics","podMonitor":{"annotations":{},"apiVersion":"monitoring.coreos.com/v1","enabled":false,"honorLabels":true,"interval":"30s","labels":{},"metricRelabelings":[],"namespace":"","path":"/metrics","portName":"metrics","relabelings":[],"scheme":"http","scrapeTimeout":"10s"},"port":9090,"portName":"metrics","pprofEnabled":false,"prometheusRule":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"labels":{},"namespace":"","rules":[]},"region":"","service":{"annotations":{},"enabled":false,"port":2112,"portName":"metrics","type":"ClusterIP"},"serviceMonitor":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"interval":"30s","jobLabel":"","labels":{},"metricRelabelings":[],"namespace":"","relabelings":[],"sampleLimit":0,"scheme":"http","scrapeTimeout":"10s","targetLabels":[]},"targetPortName":""}` | --------------------------------------------------------------------------- @section Global Metrics |
@@ -283,7 +283,7 @@ global:
 | serviceAccount.automountServiceAccountToken | bool | `false` | Control automounting of the ServiceAccount token on Pods. |
 | serviceAccount.create | bool | `true` | Create a dedicated ServiceAccount for this release. |
 | serviceAccount.name | string | `""` | ServiceAccount name. If empty and create=true, the chart generates a name. If create=false and empty, the "default" ServiceAccount is used. |
-| siteInstances | list | `[{"acceptClients":false,"affinity":{"nodeAffinity":{},"podAffinity":{},"podAntiAffinity":{}},"allowGlobalOverride":false,"auth":{"createSecret":true,"envVarsDirect":false,"existingSecretName":"","keys":{"endpointKey":"PANGOLIN_ENDPOINT","idKey":"SITE_ID","secretKey":"SITE_SECRET"}},"authDaemon":{"caCertPath":"","generateRandomPassword":false,"keySecretKey":"","keySecretName":"","principalsFile":""},"blueprintData":"","blueprintFile":"","configFile":"","configPersistence":{"enabled":false,"existingClaim":"","fileName":"config.json","mountPath":"/var/lib/pangolin","type":"emptyDir"},"disableClients":false,"disableSSH":false,"dns":"","dockerSocket":{"enabled":false,"enforceNetworkValidation":false,"path":"/var/run/docker.sock"},"enabled":true,"enforceHcCert":false,"extraContainers":[],"extraEnv":{},"extraVolumeMounts":[],"extraVolumes":[],"healthFile":"/tmp/healthy","hostNetwork":false,"hostPID":false,"id":"","initContainers":[],"interface":"pangolin","interfaceMain":"pangolin","lifecycle":{},"localEndpointInterfaces":[],"logLevel":"INFO","metrics":{"annotations":{},"enabled":false,"path":"/metrics","podMonitor":{"annotations":{},"apiVersion":"monitoring.coreos.com/v1","enabled":false,"honorLabels":true,"interval":"30s","labels":{},"metricRelabelings":[],"namespace":"","path":"/metrics","portName":"metrics","relabelings":[],"scheme":"http","scrapeTimeout":"10s"},"port":9090,"portName":"metrics","prometheusRule":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"labels":{},"namespace":"","rules":[]},"service":{"annotations":{},"enabled":false,"port":9090,"portName":"metrics","type":"ClusterIP"},"serviceMonitor":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"interval":"30s","jobLabel":"","labels":{},"metricRelabelings":[],"namespace":"","relabelings":[],"sampleLimit":0,"scheme":"http","scrapeTimeout":"10s","targetLabels":[]},"targetPortName":""},"mtls":{"certPath":"/certs/client.p12","enabled":false,"mode":"pkcs12","p12Base64":"","pem":{"caPath":"/certs/ca.crt","clientCertPath":"/certs/client.crt","clientKeyPath":"/certs/client.key","secretName":""},"secretName":""},"mtu":1280,"name":"main-tunnel","namespace":{"create":null,"labels":{},"name":"","podSecurity":{"audit":"","enforce":"","warn":""}},"networkPolicy":{"components":{"custom":{"egress":[],"enabled":false,"ingress":[],"policyTypes":["Ingress","Egress"]},"defaultApp":{"egress":[],"enabled":false,"ingress":[],"policyTypes":[]},"dns":{"egress":[],"enabled":false},"kubeApi":{"egress":[],"enabled":false}},"enabled":null,"includeRuleSets":[],"mode":"merge","useGlobalComponents":{"custom":true,"defaultApp":true,"dns":false,"kubeApi":false}},"noCloud":false,"nodeSelector":{},"pangolinEndpoint":"","pingInterval":"","pingTimeout":"","podDisruptionBudget":{},"podSecurityContext":{},"port":"","preferEndpoint":"","provisioningBlueprintData":"","provisioningBlueprintFile":"","provisioningKey":"","replicas":1,"resources":{},"secret":"","securityContext":{},"service":{"annotations":{},"enabled":true,"enabledWhenAcceptClients":true,"externalTrafficPolicy":"","labels":{},"loadBalancerClass":"","loadBalancerIP":"","loadBalancerSourceRanges":[],"nodePorts":{"tester":"","wg":""},"port":51820,"testerPort":51821,"type":"ClusterIP"},"serviceAccount":{"annotations":{},"automountServiceAccountToken":false,"create":null,"name":""},"siteName":"","tolerations":[],"topologySpreadConstraints":[],"udpProxyIdleTimeout":"","updown":{"enabled":false,"fileName":"updown.sh","mountPath":"/opt/pangolin/updown","script":""},"useCommandArgs":false,"useNativeInterface":false,"useNativeMainInterface":false}]` | List of site tunnel instances (pangolin-cli up site) to deploy. Each instance can optionally override |
+| siteInstances | list | `[{"acceptClients":false,"affinity":{"nodeAffinity":{},"podAffinity":{},"podAntiAffinity":{}},"allowGlobalOverride":false,"auth":{"createSecret":true,"envVarsDirect":false,"existingSecretName":"","keys":{"endpointKey":"PRAXIS_ENDPOINT","idKey":"SITE_ID","secretKey":"SITE_SECRET"}},"authDaemon":{"caCertPath":"","generateRandomPassword":false,"keySecretKey":"","keySecretName":"","principalsFile":""},"blueprintData":"","blueprintFile":"","configFile":"","configPersistence":{"enabled":false,"existingClaim":"","fileName":"config.json","mountPath":"/var/lib/praxis","type":"emptyDir"},"disableClients":false,"disableSSH":false,"dns":"","dockerSocket":{"enabled":false,"enforceNetworkValidation":false,"path":"/var/run/docker.sock"},"enabled":true,"enforceHcCert":false,"extraContainers":[],"extraEnv":{},"extraVolumeMounts":[],"extraVolumes":[],"healthFile":"/tmp/healthy","hostNetwork":false,"hostPID":false,"id":"","initContainers":[],"interface":"praxis","interfaceMain":"praxis","lifecycle":{},"localEndpointInterfaces":[],"logLevel":"INFO","metrics":{"annotations":{},"enabled":false,"path":"/metrics","podMonitor":{"annotations":{},"apiVersion":"monitoring.coreos.com/v1","enabled":false,"honorLabels":true,"interval":"30s","labels":{},"metricRelabelings":[],"namespace":"","path":"/metrics","portName":"metrics","relabelings":[],"scheme":"http","scrapeTimeout":"10s"},"port":9090,"portName":"metrics","prometheusRule":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"labels":{},"namespace":"","rules":[]},"service":{"annotations":{},"enabled":false,"port":9090,"portName":"metrics","type":"ClusterIP"},"serviceMonitor":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"interval":"30s","jobLabel":"","labels":{},"metricRelabelings":[],"namespace":"","relabelings":[],"sampleLimit":0,"scheme":"http","scrapeTimeout":"10s","targetLabels":[]},"targetPortName":""},"mtls":{"certPath":"/certs/client.p12","enabled":false,"mode":"pkcs12","p12Base64":"","pem":{"caPath":"/certs/ca.crt","clientCertPath":"/certs/client.crt","clientKeyPath":"/certs/client.key","secretName":""},"secretName":""},"mtu":1280,"name":"main-tunnel","namespace":{"create":null,"labels":{},"name":"","podSecurity":{"audit":"","enforce":"","warn":""}},"networkPolicy":{"components":{"custom":{"egress":[],"enabled":false,"ingress":[],"policyTypes":["Ingress","Egress"]},"defaultApp":{"egress":[],"enabled":false,"ingress":[],"policyTypes":[]},"dns":{"egress":[],"enabled":false},"kubeApi":{"egress":[],"enabled":false}},"enabled":null,"includeRuleSets":[],"mode":"merge","useGlobalComponents":{"custom":true,"defaultApp":true,"dns":false,"kubeApi":false}},"noCloud":false,"nodeSelector":{},"pangolinEndpoint":"","pingInterval":"","pingTimeout":"","podDisruptionBudget":{},"podSecurityContext":{},"port":"","preferEndpoint":"","provisioningBlueprintData":"","provisioningBlueprintFile":"","provisioningKey":"","replicas":1,"resources":{},"secret":"","securityContext":{},"service":{"annotations":{},"enabled":true,"enabledWhenAcceptClients":true,"externalTrafficPolicy":"","labels":{},"loadBalancerClass":"","loadBalancerIP":"","loadBalancerSourceRanges":[],"nodePorts":{"tester":"","wg":""},"port":51820,"testerPort":51821,"type":"ClusterIP"},"serviceAccount":{"annotations":{},"automountServiceAccountToken":false,"create":null,"name":""},"siteName":"","tolerations":[],"topologySpreadConstraints":[],"udpProxyIdleTimeout":"","updown":{"enabled":false,"fileName":"updown.sh","mountPath":"/opt/praxis/updown","script":""},"useCommandArgs":false,"useNativeInterface":false,"useNativeMainInterface":false}]` | List of site tunnel instances (praxis-cli up site) to deploy. Each instance can optionally override |
 | siteInstances[0].acceptClients | bool | `false` | Gate the client Service and the automatic client ingress NetworkPolicy rule. This is a chart-side switch only and sets no environment variable or flag. To refuse client connections set `disableClients: true`. |
 | siteInstances[0].affinity | object | `{"nodeAffinity":{},"podAffinity":{},"podAntiAffinity":{}}` | Pod affinity and anti-affinity |
 | siteInstances[0].affinity.nodeAffinity | object | `{}` | Node affinity rules |
@@ -293,8 +293,8 @@ global:
 | siteInstances[0].auth.createSecret | bool | `true` | Create a Secret from inline credentials (pangolinEndpoint/id/secret) when provided. Set false to disable secret creation from inline credentials. |
 | siteInstances[0].auth.envVarsDirect | bool | `false` | Inject inline credentials directly as env vars instead of Secret refs. Use only for local/dev testing because credentials are visible in rendered manifests. |
 | siteInstances[0].auth.existingSecretName | string | `""` | Name of an existing Secret containing endpoint/id/secret keys. The Secret must contain keys from auth.keys.endpointKey/auth.keys.idKey/auth.keys.secretKey. |
-| siteInstances[0].auth.keys | object | `{"endpointKey":"PANGOLIN_ENDPOINT","idKey":"SITE_ID","secretKey":"SITE_SECRET"}` | Key mappings used inside Secrets. IMPORTANT: auth.keys.* are key names, not credential values. |
-| siteInstances[0].auth.keys.endpointKey | string | `"PANGOLIN_ENDPOINT"` | Key name for the Pangolin endpoint (default: PANGOLIN_ENDPOINT) |
+| siteInstances[0].auth.keys | object | `{"endpointKey":"PRAXIS_ENDPOINT","idKey":"SITE_ID","secretKey":"SITE_SECRET"}` | Key mappings used inside Secrets. IMPORTANT: auth.keys.* are key names, not credential values. |
+| siteInstances[0].auth.keys.endpointKey | string | `"PRAXIS_ENDPOINT"` | Key name for the Praxis endpoint (default: PRAXIS_ENDPOINT) |
 | siteInstances[0].auth.keys.idKey | string | `"SITE_ID"` | Key name for the site ID (default: SITE_ID) |
 | siteInstances[0].auth.keys.secretKey | string | `"SITE_SECRET"` | Key name for the site secret (default: SITE_SECRET) |
 | siteInstances[0].authDaemon.caCertPath | string | `""` | Path to the SSH CA certificate (AD_CA_CERT_PATH). |
@@ -305,11 +305,11 @@ global:
 | siteInstances[0].blueprintData | string | `""` | Blueprint file content (inline). When provided, creates a ConfigMap with this content. Use this for simple inline blueprints, or leave empty to reference an existing ConfigMap. |
 | siteInstances[0].blueprintFile | string | `""` | Blueprint file path (BLUEPRINT_FILE env). Path to a site blueprint configuration file. |
 | siteInstances[0].configFile | string | `""` | Optional config file path for the site (CONFIG_FILE env) |
-| siteInstances[0].configPersistence | object | `{"enabled":false,"existingClaim":"","fileName":"config.json","mountPath":"/var/lib/pangolin","type":"emptyDir"}` | Writable config persistence (recommended for provisioning-based installs). When enabled, the chart mounts writable storage at mountPath and auto-sets CONFIG_FILE to mountPath/fileName. This does not remove support for the legacy `configFile` value. |
+| siteInstances[0].configPersistence | object | `{"enabled":false,"existingClaim":"","fileName":"config.json","mountPath":"/var/lib/praxis","type":"emptyDir"}` | Writable config persistence (recommended for provisioning-based installs). When enabled, the chart mounts writable storage at mountPath and auto-sets CONFIG_FILE to mountPath/fileName. This does not remove support for the legacy `configFile` value. |
 | siteInstances[0].configPersistence.enabled | bool | `false` | Enable writable config persistence. |
 | siteInstances[0].configPersistence.existingClaim | string | `""` | Existing PVC name when type=persistentVolumeClaim. |
 | siteInstances[0].configPersistence.fileName | string | `"config.json"` | File name inside mountPath for the persisted config. |
-| siteInstances[0].configPersistence.mountPath | string | `"/var/lib/pangolin"` | Directory mount path for config persistence. |
+| siteInstances[0].configPersistence.mountPath | string | `"/var/lib/praxis"` | Directory mount path for config persistence. |
 | siteInstances[0].configPersistence.type | string | `"emptyDir"` | Storage type. Use emptyDir for ephemeral persistence or persistentVolumeClaim for durable persistence. |
 | siteInstances[0].disableClients | bool | `false` | Disable client connections (DISABLE_CLIENTS env). When enabled, the site does not accept incoming client connections. |
 | siteInstances[0].disableSSH | bool | `false` | Disable the site's built-in SSH server (DISABLE_SSH). It is on by default. |
@@ -325,12 +325,12 @@ global:
 | siteInstances[0].healthFile | string | `"/tmp/healthy"` | Health file path used by liveness/readiness probes |
 | siteInstances[0].hostNetwork | bool | `false` | Enable host networking (useful with native mode) |
 | siteInstances[0].hostPID | bool | `false` | Enable sharing host PID namespace (rarely needed) |
-| siteInstances[0].id | string | `""` | Site ID issued by Pangolin (must be set with pangolinEndpoint and secret) |
+| siteInstances[0].id | string | `""` | Site ID issued by Praxis (must be set with pangolinEndpoint and secret) |
 | siteInstances[0].initContainers | list | `[]` | Additional init containers to add to the pod |
-| siteInstances[0].interface | string | `"pangolin"` | WireGuard interface name in the pod |
-| siteInstances[0].interfaceMain | string | `"pangolin"` | Name of the native main WireGuard interface (INTERFACE_MAIN). |
+| siteInstances[0].interface | string | `"praxis"` | WireGuard interface name in the pod |
+| siteInstances[0].interfaceMain | string | `"praxis"` | Name of the native main WireGuard interface (INTERFACE_MAIN). |
 | siteInstances[0].lifecycle | object | `{}` | Container lifecycle hooks (e.g., preStop for graceful WireGuard shutdown) |
-| siteInstances[0].localEndpointInterfaces | list | `[]` | Restrict the local endpoints the site reports to Pangolin to these network interface names, e.g. ["eth0"] (LOCAL_ENDPOINT_INTERFACES). Clients on the same network use those addresses to connect directly. Empty reports every interface. Mostly useful with hostNetwork: true, where the pod sees all node interfaces. |
+| siteInstances[0].localEndpointInterfaces | list | `[]` | Restrict the local endpoints the site reports to Praxis to these network interface names, e.g. ["eth0"] (LOCAL_ENDPOINT_INTERFACES). Clients on the same network use those addresses to connect directly. Empty reports every interface. Mostly useful with hostNetwork: true, where the pod sees all node interfaces. |
 | siteInstances[0].logLevel | string | `"INFO"` | Per-instance log level (falls back to global.logLevel when empty) |
 | siteInstances[0].metrics.annotations | object | `{}` | Override or add custom metrics annotations |
 | siteInstances[0].metrics.enabled | bool | `false` | Enable Prometheus metrics |
@@ -402,9 +402,9 @@ global:
 | siteInstances[0].networkPolicy.useGlobalComponents.defaultApp | bool | `true` | Include global defaultApp component (if enabled globally). |
 | siteInstances[0].networkPolicy.useGlobalComponents.dns | bool | `false` | Include global dns component (if enabled globally). |
 | siteInstances[0].networkPolicy.useGlobalComponents.kubeApi | bool | `false` | Include global kubeApi component (if enabled globally). |
-| siteInstances[0].noCloud | bool | `false` | Disable cloud connectivity (NO_CLOUD env). When enabled, the site operates without connecting to Pangolin cloud. |
+| siteInstances[0].noCloud | bool | `false` | Disable cloud connectivity (NO_CLOUD env). When enabled, the site operates without connecting to Praxis cloud. |
 | siteInstances[0].nodeSelector | object | `{}` | Node selection constraints |
-| siteInstances[0].pangolinEndpoint | string | `""` | Pangolin control-plane endpoint URL (e.g., https://pangolin.example.com) |
+| siteInstances[0].pangolinEndpoint | string | `""` | Praxis control-plane endpoint URL (e.g., https://praxis.example.com) |
 | siteInstances[0].pingInterval | string | `""` | Optional ping interval (e.g., "3s"). Leave empty to use default |
 | siteInstances[0].pingTimeout | string | `""` | Optional ping timeout (e.g., "5s"). Leave empty to use default |
 | siteInstances[0].podDisruptionBudget | object | `{}` | Pod Disruption Budget override for this instance |
@@ -416,7 +416,7 @@ global:
 | siteInstances[0].provisioningKey | string | `""` | Provisioning key (SITE_PROVISIONING_KEY env). When set, the site can bootstrap credentials and persist them to CONFIG_FILE. |
 | siteInstances[0].replicas | int | `1` | Number of replicas for this instance (default: 1) |
 | siteInstances[0].resources | object | `{}` | Per-instance resource requests/limits. Overrides `global.resources` whenever it is non-empty, independently of `allowGlobalOverride`. Empty by default so the chart imposes no sizing; see `global.resources` for an example. |
-| siteInstances[0].secret | string | `""` | Site secret issued by Pangolin (must be set with pangolinEndpoint and id) - WARNING: Use auth.existingSecretName for production. |
+| siteInstances[0].secret | string | `""` | Site secret issued by Praxis (must be set with pangolinEndpoint and id) - WARNING: Use auth.existingSecretName for production. |
 | siteInstances[0].securityContext | object | `{}` | Container-level securityContext override SECURITY NOTE: By default the site runs as non-root. It runs as root with privileges only when global.nativeMode.enabled=true AND the instance sets useNativeInterface or useNativeMainInterface. IMPORTANT: Do NOT set capabilities.drop when running as root - this is invalid. |
 | siteInstances[0].service.annotations | object | `{}` | Service annotations |
 | siteInstances[0].service.enabled | bool | `true` | Create a Service for this instance |
@@ -443,7 +443,7 @@ global:
 | siteInstances[0].udpProxyIdleTimeout | string | `""` | Idle timeout for proxied UDP flows, e.g. "90s" (SITE_UDP_PROXY_IDLE_TIMEOUT). Empty uses the built-in default. |
 | siteInstances[0].updown.enabled | bool | `false` | Mount and execute a shared up/down script |
 | siteInstances[0].updown.fileName | string | `"updown.sh"` | filename for the single up/down script |
-| siteInstances[0].updown.mountPath | string | `"/opt/pangolin/updown"` | Container mount path for up/down script files |
+| siteInstances[0].updown.mountPath | string | `"/opt/praxis/updown"` | Container mount path for up/down script files |
 | siteInstances[0].updown.script | string | `""` | inline script content (prefer updownScripts map) |
 | siteInstances[0].useCommandArgs | bool | `false` | Use command/args instead of environment-variable configuration |
 | siteInstances[0].useNativeInterface | bool | `false` | Use the native WireGuard kernel interface (USE_NATIVE_INTERFACE). Requires global.nativeMode.enabled=true; the chart then runs this instance as root with NET_ADMIN and SYS_MODULE. |

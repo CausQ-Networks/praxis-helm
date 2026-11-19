@@ -3,7 +3,7 @@ version: 1.6.0
 appVersion: "1.20.0"
 kubeVersion: ">=1.30.14-0"
 name: newt
-description: Helm chart to deploy Newt (fosrl/newt) client instance
+description: Helm chart to deploy Newt (causq-networks/praxis-newt) client instance
 type: application
 keywords:
   - newt
@@ -12,10 +12,10 @@ keywords:
   - wireguard
   - networking
 home: https://digpangolin.com/
-icon: https://raw.githubusercontent.com/fosrl/pangolin/refs/heads/main/public/logo/pangolin_orange.svg
+icon: https://raw.githubusercontent.com/causq-networks/praxis/refs/heads/main/public/logo/praxis_orange.svg
 sources:
-  - https://github.com/fosrl/helm-charts
-  - https://github.com/fosrl/newt
+  - https://github.com/CausQ-Networks/praxis-helm
+  - https://github.com/CausQ-Networks/praxis-newt
 maintainers:
   - name: Fossorial Inc
     email: contact@pangolin.net
@@ -53,14 +53,14 @@ annotations:
   artifacthub.io/containsSecurityUpdates: "false"
   artifacthub.io/images: |
     - name: newt-dockerhub
-      image: docker.io/fosrl/newt:1.20.0
+      image: docker.io/causq-networks/praxis-newt:1.20.0
       whitelisted: false
       platforms:
         - linux/amd64
         - linux/arm64
         - linux/arm/v7
     - name: newt-ghcr
-      image: ghcr.io/fosrl/newt:1.20.0
+      image: ghcr.io/causq-networks/praxis-newt:1.20.0
       whitelisted: false
       platforms:
         - linux/amd64
@@ -69,12 +69,12 @@ annotations:
   artifacthub.io/license: MIT
   artifacthub.io/links: |
     - name: support
-      url: https://github.com/fosrl/helm-charts/issues
+      url: https://github.com/CausQ-Networks/praxis-helm/issues
     - name: documentation
       url: https://docs.digpangolin.com/self-host/manual/kubernetes
   artifacthub.io/prerelease: "false"
   # artifacthub.io/recommendations: |
-  #   - url: https://artifacthub.io/packages/helm/fosrl/pangolin
+  #   - url: https://artifacthub.io/packages/helm/causq-networks/praxis
   artifacthub.io/signKey: |
     fingerprint: 48E7F670FCC13645FC48B08D587294B228C2EC2C
     url: https://charts.fossorial.io/pgp_keys.asc
@@ -102,4 +102,4 @@ annotations:
 #
 # artifacthub.io/screenshots: |
 #   - title: Newt
-#     url: https://raw.githubusercontent.com/fosrl/pangolin/refs/heads/main/public/logo/pangolin_orange.svg
+#     url: https://raw.githubusercontent.com/causq-networks/praxis/refs/heads/main/public/logo/praxis_orange.svg

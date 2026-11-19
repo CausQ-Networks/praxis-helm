@@ -4,7 +4,7 @@
 # Database:  database.mode=cloudnativepg (default)
 #
 # In standalone mode, an internal Traefik workload is deployed alongside
-# Pangolin instead of using an external Traefik controller. This is simpler
+# Praxis instead of using an external Traefik controller. This is simpler
 # to set up but NOT recommended for production:
 #   - No separate Traefik controller or CRDs required
 #   - The pangolin-kube-controller is NOT deployed
@@ -19,7 +19,7 @@
 # The chart will fail if this is empty or set to the placeholder "example.com".
 #
 # Usage:
-#   helm install pangolin charts/pangolin \
+#   helm install praxis charts/praxis \
 #     -f examples/values-standalone-traefik.yaml \
 #     --namespace pangolin
 
@@ -50,19 +50,19 @@ cnpg-cluster:
   enabled: true
 
 # ---------------------------------------------------------------------------
-# Pangolin – standalone mode: no controller, Traefik handles routing
+# Praxis – standalone mode: no controller, Traefik handles routing
 # ---------------------------------------------------------------------------
 pangolin:
   replicaCount: 1
   config:
     app:
-      # REPLACE: set to the actual public URL of your Pangolin dashboard.
-      dashboard_url: "https://pangolin.yourdomain.example"
+      # REPLACE: set to the actual public URL of your Praxis dashboard.
+      dashboard_url: "https://praxis.yourdomain.example"
       log_level: info
     gerbil:
       # REPLACE: set to the hostname/IP where external WireGuard peers reach Gerbil.
       base_endpoint: "vpn.yourdomain.example"
-    # Configure Pangolin's Traefik output so it generates routing rules that
+    # Configure Praxis's Traefik output so it generates routing rules that
     # match the standalone Traefik workload below. This does NOT install
     # Traefik by itself; that is controlled by top-level traefik.enabled.
     traefik:
@@ -110,7 +110,7 @@ traefik:
     # Required: ACME account email for Let's Encrypt.
     # REPLACE: must be a real email address registered with Let's Encrypt.
     letsencryptEmail: "ops@yourdomain.example"
-    # Required: the public hostname Traefik will route to Pangolin.
+    # Required: the public hostname Traefik will route to Praxis.
     # REPLACE: must be a real hostname (not example.com or empty).
     dynamicRouters:
       host: "pangolin.yourdomain.example"

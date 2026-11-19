@@ -30,7 +30,7 @@ tests:
           value: RELEASE-NAME-pangolin-db-connection
       - equal:
           path: stringData.connectionString
-          value: "postgresql://pangolin:s3cr3t@pangolin-db-rw:5432/pangolin?sslmode=disable"
+          value: "postgresql://praxis:s3cr3t@pangolin-db-rw:5432/praxis?sslmode=disable"
 
   - it: renders CNPG auth secret when auth.generatedSecret.create=true
     set:
@@ -59,9 +59,9 @@ tests:
     asserts:
       - equal:
           path: stringData.connectionString
-          value: "postgresql://pangolin:s3cr3t@pangolin-db-rw:5432/pangolin?sslmode=require"
+          value: "postgresql://praxis:s3cr3t@pangolin-db-rw:5432/praxis?sslmode=require"
 
-  - it: renders Pangolin deployment with POSTGRES_CONNECTION_STRING for cloudnativepg
+  - it: renders Praxis deployment with POSTGRES_CONNECTION_STRING for cloudnativepg
     set:
       database.mode: cloudnativepg
     template: templates/deployment-pangolin.yaml
@@ -217,7 +217,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: docker.io/fosrl/pangolin:postgresql-1.26.0
+          value: docker.io/causq-networks/praxis:postgresql-1.26.0
 
   - it: cnpg-operator can be enabled independently without cnpg-cluster
     set:
@@ -229,7 +229,7 @@ tests:
           of: Deployment
       - equal:
           path: spec.template.spec.containers[0].image
-          value: docker.io/fosrl/pangolin:postgresql-1.26.0
+          value: docker.io/causq-networks/praxis:postgresql-1.26.0
       - equal:
           path: spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.name
           value: pangolin-db-app
@@ -244,7 +244,7 @@ tests:
           of: Deployment
       - equal:
           path: spec.template.spec.containers[0].image
-          value: docker.io/fosrl/pangolin:postgresql-1.26.0
+          value: docker.io/causq-networks/praxis:postgresql-1.26.0
       - equal:
           path: spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.name
           value: pangolin-db-app

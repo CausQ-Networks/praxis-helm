@@ -43,7 +43,7 @@ tests:
           path: spec.template.spec.securityContext.fsGroupChangePolicy
           value: OnRootMismatch
 
-  - it: pangolin security context defaults are runtime compatible
+  - it: praxis security context defaults are runtime compatible
     template: templates/deployment-pangolin.yaml
     asserts:
       - equal:
@@ -56,14 +56,14 @@ tests:
           path: spec.template.spec.containers[0].securityContext.capabilities.drop[0]
           value: ALL
 
-  - it: pangolin automountServiceAccountToken is false
+  - it: praxis automountServiceAccountToken is false
     template: templates/deployment-pangolin.yaml
     asserts:
       - equal:
           path: spec.template.spec.automountServiceAccountToken
           value: false
 
-  - it: pangolin uses component-specific ServiceAccount
+  - it: praxis uses component-specific ServiceAccount
     template: templates/deployment-pangolin.yaml
     asserts:
       - equal:
@@ -117,7 +117,7 @@ tests:
           path: spec.template.spec.containers[0].securityContext.capabilities.drop[0]
           value: ALL
 
-  - it: pangolin runAsNonRoot can be overridden to true
+  - it: praxis runAsNonRoot can be overridden to true
     set:
       pangolin.securityContext.runAsNonRoot: true
     template: templates/deployment-pangolin.yaml
@@ -167,7 +167,7 @@ tests:
           path: automountServiceAccountToken
           value: true
 
-  - it: pangolin ServiceAccount has automountServiceAccountToken false
+  - it: praxis ServiceAccount has automountServiceAccountToken false
     template: templates/serviceaccount.yaml
     documentIndex: 0
     asserts:
@@ -202,7 +202,7 @@ tests:
           path: spec.template.spec.automountServiceAccountToken
           value: false
 
-  - it: pangolin automountServiceAccountToken can be overridden to true
+  - it: praxis automountServiceAccountToken can be overridden to true
     set:
       serviceAccount.pangolin.automountServiceAccountToken: true
     template: templates/deployment-pangolin.yaml

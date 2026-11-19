@@ -1,11 +1,11 @@
-# Development / CI override values for the pangolin-cli chart.
+# Development / CI override values for the praxis-cli chart.
 # Used by: make lint, make unittest
 # These values exercise the chart with a minimal but valid configuration.
 
 global:
   image:
     registry: "ghcr.io"
-    repository: "fosrl/cli"
+    repository: "causq-networks/praxis-cli"
     digest: "sha256:b30c10882405eb39b4d3532302061d461228ad994034567b96d7668343bb2e5e"
   logLevel: "DEBUG"
   metrics:
@@ -22,7 +22,7 @@ global:
 siteInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: "https://pangolin.example.com"
+    pangolinEndpoint: "https://praxis.example.com"
     # Inline credentials must be set together (pangolinEndpoint + id + secret); with id
     # missing the chart failed the credential check, so every consumer of this file -
     # make lint, make unittest, scripts/test.sh render and kubeconform - could not render

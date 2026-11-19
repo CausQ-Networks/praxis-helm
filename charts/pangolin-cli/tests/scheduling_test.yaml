@@ -40,7 +40,7 @@ tests:
               whenUnsatisfiable: ScheduleAnyway
               labelSelector:
                 matchLabels:
-                  pangolin-cli.instance: topo-instance
+                  praxis-cli.instance: topo-instance
     asserts:
       - equal:
           path: spec.template.spec.topologySpreadConstraints[0].maxSkew
@@ -70,7 +70,7 @@ tests:
               whenUnsatisfiable: ScheduleAnyway
               labelSelector:
                 matchLabels:
-                  pangolin-cli.instance: topo-merged
+                  praxis-cli.instance: topo-merged
     asserts:
       - equal:
           path: spec.template.spec.topologySpreadConstraints
@@ -86,4 +86,4 @@ tests:
               whenUnsatisfiable: ScheduleAnyway
               labelSelector:
                 matchLabels:
-                  pangolin-cli.instance: topo-merged
+                  praxis-cli.instance: topo-merged

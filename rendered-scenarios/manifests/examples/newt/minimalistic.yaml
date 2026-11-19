@@ -108,7 +108,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: newt
-          image: docker.io/fosrl/newt:latest
+          image: docker.io/causq-networks/praxis-newt:latest
           # WARNING: Do not use 'latest' tag for production deployments!
           imagePullPolicy: IfNotPresent
           securityContext:
@@ -120,11 +120,11 @@ spec:
               drop:
                 - ALL
           env:
-            - name: PANGOLIN_ENDPOINT
+            - name: PRAXIS_ENDPOINT
               valueFrom:
                 secretKeyRef:
                   name: newt-cred
-                  key: PANGOLIN_ENDPOINT
+                  key: PRAXIS_ENDPOINT
             - name: NEWT_ID
               valueFrom:
                 secretKeyRef:

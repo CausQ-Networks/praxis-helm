@@ -230,13 +230,13 @@ spec:
             {{- if hasKey $auth "createSecret" }}{{- $createSecret = (index $auth "createSecret") -}}{{- end -}}
             {{- $envVarsDirect := default false (get $auth "envVarsDirect") -}}
             {{- $hasInlineCredentials := and $inst.pangolinEndpoint $inst.id $inst.secret -}}
-            {{- $endpointKey := default "PANGOLIN_ENDPOINT" (get $keys "endpointKey") -}}
+            {{- $endpointKey := default "PRAXIS_ENDPOINT" (get $keys "endpointKey") -}}
             {{- $idKey := default "NEWT_ID" (get $keys "idKey") -}}
             {{- $secretKey := default "NEWT_SECRET" (get $keys "secretKey") -}}
             {{- $generatedSecretName := include "newt.instance.fullname" (dict "root" $root "inst" $inst) -}}
             {{- $authSecretName := ternary $existing $generatedSecretName (ne $existing "") -}}
             {{- if or $existing (and $hasInlineCredentials $createSecret (not $envVarsDirect)) }}
-            - name: PANGOLIN_ENDPOINT
+            - name: PRAXIS_ENDPOINT
               valueFrom:
                 secretKeyRef:
                   name: {{ $authSecretName }}
@@ -252,7 +252,7 @@ spec:
                   name: {{ $authSecretName }}
                   key: {{ $secretKey }}
             {{- else if and $envVarsDirect $hasInlineCredentials }}
-            - name: PANGOLIN_ENDPOINT
+            - name: PRAXIS_ENDPOINT
               value: {{ $inst.pangolinEndpoint | quote }}
             - name: NEWT_ID
               value: {{ $inst.id | quote }}

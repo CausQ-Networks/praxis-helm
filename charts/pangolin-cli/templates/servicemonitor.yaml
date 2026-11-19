@@ -23,7 +23,7 @@
   {{- else -}}
     {{- range $i, $inst := (get $vals "siteInstances") -}}
       {{- if $inst.enabled -}}
-        {{- $eff := (include "pangolin-cli.effectiveMetrics" (list $inst $gm)) | fromJson -}}
+        {{- $eff := (include "praxis-cli.effectiveMetrics" (list $inst $gm)) | fromJson -}}
         {{- $effSM := (default (dict) (get $eff "serviceMonitor")) -}}
         {{- if $effSM.enabled -}}
           {{- $shouldRender = true -}}
@@ -44,14 +44,14 @@
 apiVersion: {{ $mSM.apiVersion | default "monitoring.coreos.com/v1" }}
 kind: ServiceMonitor
 metadata:
-  name: {{ include "pangolin-cli.fullname" . }}
+  name: {{ include "praxis-cli.fullname" . }}
   {{- with $mSM.namespace }}
   {{- if . }}
   namespace: {{ . }}
   {{- end }}
   {{- end }}
   labels:
-    {{- include "pangolin-cli.labels" . | nindent 4 }}
+    {{- include "praxis-cli.labels" . | nindent 4 }}
     {{- with $mSM.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -76,11 +76,11 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/instance: {{ .Release.Name }}
-      app.kubernetes.io/name: {{ include "pangolin-cli.name" . }}
+      app.kubernetes.io/name: {{ include "praxis-cli.name" . }}
       app.kubernetes.io/component: metrics
   namespaceSelector:
     matchNames:
-      - {{ include "pangolin-cli.namespace" . }}
+      - {{ include "praxis-cli.namespace" . }}
   {{- with $mSM.targetLabels }}
   targetLabels:
     {{- toYaml . | nindent 4 }}

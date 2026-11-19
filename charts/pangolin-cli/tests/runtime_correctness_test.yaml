@@ -58,7 +58,7 @@ tests:
           count: 1
       - equal:
           path: metadata.name
-          value: RELEASE-NAME-pangolin-cli-a-updown
+          value: RELEASE-NAME-praxis-cli-a-updown
 
   # The probes test for a file the site must create, on a container whose root filesystem is
   # read-only. Without a writable directory the file can never appear.
@@ -94,7 +94,7 @@ tests:
       global:
         health:
           enabled: true
-          path: /var/run/pangolin/healthy
+          path: /var/run/praxis/healthy
       siteInstances:
         - name: a
           enabled: true
@@ -105,7 +105,7 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts
           content:
             name: site-health
-            mountPath: "/var/run/pangolin"
+            mountPath: "/var/run/praxis"
 
   - it: adds no health volume when probes are disabled
     template: templates/deployment.yaml

@@ -37,7 +37,7 @@ tests:
       - equal:
           path: spec.template.spec.hostNetwork
           value: true
-      # ClusterFirst on a hostNetwork Pod uses the node resolver, where the Pangolin
+      # ClusterFirst on a hostNetwork Pod uses the node resolver, where the Praxis
       # Service name does not exist - Gerbil would never reach --remoteConfig.
       - equal:
           path: spec.template.spec.dnsPolicy
@@ -271,7 +271,7 @@ tests:
           count: 1
 
   # --- NetworkPolicy -------------------------------------------------------------
-  - it: allows Gerbil to reach Pangolin from the node address in host gateway mode
+  - it: allows Gerbil to reach Praxis from the node address in host gateway mode
     set:
       networkPolicy:
         gerbil:

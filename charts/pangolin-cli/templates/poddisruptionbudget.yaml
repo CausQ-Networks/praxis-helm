@@ -42,10 +42,10 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-pdb
+  name: {{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-pdb
   labels:
-    {{- include "pangolin-cli.labels" $root | nindent 4 }}
-    pangolin-cli.instance: {{ $inst.name }}
+    {{- include "praxis-cli.labels" $root | nindent 4 }}
+    praxis-cli.instance: {{ $inst.name }}
 spec:
   {{- if ne (printf "%v" $maxUnavail) "" }}
   maxUnavailable: {{ $maxUnavail }}
@@ -55,7 +55,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/instance: {{ $root.Release.Name }}
-      pangolin-cli.instance: {{ $inst.name }}
+      praxis-cli.instance: {{ $inst.name }}
 {{- end }}
 {{- end }}
 {{- end }}

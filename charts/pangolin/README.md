@@ -1,8 +1,8 @@
-# Pangolin Helm Chart
+# Praxis Helm Chart
 
 ![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.26.0](https://img.shields.io/badge/AppVersion-1.26.0-informational?style=flat-square)
 
-Pangolin Helm Chart
+Praxis Helm Chart
 
 ## Features
 
@@ -23,10 +23,10 @@ Pangolin Helm Chart
 
 ## Architecture overview
 
-This chart can deploy a Pangolin control-plane plus optional components:
+This chart can deploy a Praxis control-plane plus optional components:
 
-- **Pangolin app**: the main API/UI workloads and Services.
-- **pangolin-kube-controller** (controller mode): reconciles Traefik CRDs and reads Pangolin config from the Pangolin API endpoint.
+- **Praxis app**: the main API/UI workloads and Services.
+- **pangolin-kube-controller** (controller mode): reconciles Traefik CRDs and reads Praxis config from the Praxis API endpoint.
 - **Traefik**:
 	- **Controller mode**: you run a Traefik Ingress Controller (optionally installed via the bundled dependency, aliased as `traefikController`).
 	- **Standalone mode**: the chart runs Traefik itself. In `deployment.mode=multi` it is a container in the Gerbil Pod (see [Tunnel data path](#tunnel-data-path)); in `single` mode it is part of the shared Pod.
@@ -35,33 +35,33 @@ This chart can deploy a Pangolin control-plane plus optional components:
 ## Deployment modes
 
 - `deployment.type=controller` (recommended)
-	- Runs Pangolin + `pangolin-kube-controller`.
+	- Runs Praxis + `pangolin-kube-controller`.
 	- Requires Traefik CRDs and a Traefik controller (either installed separately or via `deployment.installTraefikController=true`).
 - `deployment.type=standalone`
-	- Runs Pangolin plus an internal Traefik workload managed by this chart.
+	- Runs Praxis plus an internal Traefik workload managed by this chart.
 	- Best for labs/dev; for production, controller mode is recommended unless you specifically need a self-contained deployment.
 
 `deployment.mode` controls how workloads are split:
 
-- `multi`: separate workloads for Pangolin / Gerbil (+ Traefik in the Gerbil Pod for `standalone`) / controller.
-- `single`: one shared Pod. In `deployment.type=controller`, it runs Pangolin + optional Gerbil + controller. In `deployment.type=standalone`, it runs Pangolin + optional Gerbil + optional standalone Traefik. `deployment.mode=multi` remains the recommended production topology.
+- `multi`: separate workloads for Praxis / Gerbil (+ Traefik in the Gerbil Pod for `standalone`) / controller.
+- `single`: one shared Pod. In `deployment.type=controller`, it runs Praxis + optional Gerbil + controller. In `deployment.type=standalone`, it runs Praxis + optional Gerbil + optional standalone Traefik. `deployment.mode=multi` remains the recommended production topology.
 
 ## Example install profiles
 
-Scenario-based example values files are in [`charts/pangolin/examples/`](./examples/).
+Scenario-based example values files are in [`charts/praxis/examples/`](./examples/).
 Use the examples guide for profile selection, prerequisites, and install/cleanup commands:
-[`charts/pangolin/examples/README.md`](./examples/README.md).
+[`charts/praxis/examples/README.md`](./examples/README.md).
 
 ## Database mode selection
 
-The default `database.mode` is **`cloudnativepg`** — the recommended production path. Pangolin automatically uses the PostgreSQL-capable image (`fosrl/pangolin:postgresql-<appVersion>`) for any non-SQLite mode.
+The default `database.mode` is **`cloudnativepg`** — the recommended production path. Praxis automatically uses the PostgreSQL-capable image (`causq-networks/praxis:postgresql-<appVersion>`) for any non-SQLite mode.
 
-| Mode | Use case | Pangolin image |
+| Mode | Use case | Praxis image |
 |------|----------|---------------|
-| `cloudnativepg` | **Recommended production** – CloudNativePG operator manages PostgreSQL | `fosrl/pangolin:postgresql-<appVersion>` |
-| `external` | Production with externally managed PostgreSQL (RDS, Cloud SQL, etc.) | `fosrl/pangolin:postgresql-<appVersion>` |
-| `embedded` | Labs/test – chart-managed PostgreSQL StatefulSet | `fosrl/pangolin:postgresql-<appVersion>` |
-| `sqlite` | **Dev/CI only – NOT for production** | `fosrl/pangolin:<appVersion>` |
+| `cloudnativepg` | **Recommended production** – CloudNativePG operator manages PostgreSQL | `causq-networks/praxis:postgresql-<appVersion>` |
+| `external` | Production with externally managed PostgreSQL (RDS, Cloud SQL, etc.) | `causq-networks/praxis:postgresql-<appVersion>` |
+| `embedded` | Labs/test – chart-managed PostgreSQL StatefulSet | `causq-networks/praxis:postgresql-<appVersion>` |
+| `sqlite` | **Dev/CI only – NOT for production** | `causq-networks/praxis:<appVersion>` |
 
 ## CloudNativePG setup (recommended production database)
 
@@ -76,7 +76,7 @@ The operator and cluster are controlled only by top-level subchart values and su
 3. **Chart installs cluster only**: `cnpg-operator.enabled=false`, `cnpg-cluster.enabled=true`
 4. **Chart installs both operator and cluster**: `cnpg-operator.enabled=true`, `cnpg-cluster.enabled=true`
 
-When `database.mode=cloudnativepg` and `cnpg-cluster.enabled=true`, Pangolin resolves the cluster
+When `database.mode=cloudnativepg` and `cnpg-cluster.enabled=true`, Praxis resolves the cluster
 name in this order:
 
 1. `cnpg-cluster.fullnameOverride` (when non-empty)
@@ -85,7 +85,7 @@ name in this order:
 If both are set to different values, chart rendering fails with:
 `PANGOLIN-CNPG: cnpg-cluster.fullnameOverride and database.cloudnativepg.cluster.name must match when cnpg-cluster.enabled=true`.
 
-### Connecting Pangolin to a CNPG cluster
+### Connecting Praxis to a CNPG cluster
 
 CloudNativePG automatically creates an application Secret when a cluster boots.
 For a cluster named `pangolin-db` (the default `cnpg-cluster.fullnameOverride`),
@@ -152,7 +152,7 @@ if no Secret source is configured.
 
 ```bash
 kubectl create secret generic pangolin-ext-db \
-  --from-literal=connectionString="postgresql://pangolin:s3cr3t@db.example.com:5432/pangolin?sslmode=require"
+  --from-literal=connectionString="postgresql://praxis:s3cr3t@db.example.com:5432/praxis?sslmode=require"
 ```
 
 ```yaml
@@ -171,7 +171,7 @@ database:
   external:
     generatedSecret:
       create: true
-      connectionString: "postgresql://pangolin:s3cr3t@db.example.com:5432/pangolin?sslmode=require"
+      connectionString: "postgresql://praxis:s3cr3t@db.example.com:5432/praxis?sslmode=require"
 ```
 
 ### Option C — Chart-managed Secret from individual connection parameters
@@ -191,15 +191,15 @@ database:
 ```
 
 > **Note:** Setting `database.mode=external` without any Secret source configuration will cause Helm
-> to fail at render time with a clear `PANGOLIN-061` error. This prevents Pangolin from starting with
+> to fail at render time with a clear `PANGOLIN-061` error. This prevents Praxis from starting with
 > a missing database Secret.
 
 See `examples/values-controller-external-db.yaml` for a complete working example.
 
 ## Ingress and Traefik guidance
 
-- In controller mode you typically expose Pangolin via Traefik CRDs/IngressRoute resources.
-- `pangolin.config.traefik` configures the Traefik output Pangolin generates in `config.yml`; it does **not** install Traefik.
+- In controller mode you typically expose Praxis via Traefik CRDs/IngressRoute resources.
+- `pangolin.config.traefik` configures the Traefik output Praxis generates in `config.yml`; it does **not** install Traefik.
 - The chart renders `pangolin.config.traefik` by default so entrypoint and cert resolver names are explicit. Review `pangolin.config.traefik.http_entrypoint`, `https_entrypoint`, and `cert_resolver` so they match your real Traefik deployment.
 - If you enable the bundled Traefik dependency, put Traefik chart overrides under the **`traefikController:`** key (the dependency is aliased).
 - In standalone mode, Traefik dashboard is **disabled by default** and the Service does **not** expose the admin port.
@@ -207,7 +207,7 @@ See `examples/values-controller-external-db.yaml` for a complete working example
 ### Chart-managed dashboard IngressRoute (controller mode)
 
 By default (`pangolin.ingressRoute.dashboard.enabled=true`) the chart renders a Traefik `IngressRoute`
-for the Pangolin dashboard/API when `deployment.type=controller`.
+for the Praxis dashboard/API when `deployment.type=controller`.
 
 - Host defaults to `pangolin.config.app.dashboard_url` (hostname extracted from URL), or set `pangolin.ingressRoute.dashboard.host`.
 - API route: `Host(<host>) && PathPrefix(/api/v1)` -> `pangolin.service.ports.external` (default `3000`), priority `100`.
@@ -223,7 +223,7 @@ for the Pangolin dashboard/API when `deployment.type=controller`.
 pangolin:
   config:
     app:
-      dashboard_url: "https://pangolin-e2e.example.com"
+      dashboard_url: "https://praxis-e2e.example.com"
   ingressRoute:
     dashboard:
       enabled: true
@@ -260,10 +260,10 @@ pangolin:
 - **NetworkPolicy:** By default, the chart does **not** allow broad HTTPS egress to the internet. If your deployment needs outbound TCP/443, explicitly enable it (or, preferably, add a scoped allow-list via `networkPolicy.extraEgress`).
 - **ServiceAccount token automount (least-privilege):**
   - **Controller** (`serviceAccount.controller.automountServiceAccountToken=true`, default): the pangolin-kube-controller must call the Kubernetes API to reconcile Traefik CRDs, manage EndpointSlices, and (optionally) perform leader election. It therefore requires a mounted ServiceAccount token. The matching RBAC Role/ClusterRole is only bound to the controller ServiceAccount.
-  - **Pangolin** (`serviceAccount.pangolin.automountServiceAccountToken=false`, default): the main Pangolin application server does not require Kubernetes API access. Keeping automount disabled follows the least-privilege principle and prevents accidental in-cluster API calls.
+  - **Praxis** (`serviceAccount.pangolin.automountServiceAccountToken=false`, default): the main Praxis application server does not require Kubernetes API access. Keeping automount disabled follows the least-privilege principle and prevents accidental in-cluster API calls.
   - **Gerbil** (`serviceAccount.gerbil.automountServiceAccountToken=false`, default): Gerbil manages WireGuard tunnels and does not require Kubernetes API access. Token automount is disabled by default.
   - All three settings are configurable via `serviceAccount.<component>.automountServiceAccountToken`.
-- **Single mode ServiceAccount trade-off:** Kubernetes ServiceAccount selection is Pod-level. In `deployment.mode=single` + `deployment.type=controller`, the shared Pod uses the controller ServiceAccount/token so Pangolin and Gerbil share that Pod-level token behavior.
+- **Single mode ServiceAccount trade-off:** Kubernetes ServiceAccount selection is Pod-level. In `deployment.mode=single` + `deployment.type=controller`, the shared Pod uses the controller ServiceAccount/token so Praxis and Gerbil share that Pod-level token behavior.
 - **Container security context:** `global.containerSecurityContext` is intentionally empty by default so you can choose a baseline that matches your cluster policy. Workloads merge this with their own `*.securityContext`.
 
 ## Production checklist
@@ -276,9 +276,9 @@ pangolin:
 	- Or explicitly reference it via `database.connection.existingSecretName: <cluster-name>-app` / `existingSecretKey: uri`
 	- Or provide a password and set `database.cloudnativepg.connection.generatedSecret.create=true`
 - Provide externally managed Secrets where appropriate:
-	- `pangolin.secret.existingSecretName` (Pangolin app server secret)
+	- `pangolin.secret.existingSecretName` (Praxis app server secret)
 	- database connection Secret (`database.connection.existingSecretName`)
-- Review `pangolin.config.traefik.*` so Pangolin emits routes for the same Traefik entrypoints and certificate resolver names your cluster actually uses.
+- Review `pangolin.config.traefik.*` so Praxis emits routes for the same Traefik entrypoints and certificate resolver names your cluster actually uses.
 - For external PostgreSQL:
 	- User-managed Secret: set `database.connection.existingSecretName` — Helm fails with PANGOLIN-061 if omitted
 	- Chart-managed Secret: set `database.external.generatedSecret.create=true` with a `connectionString` or individual params
@@ -294,16 +294,16 @@ Use this checklist before tagging alpha/RC/stable releases. This runtime validat
 
 ### Before alpha
 
-- [ ] `helm dependency build charts/pangolin`
-- [ ] `helm lint charts/pangolin`
+- [ ] `helm dependency build charts/praxis`
+- [ ] `helm lint charts/praxis`
 - [ ] Render templates:
-  - [ ] `helm template demo charts/pangolin --namespace pangolin > /tmp/pangolin-default.yaml`
-  - [ ] `for values in charts/pangolin/examples/*.yaml; do helm template demo charts/pangolin --namespace pangolin -f "$values" > "/tmp/pangolin-$(basename "$values" .yaml).yaml"; done`
-- [ ] `helm unittest charts/pangolin`
-- [ ] `yamllint -d '{extends: relaxed, rules: {line-length: {max: 200}, indentation: {spaces: consistent, indent-sequences: whatever}, trailing-spaces: disable}}' /tmp/pangolin-*.yaml`
-- [ ] `for f in /tmp/pangolin-*.yaml; do kubeconform -strict -summary -ignore-missing-schemas "$f"; done`
-- [ ] Validate image/app versions and ArtifactHub image annotations in `charts/pangolin/Chart.yaml` and `charts/pangolin/values.yaml` are consistent.
-- [ ] Bump the chart version to the next alpha in `charts/pangolin/Chart.yaml`.
+  - [ ] `helm template demo charts/praxis --namespace praxis > /tmp/praxis-default.yaml`
+  - [ ] `for values in charts/praxis/examples/*.yaml; do helm template demo charts/praxis --namespace praxis -f "$values" > "/tmp/praxis-$(basename "$values" .yaml).yaml"; done`
+- [ ] `helm unittest charts/praxis`
+- [ ] `yamllint -d '{extends: relaxed, rules: {line-length: {max: 200}, indentation: {spaces: consistent, indent-sequences: whatever}, trailing-spaces: disable}}' /tmp/praxis-*.yaml`
+- [ ] `for f in /tmp/praxis-*.yaml; do kubeconform -strict -summary -ignore-missing-schemas "$f"; done`
+- [ ] Validate image/app versions and ArtifactHub image annotations in `charts/praxis/Chart.yaml` and `charts/praxis/values.yaml` are consistent.
+- [ ] Bump the chart version to the next alpha in `charts/praxis/Chart.yaml`.
 - [ ] Do **not** change `kubeVersion`; current value is intentional.
 
 ### Before RC
@@ -312,7 +312,7 @@ Use this checklist before tagging alpha/RC/stable releases. This runtime validat
   - [ ] `kubectl wait --for=condition=Available deploy/<release>-pangolin -n <ns> --timeout=10m`
   - [ ] `kubectl wait --for=condition=Available deploy/<release>-pangolin-kube-controller -n <ns> --timeout=10m`
 - [ ] Default controller + CloudNativePG path reaches readiness (`deployment.type=controller`, `database.mode=cloudnativepg`).
-- [ ] Pangolin is running with PostgreSQL image:
+- [ ] Praxis is running with PostgreSQL image:
   - [ ] `kubectl get deploy/<release>-pangolin -n <ns> -o jsonpath='{.spec.template.spec.containers[0].image}'` contains `:postgresql-`.
 - [ ] Gerbil registration + persistence works:
   - [ ] Confirm startup logs show registration success.
@@ -321,7 +321,7 @@ Use this checklist before tagging alpha/RC/stable releases. This runtime validat
   - [ ] `kubectl port-forward -n <ns> svc/<release>-pangolin-kube-controller 9090:9090` then `curl -fsS http://127.0.0.1:9090/livez` and `curl -fsS http://127.0.0.1:9090/readyz`.
   - [ ] Controller logs confirm Kubernetes API connectivity (no repeated in-cluster auth/permission errors).
 - [ ] Traefik CRDs are present and reconciled where applicable (`IngressRoute`, `Middleware`, `TLSOption`).
-- [ ] Default NetworkPolicy does not block startup (Pangolin, Gerbil, controller, and DB all become ready).
+- [ ] Default NetworkPolicy does not block startup (Praxis, Gerbil, controller, and DB all become ready).
 
 ### Before stable
 
@@ -339,18 +339,18 @@ Use this checklist before tagging alpha/RC/stable releases. This runtime validat
 - [ ] ArtifactHub metadata verified (links, maintainers, image annotations).
 - [ ] Blueprint + Newt workflow tested/documented:
   - [ ] Blueprint files are stored by this chart (ConfigMap/Secret).
-  - [ ] Blueprints are applied via Newt (`--blueprint-file` / `--provisioning-blueprint-file`), not by Pangolin server directly.
+  - [ ] Blueprints are applied via Newt (`--blueprint-file` / `--provisioning-blueprint-file`), not by Praxis server directly.
 
 ## Troubleshooting basics
 
-- Check rendered resources: `helm template <release> charts/pangolin -n <ns> | less`
+- Check rendered resources: `helm template <release> charts/praxis -n <ns> | less`
 - Check pods: `kubectl get pods -n <ns> -l app.kubernetes.io/instance=<release>`
 - Check events: `kubectl get events -n <ns> --sort-by=.lastTimestamp | tail -n 50`
 - Controller logs: `kubectl logs -n <ns> deploy/<release>-pangolin --since=10m` (adjust name if overridden)
 
 ## Tunnel data path
 
-Pangolin advertises the backends behind a Newt site as raw WireGuard peer addresses, for
+Praxis advertises the backends behind a Newt site as raw WireGuard peer addresses, for
 example `http://100.89.128.4:44602`. Gerbil creates its WireGuard interface in whatever
 network namespace it runs in, so under Kubernetes those addresses exist inside the Gerbil
 Pod and nowhere else. An externally installed Traefik has no route to them: every
@@ -371,7 +371,7 @@ ports 8000 and 9443 (HTTPS is not on 8443: Gerbil's SNI proxy binds that port in
 shared network namespace).
 
 An **externally installed** Traefik (controller mode) is a separate Pod and still has no
-route. That case is tracked in [#20](https://github.com/fosrl/helm-charts/issues/20),
+route. That case is tracked in [#20](https://github.com/CausQ-Networks/praxis-helm/issues/20),
 which remains open; host gateway mode below is the workaround.
 
 ### If your targets run in this cluster
@@ -404,7 +404,7 @@ Be clear about what it does **not** solve:
 | Requires CNI egress masquerading | Default for Flannel, Calico (`natOutgoing`) and Cilium. Without that SNAT the remote peer sees the Traefik Pod IP as source and drops the reply. The chart can neither detect nor fix this. |
 | Gerbil binds node ports | One Gerbil per node; `gerbil.replicaCount` must stay `1`, so there is no Gerbil HA. |
 | `hostNetwork` needs a privileged namespace | Pod Security Admission must be `privileged`; `baseline` forbids it. `NET_ADMIN` is still required as before. |
-| Not available in `single` mode | Gerbil shares a Pod with Pangolin there, so `hostNetwork` would bind every component's ports on the node. |
+| Not available in `single` mode | Gerbil shares a Pod with Praxis there, so `hostNetwork` would bind every component's ports on the node. |
 
 The chart refuses the combinations that cannot work rather than letting them surface as a
 Pending Pod or a silent `502`: `PANGOLIN-071` (single mode), `PANGOLIN-072` (Gerbil
@@ -414,7 +414,7 @@ namespace without `privileged`).
 ### NetworkPolicy
 
 A `hostNetwork` Pod is not matched by a `podSelector` on any mainstream CNI — its traffic
-sources from the node IP. In host gateway mode the Gerbil → Pangolin internal-API rule is
+sources from the node IP. In host gateway mode the Gerbil → Praxis internal-API rule is
 therefore expressed as node address blocks
 (`networkPolicy.gerbil.hostGateway.nodeCIDRs`). There is deliberately no default: the
 private ranges contain every mainstream Pod CIDR, so `PANGOLIN-075` fails the render
@@ -429,9 +429,9 @@ policy would blackhole Gerbil's `--remoteConfig` polling.
 
 ## Gerbil first-run bootstrap behavior
 
-- Upstream Pangolin returns `404 {"message":"Exit node not found"}` from `/gerbil/get-all-relays` until an exit node exists.
+- Upstream Praxis returns `404 {"message":"Exit node not found"}` from `/gerbil/get-all-relays` until an exit node exists.
 - Upstream Gerbil exits on startup when that endpoint returns non-200 (`Failed to fetch initial mappings`), so waiting for Gerbil readiness can fail on fresh installs before UI/bootstrap is completed.
-- Use `gerbil.startupMode=delayed` for first installs or smoke tests. This keeps Gerbil resources rendered but starts the Deployment with `replicas: 0` so `helm install --wait` can succeed while you complete initial Pangolin setup.
+- Use `gerbil.startupMode=delayed` for first installs or smoke tests. This keeps Gerbil resources rendered but starts the Deployment with `replicas: 0` so `helm install --wait` can succeed while you complete initial Praxis setup.
 - After setup, switch to normal startup with:
 
 ```bash
@@ -440,16 +440,16 @@ helm upgrade <release> <chart> -n <namespace> --reuse-values --set gerbil.startu
 
 ## Secrets
 
-- **Pangolin app secret:** If you do not provide `pangolin.secret.existingSecretName`, the chart generates a strong random secret and reuses it across upgrades.
+- **Praxis app secret:** If you do not provide `pangolin.secret.existingSecretName`, the chart generates a strong random secret and reuses it across upgrades.
 - **Controller TLS:** In controller mode, the chart can generate a self-signed `kubernetes.io/tls` Secret (or you can provide an existing one via `controller.tls.existingSecretName`).
 
 ## Standalone Traefik notes
 
-- `pangolin.config.traefik` configures Pangolin's generated Traefik output only; Traefik installation is controlled separately by top-level `traefik.enabled`.
+- `pangolin.config.traefik` configures Praxis's generated Traefik output only; Traefik installation is controlled separately by top-level `traefik.enabled`.
 - `traefik.enabled=true` requires `traefik.config.letsencryptEmail` to be set.
 - ACME uses the HTTP challenge on the HTTP entrypoint, so port 80 of the Traefik Service must be reachable from the internet. When Cloudflare credentials are configured (`traefik.cloudflare.existingSecretName` or `traefik.cloudflare.generatedSecret.create`) the Cloudflare DNS challenge is used instead.
 - Without `traefik.persistence.enabled`, ACME state lives in an `emptyDir` and certificates are re-issued after every restart; Let's Encrypt rate limits make that a problem quickly. With persistence enabled the chart creates the `<release>-pangolin-traefik-acme` PVC unless `traefik.persistence.existingClaim` is set.
-- Pangolin's generated routers use the `web` / `websecure` entrypoints and the `letsencrypt` resolver by default. If you rename them via `traefik.config.httpEntrypoint`, `httpsEntrypoint` or `certResolver`, set the same names in `pangolin.config.traefik`.
+- Praxis's generated routers use the `web` / `websecure` entrypoints and the `letsencrypt` resolver by default. If you rename them via `traefik.config.httpEntrypoint`, `httpsEntrypoint` or `certResolver`, set the same names in `pangolin.config.traefik`.
 - Raw TCP/UDP resources need an entrypoint per port (`tcp-<port>` / `udp-<port>`) and a matching Service port, which this chart does not create.
 - `traefik.replicaCount` must be `1` while Traefik runs in the Gerbil Pod (`PANGOLIN-076`).
 
@@ -459,15 +459,15 @@ helm upgrade <release> <chart> -n <namespace> --reuse-values --set gerbil.startu
 
 ## Upgrades and rollbacks
 
-- Secrets generated by the chart (like the Pangolin app secret) are designed to be stable across upgrades.
+- Secrets generated by the chart (like the Praxis app secret) are designed to be stable across upgrades.
 - For embedded database mode, data lives on a PVC; rolling back a chart does not revert database data.
 - Use standard Helm workflows: `helm upgrade` to update, `helm rollback` to revert.
 
 ## Blueprints
 
-Pangolin [Blueprints](https://docs.pangolin.net/manage/blueprints) let you define resources (public-resources, private-resources, sites) as YAML and apply them to Pangolin via Newt agents using `--blueprint-file` or `--provisioning-blueprint-file`. The Pangolin server does **not** read blueprint files directly — Newt pushes blueprints through the Pangolin API.
+Praxis [Blueprints](https://docs.praxis.causq.com/manage/blueprints) let you define resources (public-resources, private-resources, sites) as YAML and apply them to Praxis via Newt agents using `--blueprint-file` or `--provisioning-blueprint-file`. The Praxis server does **not** read blueprint files directly — Newt pushes blueprints through the Praxis API.
 
-This chart provides optional storage of blueprint YAML files as Kubernetes ConfigMaps and Secrets so they can be managed declaratively alongside your Pangolin release.
+This chart provides optional storage of blueprint YAML files as Kubernetes ConfigMaps and Secrets so they can be managed declaratively alongside your Praxis release.
 
 ### Enabling blueprints
 
@@ -540,7 +540,7 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | cnpg-cluster.fullnameOverride | string | `"pangolin-db"` | Override the CNPG cluster resource name to keep it stable and RFC1123-safe. Set this to match `database.cloudnativepg.cluster.name`. |
 | cnpg-cluster.managed | object | `{"backup":{},"monitoring":{"enabled":false},"roles":[],"services":{"disabledDefaultServices":[]}}` | Managed application database/user bootstrap configuration for the CNPG cluster. |
 | cnpg-cluster.mode | string | `"standalone"` | CNPG deployment mode passed to the official `cluster` chart. |
-| cnpg-cluster.namespace | string | `""` | Target namespace for the CNPG cluster release / cluster CR. Leave empty to use the Pangolin release namespace unless your chart logic/templates override it. |
+| cnpg-cluster.namespace | string | `""` | Target namespace for the CNPG cluster release / cluster CR. Leave empty to use the Praxis release namespace unless your chart logic/templates override it. |
 | cnpg-cluster.type | string | `"postgresql"` | CNPG workload type passed to the official `cluster` chart. |
 | cnpg-operator | object | `{"additionalLabels":{},"config":{"data":{}},"crds":{"create":true},"enabled":false,"monitoring":{"grafanaDashboard":{"create":false},"podMonitorEnabled":false},"namespace":"","replicaCount":1}` | --------------------------------------------------------------------------- # @section CloudNativePG Operator subchart |
 | cnpg-operator.additionalLabels | object | `{}` | Additional labels applied by the CloudNativePG operator chart where supported. |
@@ -550,56 +550,56 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | cnpg-operator.monitoring.podMonitorEnabled | bool | `false` | Create ServiceMonitor resources for the operator if supported by the upstream chart. |
 | cnpg-operator.namespace | string | `""` | Target namespace for the CloudNativePG operator release. Leave empty to let the Helm release/subchart behavior decide the namespace. |
 | cnpg-operator.replicaCount | int | `1` | Number of CloudNativePG operator replicas. |
-| controller | object | `{"commonAnnotations":{},"commonLabels":{},"config":{"allowInsecureHttp":null,"configEndpoint":"","configTlsSkipVerify":false,"enableLeaderElection":false,"ingressClass":"traefik","leaseLockNamespace":"","logTraefikConfig":false,"metricsAddr":":9090","readOnly":false,"resyncInterval":"10m","targetNamespace":""},"deployment":{"annotations":{},"labels":{},"podAnnotations":{},"podLabels":{},"updateStrategy":{}},"enabled":true,"extraEnv":{},"monitoring":{"podMonitor":{"annotations":{},"apiVersion":"monitoring.coreos.com/v1","enabled":false,"interval":"30s","labels":{},"metricRelabelings":[],"namespace":"","path":"/metrics","portName":"metrics","relabelings":[],"scheme":"http","scrapeTimeout":"10s"},"prometheusRule":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"labels":{},"namespace":"","rules":[]},"serviceMonitor":{"annotations":{},"apiVersion":"monitoring.coreos.com/v1","enabled":false,"honorLabels":true,"interval":"30s","labels":{},"metricRelabelings":[],"namespace":"","path":"/metrics","relabelings":[],"sampleLimit":0,"scheme":"http","scrapeTimeout":"10s","targetLabels":[]}},"probes":{"liveness":{"failureThreshold":3,"httpGet":{"path":"/livez","port":"metrics"},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":5},"readiness":{"failureThreshold":3,"httpGet":{"path":"/readyz","port":"metrics"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":5},"startup":{"failureThreshold":24,"httpGet":{"path":"/livez","port":"metrics"},"initialDelaySeconds":5,"periodSeconds":5,"timeoutSeconds":3}},"rbac":{"annotations":{},"labels":{}},"replicaCount":1,"resources":{"limits":{"cpu":"500m","ephemeral-storage":"128Mi","memory":"512Mi"},"requests":{"cpu":"100m","ephemeral-storage":"16Mi","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":false},"service":{"annotations":{},"enabled":true,"labels":{},"port":9090,"portName":"metrics","type":"ClusterIP"},"serviceAccount":{"annotations":{},"labels":{}},"tls":{"enabled":false,"existingSecretName":""},"waitForPangolin":{"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repository":"curlimages/curl","tag":"8.8.0"},"intervalSeconds":5,"stableSeconds":30,"timeoutSeconds":600},"workloadType":"Deployment"}` | --------------------------------------------------------------------------- # @section Pangolin kube controller |
+| controller | object | `{"commonAnnotations":{},"commonLabels":{},"config":{"allowInsecureHttp":null,"configEndpoint":"","configTlsSkipVerify":false,"enableLeaderElection":false,"ingressClass":"traefik","leaseLockNamespace":"","logTraefikConfig":false,"metricsAddr":":9090","readOnly":false,"resyncInterval":"10m","targetNamespace":""},"deployment":{"annotations":{},"labels":{},"podAnnotations":{},"podLabels":{},"updateStrategy":{}},"enabled":true,"extraEnv":{},"monitoring":{"podMonitor":{"annotations":{},"apiVersion":"monitoring.coreos.com/v1","enabled":false,"interval":"30s","labels":{},"metricRelabelings":[],"namespace":"","path":"/metrics","portName":"metrics","relabelings":[],"scheme":"http","scrapeTimeout":"10s"},"prometheusRule":{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"labels":{},"namespace":"","rules":[]},"serviceMonitor":{"annotations":{},"apiVersion":"monitoring.coreos.com/v1","enabled":false,"honorLabels":true,"interval":"30s","labels":{},"metricRelabelings":[],"namespace":"","path":"/metrics","relabelings":[],"sampleLimit":0,"scheme":"http","scrapeTimeout":"10s","targetLabels":[]}},"probes":{"liveness":{"failureThreshold":3,"httpGet":{"path":"/livez","port":"metrics"},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":5},"readiness":{"failureThreshold":3,"httpGet":{"path":"/readyz","port":"metrics"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":5},"startup":{"failureThreshold":24,"httpGet":{"path":"/livez","port":"metrics"},"initialDelaySeconds":5,"periodSeconds":5,"timeoutSeconds":3}},"rbac":{"annotations":{},"labels":{}},"replicaCount":1,"resources":{"limits":{"cpu":"500m","ephemeral-storage":"128Mi","memory":"512Mi"},"requests":{"cpu":"100m","ephemeral-storage":"16Mi","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":false},"service":{"annotations":{},"enabled":true,"labels":{},"port":9090,"portName":"metrics","type":"ClusterIP"},"serviceAccount":{"annotations":{},"labels":{}},"tls":{"enabled":false,"existingSecretName":""},"waitForPraxis":{"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repository":"curlimages/curl","tag":"8.8.0"},"intervalSeconds":5,"stableSeconds":30,"timeoutSeconds":600},"workloadType":"Deployment"}` | --------------------------------------------------------------------------- # @section Praxis kube controller |
 | controller.commonAnnotations | object | `{}` | Annotations added to all controller resources rendered by this chart. |
 | controller.commonLabels | object | `{}` | Labels added to all controller resources rendered by this chart. |
 | controller.config.allowInsecureHttp | string | `nil` | Allow plaintext HTTP for the controller config endpoint. Set to `null` (default) to auto-derive from `configEndpoint` (`http://` => true, `https://` => false). INSECURE: plaintext HTTP is only acceptable for same-namespace in-cluster traffic protected by NetworkPolicy. For production, prefer HTTPS/mTLS (set an HTTPS configEndpoint and enable controller.tls). |
-| controller.config.configEndpoint | string | `""` | Pangolin config API endpoint consumed by the controller. Defaults to in-cluster HTTP (`http://<pangolin-service>:3001/...`). Set an HTTPS endpoint when using TLS/mTLS for controller->Pangolin traffic. |
-| controller.config.configTlsSkipVerify | bool | `false` | Skip TLS verification when fetching Pangolin config. |
+| controller.config.configEndpoint | string | `""` | Praxis config API endpoint consumed by the controller. Defaults to in-cluster HTTP (`http://<pangolin-service>:3001/...`). Set an HTTPS endpoint when using TLS/mTLS for controller->Praxis traffic. |
+| controller.config.configTlsSkipVerify | bool | `false` | Skip TLS verification when fetching Praxis config. |
 | controller.config.enableLeaderElection | bool | `false` | Enable lease-based leader election. |
 | controller.config.ingressClass | string | `"traefik"` | Ingress class written as `kubernetes.io/ingress.class` on every IngressRoute, IngressRouteTCP and IngressRouteUDP the controller creates. Must match `providers.kubernetesCRD.ingressClass` of the Traefik that should serve them; the default also matches a Traefik that sets no ingress class. Requires controller >= 0.1.0. |
 | controller.config.leaseLockNamespace | string | `""` | Namespace used for the leader election Lease. Defaults to targetNamespace when empty. |
 | controller.config.logTraefikConfig | bool | `false` | DEBUG ONLY. Log full rendered Traefik configuration. |
 | controller.config.metricsAddr | string | `":9090"` | Metrics / health listen address. |
 | controller.config.readOnly | bool | `false` | Run controller in read-only mode and disable mutating operations. |
-| controller.config.resyncInterval | string | `"10m"` | Re-apply Pangolin's full configuration at this interval even when it has not changed, repairing objects edited or deleted by hand. `0s` disables it. Requires controller >= 0.1.0. |
+| controller.config.resyncInterval | string | `"10m"` | Re-apply Praxis's full configuration at this interval even when it has not changed, repairing objects edited or deleted by hand. `0s` disables it. Requires controller >= 0.1.0. |
 | controller.config.targetNamespace | string | `""` | Namespace where Traefik CRDs/resources live. Defaults to `deployment.traefikNamespace` or release namespace when empty. |
 | controller.deployment.updateStrategy | object | `{}` | Rollout strategy for this component, overriding `runtime.updateStrategy`. Left empty the chart picks it: a component holding a PVC that is not ReadWriteMany is switched to Recreate, because a surged Pod could never attach the volume. |
-| controller.enabled | bool | `true` | Enable Pangolin kube controller. Default should be true because the preferred chart mode is controller + multi. |
+| controller.enabled | bool | `true` | Enable Praxis kube controller. Default should be true because the preferred chart mode is controller + multi. |
 | controller.monitoring.podMonitor | object | `{"annotations":{},"apiVersion":"monitoring.coreos.com/v1","enabled":false,"interval":"30s","labels":{},"metricRelabelings":[],"namespace":"","path":"/metrics","portName":"metrics","relabelings":[],"scheme":"http","scrapeTimeout":"10s"}` | Enable PodMonitor for Prometheus Operator. |
 | controller.monitoring.prometheusRule | object | `{"apiVersion":"monitoring.coreos.com/v1","enabled":false,"labels":{},"namespace":"","rules":[]}` | Create PrometheusRule resources for the controller. |
 | controller.monitoring.serviceMonitor | object | `{"annotations":{},"apiVersion":"monitoring.coreos.com/v1","enabled":false,"honorLabels":true,"interval":"30s","labels":{},"metricRelabelings":[],"namespace":"","path":"/metrics","relabelings":[],"sampleLimit":0,"scheme":"http","scrapeTimeout":"10s","targetLabels":[]}` | Enable ServiceMonitor for Prometheus Operator. |
 | controller.replicaCount | int | `1` | Number of controller replicas. |
 | controller.service.enabled | bool | `true` | Create a metrics / health Service for the controller. |
-| controller.tls.enabled | bool | `false` | Mount a TLS Secret at /etc/pangolin/tls for the controller. Keep disabled for the default same-namespace HTTP setup. Enable only when controller.config.configEndpoint uses HTTPS and the controller needs client TLS material. When enabled and no existing Secret is provided, the chart generates a self-signed certificate. |
+| controller.tls.enabled | bool | `false` | Mount a TLS Secret at /etc/praxis/tls for the controller. Keep disabled for the default same-namespace HTTP setup. Enable only when controller.config.configEndpoint uses HTTPS and the controller needs client TLS material. When enabled and no existing Secret is provided, the chart generates a self-signed certificate. |
 | controller.tls.existingSecretName | string | `""` | Existing Secret name to use for controller TLS material. When set, the chart does not generate a Secret. |
-| controller.waitForPangolin.enabled | bool | `true` | Wait for Pangolin CONFIG_ENDPOINT before starting controller. |
+| controller.waitForPraxis.enabled | bool | `true` | Wait for Praxis CONFIG_ENDPOINT before starting controller. |
 | controller.workloadType | string | `"Deployment"` | Controller workload type. |
-| database | object | `{"cloudnativepg":{"auth":{"existingSecretName":"","generatedSecret":{"create":false,"name":"","password":"","passwordKey":"password"},"passwordKey":"password"},"cluster":{"name":"pangolin-db","port":5432,"rwServiceName":""},"connection":{"database":"pangolin","existingSecretKey":"connectionString","existingSecretName":"","generatedSecret":{"create":false,"key":"connectionString","name":""},"host":"","port":5432,"sslMode":"disable","username":"pangolin"}},"connection":{"existingSecretKey":"connectionString","existingSecretName":"","generatedSecret":{"create":true,"key":"connectionString","name":"","sslMode":"disable"}},"embedded":{"auth":{"databaseKey":"database","existingSecretName":"","generatedSecret":{"create":true,"databaseKey":"database","name":"","password":"","passwordKey":"password","usernameKey":"username"},"passwordKey":"password","usernameKey":"username"},"commonAnnotations":{},"commonLabels":{},"deployment":{"annotations":{},"labels":{},"podAnnotations":{},"podLabels":{},"updateStrategy":{}},"enabled":false,"extraEnv":{},"persistence":{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":false,"existingClaim":"","size":"8Gi","storageClass":""},"podSecurityContext":{"fsGroup":null},"resources":{"limits":{"cpu":"300m","ephemeral-storage":"128Mi","memory":"256Mi"},"requests":{"cpu":"100m","ephemeral-storage":"16Mi","memory":"128Mi"}},"service":{"annotations":{},"enabled":true,"labels":{},"port":5432,"type":"ClusterIP"},"workloadType":{"kind":"StatefulSet","replicaCount":1}},"external":{"enabled":false,"existingSecretKey":"connectionString","existingSecretName":"","generatedSecret":{"connectionString":"","create":false,"database":"","host":"","key":"connectionString","name":"","password":"","port":5432,"sslMode":"disable","username":""}},"mode":"cloudnativepg","name":"pangolin","sqlite":{"path":"/app/data/pangolin.db","persistence":{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":false,"existingClaim":"","labels":{},"size":"1Gi","storageClass":""}},"username":"pangolin"}` | --------------------------------------------------------------------------- # @section Database |
-| database.cloudnativepg | object | `{"auth":{"existingSecretName":"","generatedSecret":{"create":false,"name":"","password":"","passwordKey":"password"},"passwordKey":"password"},"cluster":{"name":"pangolin-db","port":5432,"rwServiceName":""},"connection":{"database":"pangolin","existingSecretKey":"connectionString","existingSecretName":"","generatedSecret":{"create":false,"key":"connectionString","name":""},"host":"","port":5432,"sslMode":"disable","username":"pangolin"}}` | CloudNativePG-backed database configuration. This is the recommended production backend model for Pangolin on Kubernetes. |
-| database.cloudnativepg.auth.existingSecretName | string | `""` | Existing Secret name containing the application user password for Pangolin. This password is used to generate the final application-facing connection string. |
-| database.cloudnativepg.auth.generatedSecret.create | bool | `false` | Create a Secret containing the Pangolin database password for use with CNPG connection generation. |
+| database | object | `{"cloudnativepg":{"auth":{"existingSecretName":"","generatedSecret":{"create":false,"name":"","password":"","passwordKey":"password"},"passwordKey":"password"},"cluster":{"name":"pangolin-db","port":5432,"rwServiceName":""},"connection":{"database":"praxis","existingSecretKey":"connectionString","existingSecretName":"","generatedSecret":{"create":false,"key":"connectionString","name":""},"host":"","port":5432,"sslMode":"disable","username":"praxis"}},"connection":{"existingSecretKey":"connectionString","existingSecretName":"","generatedSecret":{"create":true,"key":"connectionString","name":"","sslMode":"disable"}},"embedded":{"auth":{"databaseKey":"database","existingSecretName":"","generatedSecret":{"create":true,"databaseKey":"database","name":"","password":"","passwordKey":"password","usernameKey":"username"},"passwordKey":"password","usernameKey":"username"},"commonAnnotations":{},"commonLabels":{},"deployment":{"annotations":{},"labels":{},"podAnnotations":{},"podLabels":{},"updateStrategy":{}},"enabled":false,"extraEnv":{},"persistence":{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":false,"existingClaim":"","size":"8Gi","storageClass":""},"podSecurityContext":{"fsGroup":null},"resources":{"limits":{"cpu":"300m","ephemeral-storage":"128Mi","memory":"256Mi"},"requests":{"cpu":"100m","ephemeral-storage":"16Mi","memory":"128Mi"}},"service":{"annotations":{},"enabled":true,"labels":{},"port":5432,"type":"ClusterIP"},"workloadType":{"kind":"StatefulSet","replicaCount":1}},"external":{"enabled":false,"existingSecretKey":"connectionString","existingSecretName":"","generatedSecret":{"connectionString":"","create":false,"database":"","host":"","key":"connectionString","name":"","password":"","port":5432,"sslMode":"disable","username":""}},"mode":"cloudnativepg","name":"praxis","sqlite":{"path":"/app/data/praxis.db","persistence":{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":false,"existingClaim":"","labels":{},"size":"1Gi","storageClass":""}},"username":"praxis"}` | --------------------------------------------------------------------------- # @section Database |
+| database.cloudnativepg | object | `{"auth":{"existingSecretName":"","generatedSecret":{"create":false,"name":"","password":"","passwordKey":"password"},"passwordKey":"password"},"cluster":{"name":"pangolin-db","port":5432,"rwServiceName":""},"connection":{"database":"praxis","existingSecretKey":"connectionString","existingSecretName":"","generatedSecret":{"create":false,"key":"connectionString","name":""},"host":"","port":5432,"sslMode":"disable","username":"praxis"}}` | CloudNativePG-backed database configuration. This is the recommended production backend model for Praxis on Kubernetes. |
+| database.cloudnativepg.auth.existingSecretName | string | `""` | Existing Secret name containing the application user password for Praxis. This password is used to generate the final application-facing connection string. |
+| database.cloudnativepg.auth.generatedSecret.create | bool | `false` | Create a Secret containing the Praxis database password for use with CNPG connection generation. |
 | database.cloudnativepg.auth.generatedSecret.name | string | `""` | Name of the generated CNPG auth Secret. Defaults to "<fullname>-cnpg-app-auth" when empty. |
-| database.cloudnativepg.auth.generatedSecret.password | string | `""` | Pangolin database password. |
+| database.cloudnativepg.auth.generatedSecret.password | string | `""` | Praxis database password. |
 | database.cloudnativepg.auth.generatedSecret.passwordKey | string | `"password"` | Key inside the generated CNPG auth Secret containing the password. |
-| database.cloudnativepg.auth.passwordKey | string | `"password"` | Key in the existing Secret containing the Pangolin database password. |
-| database.cloudnativepg.cluster.name | string | `"pangolin-db"` | CloudNativePG cluster name used for Pangolin. When `cnpg-cluster.enabled=true` and `cnpg-cluster.fullnameOverride` is set, templates prefer `cnpg-cluster.fullnameOverride` for CNPG Secret/service derivation. If both are set to different values, chart validation fails. |
+| database.cloudnativepg.auth.passwordKey | string | `"password"` | Key in the existing Secret containing the Praxis database password. |
+| database.cloudnativepg.cluster.name | string | `"pangolin-db"` | CloudNativePG cluster name used for Praxis. When `cnpg-cluster.enabled=true` and `cnpg-cluster.fullnameOverride` is set, templates prefer `cnpg-cluster.fullnameOverride` for CNPG Secret/service derivation. If both are set to different values, chart validation fails. |
 | database.cloudnativepg.cluster.port | int | `5432` | PostgreSQL port exposed by the CNPG cluster service. |
-| database.cloudnativepg.cluster.rwServiceName | string | `""` | Read-write service hostname override for Pangolin connection generation. When empty, templates can derive it from the CNPG cluster naming convention. |
-| database.cloudnativepg.connection.database | string | `"pangolin"` | Database name used in the generated Pangolin connection string. |
-| database.cloudnativepg.connection.existingSecretKey | string | `"connectionString"` | Key inside the existing Secret containing the final Pangolin CNPG connection string. |
-| database.cloudnativepg.connection.existingSecretName | string | `""` | Existing Secret containing a fully assembled Pangolin connection string for CNPG. If set, this takes precedence over chart-generated CNPG connection strings. |
-| database.cloudnativepg.connection.generatedSecret.create | bool | `false` | Create a chart-managed Secret containing the final Pangolin CNPG connection string. Requires a password to be available via database.cloudnativepg.auth.generatedSecret.password or database.cloudnativepg.auth.existingSecretName (the chart looks up the Secret at render time). If you are using the CloudNativePG-generated app Secret (typically <cluster>-app with key `uri`), leave create=false and reference it via database.connection.existingSecretName instead. |
+| database.cloudnativepg.cluster.rwServiceName | string | `""` | Read-write service hostname override for Praxis connection generation. When empty, templates can derive it from the CNPG cluster naming convention. |
+| database.cloudnativepg.connection.database | string | `"praxis"` | Database name used in the generated Praxis connection string. |
+| database.cloudnativepg.connection.existingSecretKey | string | `"connectionString"` | Key inside the existing Secret containing the final Praxis CNPG connection string. |
+| database.cloudnativepg.connection.existingSecretName | string | `""` | Existing Secret containing a fully assembled Praxis connection string for CNPG. If set, this takes precedence over chart-generated CNPG connection strings. |
+| database.cloudnativepg.connection.generatedSecret.create | bool | `false` | Create a chart-managed Secret containing the final Praxis CNPG connection string. Requires a password to be available via database.cloudnativepg.auth.generatedSecret.password or database.cloudnativepg.auth.existingSecretName (the chart looks up the Secret at render time). If you are using the CloudNativePG-generated app Secret (typically <cluster>-app with key `uri`), leave create=false and reference it via database.connection.existingSecretName instead. |
 | database.cloudnativepg.connection.generatedSecret.key | string | `"connectionString"` | Key used in the generated CNPG connection Secret. |
 | database.cloudnativepg.connection.generatedSecret.name | string | `""` | Name of the generated CNPG connection Secret. Defaults to "<fullname>-cnpg-db-connection" when empty. |
-| database.cloudnativepg.connection.host | string | `""` | Override the hostname used when generating the final Pangolin connection string. Usually left empty so templates derive it from the CNPG cluster/service. |
-| database.cloudnativepg.connection.port | int | `5432` | Override the port used when generating the final Pangolin connection string. |
-| database.cloudnativepg.connection.sslMode | string | `"disable"` | SSL mode used in the generated Pangolin connection string. Default `disable` is intended for chart-managed in-cluster CNPG connectivity unless TLS/CA is explicitly configured. |
-| database.cloudnativepg.connection.username | string | `"pangolin"` | Username used in the generated Pangolin connection string. |
-| database.connection | object | `{"existingSecretKey":"connectionString","existingSecretName":"","generatedSecret":{"create":true,"key":"connectionString","name":"","sslMode":"disable"}}` | Unified application-facing database connection secret configuration. Pangolin should always consume one consistent Secret/key pair regardless of the selected backend mode. |
-| database.connection.existingSecretKey | string | `"connectionString"` | Key inside the existing Secret containing the final Pangolin PostgreSQL connection string. |
-| database.connection.existingSecretName | string | `""` | Existing Secret name containing the final Pangolin PostgreSQL connection string. If set, this takes precedence over chart-generated connection secrets. |
-| database.connection.generatedSecret.create | bool | `true` | Create a chart-managed Secret containing the Pangolin PostgreSQL connection string. Used for `embedded` mode (chart-builds the connection string from embedded PostgreSQL credentials). For `cloudnativepg` mode, the chart auto-derives the CNPG-generated app Secret (`<cluster-name>-app`) and this flag has no effect. For `external` mode, use `database.external.generatedSecret.create` instead. |
+| database.cloudnativepg.connection.host | string | `""` | Override the hostname used when generating the final Praxis connection string. Usually left empty so templates derive it from the CNPG cluster/service. |
+| database.cloudnativepg.connection.port | int | `5432` | Override the port used when generating the final Praxis connection string. |
+| database.cloudnativepg.connection.sslMode | string | `"disable"` | SSL mode used in the generated Praxis connection string. Default `disable` is intended for chart-managed in-cluster CNPG connectivity unless TLS/CA is explicitly configured. |
+| database.cloudnativepg.connection.username | string | `"praxis"` | Username used in the generated Praxis connection string. |
+| database.connection | object | `{"existingSecretKey":"connectionString","existingSecretName":"","generatedSecret":{"create":true,"key":"connectionString","name":"","sslMode":"disable"}}` | Unified application-facing database connection secret configuration. Praxis should always consume one consistent Secret/key pair regardless of the selected backend mode. |
+| database.connection.existingSecretKey | string | `"connectionString"` | Key inside the existing Secret containing the final Praxis PostgreSQL connection string. |
+| database.connection.existingSecretName | string | `""` | Existing Secret name containing the final Praxis PostgreSQL connection string. If set, this takes precedence over chart-generated connection secrets. |
+| database.connection.generatedSecret.create | bool | `true` | Create a chart-managed Secret containing the Praxis PostgreSQL connection string. Used for `embedded` mode (chart-builds the connection string from embedded PostgreSQL credentials). For `cloudnativepg` mode, the chart auto-derives the CNPG-generated app Secret (`<cluster-name>-app`) and this flag has no effect. For `external` mode, use `database.external.generatedSecret.create` instead. |
 | database.connection.generatedSecret.key | string | `"connectionString"` | Key used inside the generated Secret for the final connection string. |
 | database.connection.generatedSecret.name | string | `""` | Name of the generated connection Secret. Defaults to "<fullname>-db-connection" when empty. |
 | database.connection.generatedSecret.sslMode | string | `"disable"` | SSL mode appended to generated PostgreSQL connection strings where applicable. Default `disable` is intended for simple in-cluster chart-managed database paths. For external/production PostgreSQL, prefer `require`, `verify-ca`, or `verify-full` with proper CA handling. |
@@ -634,8 +634,8 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | database.embedded.workloadType.replicaCount | int | `1` | Number of embedded PostgreSQL replicas. Keep this at 1 unless you explicitly know what you are doing. |
 | database.external | object | `{"enabled":false,"existingSecretKey":"connectionString","existingSecretName":"","generatedSecret":{"connectionString":"","create":false,"database":"","host":"","key":"connectionString","name":"","password":"","port":5432,"sslMode":"disable","username":""}}` | Existing external PostgreSQL database configuration. |
 | database.external.existingSecretKey | string | `"connectionString"` | Key in the external Secret containing the connection string. |
-| database.external.existingSecretName | string | `""` | Existing Secret name containing a PostgreSQL connection string for Pangolin. External-mode compatibility key. Prefer using database.connection.existingSecretName when possible so Pangolin always consumes one consistent Secret/key regardless of database mode. |
-| database.external.generatedSecret.connectionString | string | `""` | Full PostgreSQL connection string for Pangolin. When set, this value is used directly and the individual connection parameters below are ignored. |
+| database.external.existingSecretName | string | `""` | Existing Secret name containing a PostgreSQL connection string for Praxis. External-mode compatibility key. Prefer using database.connection.existingSecretName when possible so Praxis always consumes one consistent Secret/key regardless of database mode. |
+| database.external.generatedSecret.connectionString | string | `""` | Full PostgreSQL connection string for Praxis. When set, this value is used directly and the individual connection parameters below are ignored. |
 | database.external.generatedSecret.create | bool | `false` | Create a chart-managed Secret containing the external PostgreSQL connection string. |
 | database.external.generatedSecret.database | string | `""` | Database name. Defaults to database.name when empty. Used when connectionString is empty. |
 | database.external.generatedSecret.host | string | `""` | PostgreSQL hostname. Used when connectionString is empty. |
@@ -645,10 +645,10 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | database.external.generatedSecret.port | int | `5432` | PostgreSQL port. Used when connectionString is empty. |
 | database.external.generatedSecret.sslMode | string | `"disable"` | SSL mode. Used when connectionString is empty. Default `disable` is intended for simple in-cluster usage. For external/production PostgreSQL, prefer `require`, `verify-ca`, or `verify-full` with proper CA handling. |
 | database.external.generatedSecret.username | string | `""` | Database username. Defaults to database.username when empty. Used when connectionString is empty. |
-| database.mode | string | `"cloudnativepg"` | Database backend mode used by Pangolin. `cloudnativepg` = preferred production mode using the CloudNativePG operator and cluster chart `external`      = use an already existing external PostgreSQL database `embedded`      = use a simple chart-managed PostgreSQL instance `sqlite`        = use SQLite (development / test only; NOT recommended for production) |
-| database.name | string | `"pangolin"` | Logical database name used by Pangolin. |
-| database.sqlite | object | `{"path":"/app/data/pangolin.db","persistence":{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":false,"existingClaim":"","labels":{},"size":"1Gi","storageClass":""}}` | SQLite backend configuration. Recommended only for development or very small test deployments. |
-| database.sqlite.path | string | `"/app/data/pangolin.db"` | SQLite database file path used by Pangolin. Its parent directory is what gets mounted when persistence is enabled, because SQLite writes -wal/-shm/journal siblings next to the database file. |
+| database.mode | string | `"cloudnativepg"` | Database backend mode used by Praxis. `cloudnativepg` = preferred production mode using the CloudNativePG operator and cluster chart `external`      = use an already existing external PostgreSQL database `embedded`      = use a simple chart-managed PostgreSQL instance `sqlite`        = use SQLite (development / test only; NOT recommended for production) |
+| database.name | string | `"praxis"` | Logical database name used by Praxis. |
+| database.sqlite | object | `{"path":"/app/data/praxis.db","persistence":{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":false,"existingClaim":"","labels":{},"size":"1Gi","storageClass":""}}` | SQLite backend configuration. Recommended only for development or very small test deployments. |
+| database.sqlite.path | string | `"/app/data/praxis.db"` | SQLite database file path used by Praxis. Its parent directory is what gets mounted when persistence is enabled, because SQLite writes -wal/-shm/journal siblings next to the database file. |
 | database.sqlite.persistence.accessModes | list | `["ReadWriteOnce"]` | Access modes for the SQLite PVC. |
 | database.sqlite.persistence.annotations | object | `{}` | Additional annotations for the SQLite PVC. |
 | database.sqlite.persistence.enabled | bool | `false` | Persist the SQLite database file on a PersistentVolumeClaim. |
@@ -656,21 +656,21 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | database.sqlite.persistence.labels | object | `{}` | Additional labels for the SQLite PVC. |
 | database.sqlite.persistence.size | string | `"1Gi"` | PVC size for SQLite data. |
 | database.sqlite.persistence.storageClass | string | `""` | StorageClass for the SQLite PVC. Falls back to `global.storageClass` when empty. |
-| database.username | string | `"pangolin"` | Database username used by Pangolin. |
+| database.username | string | `"praxis"` | Database username used by Praxis. |
 | deployment | object | `{"installTraefikController":false,"mode":"multi","traefikNamespace":"","type":"controller"}` | --------------------------------------------------------------------------- # @section Deployment topology |
 | deployment.installTraefikController | bool | `false` | Install bundled Traefik subchart when `deployment.type=controller`. |
-| deployment.mode | string | `"multi"` | Pod topology for Pangolin application components. `single` runs one Pod containing Pangolin plus optional Gerbil and either pangolin-kube-controller (controller type) or standalone Traefik (standalone type). `multi` runs separate workloads (recommended for production). |
+| deployment.mode | string | `"multi"` | Pod topology for Praxis application components. `single` runs one Pod containing Praxis plus optional Gerbil and either pangolin-kube-controller (controller type) or standalone Traefik (standalone type). `multi` runs separate workloads (recommended for production). |
 | deployment.traefikNamespace | string | `""` | Namespace where Traefik controller resources live in controller mode. Defaults to the release namespace. |
-| deployment.type | string | `"controller"` | Pangolin deployment integration mode. `controller` uses pangolin-kube-controller and Traefik CRDs. `standalone` runs an internal Traefik Pod (not recommended for production). |
-| gerbil | object | `{"args":[],"command":[],"commonAnnotations":{},"commonLabels":{},"deployment":{"annotations":{},"labels":{},"podAnnotations":{},"podLabels":{},"updateStrategy":{}},"enabled":true,"extraEnv":{},"hostGateway":{"dnsPolicy":"ClusterFirstWithHostNet","enabled":false},"persistence":{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":true,"existingClaim":"","size":"1Gi","storageClass":""},"ports":{"internalApi":3004,"wg1":51820,"wg2":21820},"probes":{},"pvc":{"annotations":{},"labels":{}},"replicaCount":1,"resources":{"limits":{"cpu":"500m","ephemeral-storage":"128Mi","memory":"512Mi"},"requests":{"cpu":"100m","ephemeral-storage":"16Mi","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"add":["NET_ADMIN"],"drop":["ALL"]},"readOnlyRootFilesystem":false,"runAsNonRoot":false},"service":{"annotations":{},"enabled":true,"externalTrafficPolicy":"","labels":{},"loadBalancerIP":"","loadBalancerSourceRanges":[],"ports":[{"name":"wg1","port":51820,"protocol":"UDP","targetPort":"wg1"},{"name":"wg2","port":21820,"protocol":"UDP","targetPort":"wg2"},{"name":"internal-api","port":3004,"protocol":"TCP","targetPort":"internal-api"}],"type":"ClusterIP"},"serviceAccount":{"annotations":{},"labels":{}},"startupMode":"normal","waitForPangolin":{"enabled":true,"endpoint":"","image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repository":"curlimages/curl","tag":"8.8.0"},"intervalSeconds":5,"stableSeconds":30,"timeoutSeconds":600}}` | --------------------------------------------------------------------------- # @section Gerbil |
+| deployment.type | string | `"controller"` | Praxis deployment integration mode. `controller` uses pangolin-kube-controller and Traefik CRDs. `standalone` runs an internal Traefik Pod (not recommended for production). |
+| gerbil | object | `{"args":[],"command":[],"commonAnnotations":{},"commonLabels":{},"deployment":{"annotations":{},"labels":{},"podAnnotations":{},"podLabels":{},"updateStrategy":{}},"enabled":true,"extraEnv":{},"hostGateway":{"dnsPolicy":"ClusterFirstWithHostNet","enabled":false},"persistence":{"accessModes":["ReadWriteOnce"],"annotations":{},"enabled":true,"existingClaim":"","size":"1Gi","storageClass":""},"ports":{"internalApi":3004,"wg1":51820,"wg2":21820},"probes":{},"pvc":{"annotations":{},"labels":{}},"replicaCount":1,"resources":{"limits":{"cpu":"500m","ephemeral-storage":"128Mi","memory":"512Mi"},"requests":{"cpu":"100m","ephemeral-storage":"16Mi","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"add":["NET_ADMIN"],"drop":["ALL"]},"readOnlyRootFilesystem":false,"runAsNonRoot":false},"service":{"annotations":{},"enabled":true,"externalTrafficPolicy":"","labels":{},"loadBalancerIP":"","loadBalancerSourceRanges":[],"ports":[{"name":"wg1","port":51820,"protocol":"UDP","targetPort":"wg1"},{"name":"wg2","port":21820,"protocol":"UDP","targetPort":"wg2"},{"name":"internal-api","port":3004,"protocol":"TCP","targetPort":"internal-api"}],"type":"ClusterIP"},"serviceAccount":{"annotations":{},"labels":{}},"startupMode":"normal","waitForPraxis":{"enabled":true,"endpoint":"","image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repository":"curlimages/curl","tag":"8.8.0"},"intervalSeconds":5,"stableSeconds":30,"timeoutSeconds":600}}` | --------------------------------------------------------------------------- # @section Gerbil |
 | gerbil.args | list | `[]` | Override the Gerbil container args. When empty the chart computes the following default args:   --reachableAt=http://<gerbil-svc>:<internalApi-port>   --generateAndSaveKeyTo=/var/config/key   --remoteConfig=http://<pangolin-svc>:<internalApi-port>/api/v1/ Set this list explicitly to pass custom args to Gerbil. |
 | gerbil.command | list | `[]` | Override the Gerbil container entrypoint (command). When empty the container image's default entrypoint is used. |
 | gerbil.commonAnnotations | object | `{}` | Annotations added to all Gerbil resources rendered by this chart. |
 | gerbil.commonLabels | object | `{}` | Labels added to all Gerbil resources rendered by this chart. |
 | gerbil.deployment.updateStrategy | object | `{}` | Rollout strategy for this component, overriding `runtime.updateStrategy`. Left empty the chart picks it: a component holding a PVC that is not ReadWriteMany is switched to Recreate, because a surged Pod could never attach the volume. |
 | gerbil.enabled | bool | `true` | Enable Gerbil component. |
-| gerbil.hostGateway.dnsPolicy | string | `"ClusterFirstWithHostNet"` | DNS policy applied together with hostNetwork. Gerbil still has to resolve the Pangolin Service for --remoteConfig, and a hostNetwork Pod with the default ClusterFirst uses the node resolver, where that name does not exist. |
-| gerbil.hostGateway.enabled | bool | `false` | TRANSITIONAL COMPATIBILITY MODE - opt-in, never enabled implicitly.  Gerbil creates its WireGuard interface in whatever network namespace it runs in. Under Kubernetes that is its own Pod namespace, so the tunnel subnet Pangolin advertises as a backend exists there and nowhere else: an externally installed Traefik has no route to it and every tunnel-backed resource returns 502 while the tunnel itself is healthy. Docker Compose avoids this by giving Traefik Gerbil's namespace outright (network_mode: service:gerbil); separate Pods have no equivalent.  With hostNetwork the interface and its connected route are created in the NODE namespace, so Pods scheduled onto that node reach the tunnel through the node routing table.  This is a workaround for a missing portable data path, not the intended architecture. It is expected to be superseded - see the chart README.  Requirements and consequences:   - Traefik MUST run on the same node. `traefik.colocateWithGerbil` handles the     chart-managed Traefik; `helm get notes` prints the snippet for an external one.   - Your CNI must masquerade Pod egress leaving the node (the default for Flannel,     Calico with natOutgoing, and Cilium). Without it the remote WireGuard peer sees     the Traefik Pod IP as source and drops the reply.   - The namespace must permit hostNetwork, i.e. Pod Security Admission `privileged`.   - Gerbil binds its ports on the node: one Gerbil per node, replicaCount must be 1. |
+| gerbil.hostGateway.dnsPolicy | string | `"ClusterFirstWithHostNet"` | DNS policy applied together with hostNetwork. Gerbil still has to resolve the Praxis Service for --remoteConfig, and a hostNetwork Pod with the default ClusterFirst uses the node resolver, where that name does not exist. |
+| gerbil.hostGateway.enabled | bool | `false` | TRANSITIONAL COMPATIBILITY MODE - opt-in, never enabled implicitly.  Gerbil creates its WireGuard interface in whatever network namespace it runs in. Under Kubernetes that is its own Pod namespace, so the tunnel subnet Praxis advertises as a backend exists there and nowhere else: an externally installed Traefik has no route to it and every tunnel-backed resource returns 502 while the tunnel itself is healthy. Docker Compose avoids this by giving Traefik Gerbil's namespace outright (network_mode: service:gerbil); separate Pods have no equivalent.  With hostNetwork the interface and its connected route are created in the NODE namespace, so Pods scheduled onto that node reach the tunnel through the node routing table.  This is a workaround for a missing portable data path, not the intended architecture. It is expected to be superseded - see the chart README.  Requirements and consequences:   - Traefik MUST run on the same node. `traefik.colocateWithGerbil` handles the     chart-managed Traefik; `helm get notes` prints the snippet for an external one.   - Your CNI must masquerade Pod egress leaving the node (the default for Flannel,     Calico with natOutgoing, and Cilium). Without it the remote WireGuard peer sees     the Traefik Pod IP as source and drops the reply.   - The namespace must permit hostNetwork, i.e. Pod Security Admission `privileged`.   - Gerbil binds its ports on the node: one Gerbil per node, replicaCount must be 1. |
 | gerbil.persistence.accessModes | list | `["ReadWriteOnce"]` | Access modes for the Gerbil PVC. |
 | gerbil.persistence.annotations | object | `{}` | Additional annotations for the Gerbil PVC. |
 | gerbil.persistence.enabled | bool | `true` | Persist Gerbil key/config data on a PVC. Enabled by default (production-recommended): Gerbil saves its WireGuard private key to /var/config/key. Without persistence the key regenerates on every restart, which forces all WireGuard peers to re-handshake and breaks connectivity until peers reconnect. Disable only for ephemeral dev/CI environments where key rotation is acceptable. |
@@ -686,8 +686,8 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | gerbil.service.enabled | bool | `true` | Create a Service for Gerbil UDP traffic. Enabled by default so a standard installation can receive WireGuard traffic without hostNetwork/hostPort overrides. |
 | gerbil.service.loadBalancerIP | string | `""` | Fixed IP to request from the cloud provider when type=LoadBalancer. Leave empty to let the provider assign an IP automatically. |
 | gerbil.startupMode | string | `"normal"` | Gerbil first-run startup behavior. `normal`: render and start Gerbil immediately. `delayed`: render Gerbil resources but keep the multi-mode Gerbil Deployment at replicas=0. `disabledUntilSetup`: do not render Gerbil resources until switched back to `normal` (or `delayed`). |
-| gerbil.waitForPangolin.enabled | bool | `true` | Wait for Pangolin internal API before starting Gerbil. |
-| gerbil.waitForPangolin.endpoint | string | `""` | Override endpoint checked by the wait initContainer. Defaults to http://<pangolin-service>:<internal-api-port>/api/v1/ |
+| gerbil.waitForPraxis.enabled | bool | `true` | Wait for Praxis internal API before starting Gerbil. |
+| gerbil.waitForPraxis.endpoint | string | `""` | Override endpoint checked by the wait initContainer. Defaults to http://<pangolin-service>:<internal-api-port>/api/v1/ |
 | global | object | `{"additionalAnnotations":{},"additionalLabels":{},"additionalPodAnnotations":{},"additionalPodLabels":{},"additionalServiceAnnotations":{},"additionalServiceLabels":{},"affinity":{},"clusterDomain":"cluster.local","commonAnnotations":{},"commonLabels":{},"containerSecurityContext":{},"extraEnv":{},"fullnameOverride":"","image":{"imagePullPolicy":"IfNotPresent","imagePullSecrets":[],"registry":"docker.io"},"nameOverride":"","namespaceOverride":"","nodeSelector":{},"podSecurityContext":{"fsGroupChangePolicy":"OnRootMismatch","seccompProfile":{"type":"RuntimeDefault"}},"priorityClassName":"","revisionHistoryLimit":10,"storageClass":"","tolerations":[],"topologySpreadConstraints":[]}` | --------------------------------------------------------------------------- # @section Global settings |
 | global.additionalAnnotations | object | `{}` | Common annotations applied to all resources rendered by this chart. |
 | global.additionalLabels | object | `{}` | Common labels applied to all resources rendered by this chart. |
@@ -717,27 +717,27 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | highAvailability | object | `{"podAntiAffinity":{"enabled":false,"labelSelector":{},"topologyKey":"kubernetes.io/hostname","type":"soft","weight":100},"podDisruptionBudget":{"annotations":{},"enabled":false,"labels":{},"maxUnavailable":null,"minAvailable":1}}` | --------------------------------------------------------------------------- # @section High availability |
 | highAvailability.podAntiAffinity | object | `{"enabled":false,"labelSelector":{},"topologyKey":"kubernetes.io/hostname","type":"soft","weight":100}` | Optional anti-affinity helper for spreading replicas. |
 | highAvailability.podDisruptionBudget | object | `{"annotations":{},"enabled":false,"labels":{},"maxUnavailable":null,"minAvailable":1}` | Enable a chart-managed PodDisruptionBudget for applicable workloads. |
-| images | object | `{"controller":{"digest":"","pullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"fosrl/pangolin-kube-controller","tag":"0.1.0"},"gerbil":{"digest":"","pullPolicy":"IfNotPresent","registry":"docker.io","repository":"fosrl/gerbil","tag":"1.6.0"},"pangolin":{"digest":"","pullPolicy":"IfNotPresent","registry":"docker.io","repository":"fosrl/pangolin","tag":""},"pangolinPostgresql":{"digest":"","pullPolicy":"IfNotPresent","registry":"docker.io","repository":"fosrl/pangolin","tag":""},"postgres":{"digest":"","pullPolicy":"IfNotPresent","registry":"docker.io","repository":"postgres","tag":"18.3-alpine"},"traefik":{"digest":"","pullPolicy":"IfNotPresent","registry":"docker.io","repository":"traefik","tag":"v3.7.19"}}` | --------------------------------------------------------------------------- # @section Images |
-| images.controller.digest | string | `""` | Pangolin kube controller image digest. Overrides tag when set. |
-| images.controller.pullPolicy | string | `"IfNotPresent"` | Pangolin kube controller image pull policy. |
-| images.controller.registry | string | `"ghcr.io"` | Pangolin kube controller image registry. |
-| images.controller.repository | string | `"fosrl/pangolin-kube-controller"` | Pangolin kube controller image repository. |
-| images.controller.tag | string | `"0.1.0"` | Pangolin kube controller image tag. Managed independently from `.Chart.AppVersion`. |
+| images | object | `{"controller":{"digest":"","pullPolicy":"IfNotPresent","registry":"ghcr.io","repository":"causq-networks/praxis-kube-controller","tag":"0.1.0"},"gerbil":{"digest":"","pullPolicy":"IfNotPresent","registry":"docker.io","repository":"causq-networks/praxis-gerbil","tag":"1.6.0"},"praxis":{"digest":"","pullPolicy":"IfNotPresent","registry":"docker.io","repository":"causq-networks/praxis","tag":""},"pangolinPostgresql":{"digest":"","pullPolicy":"IfNotPresent","registry":"docker.io","repository":"causq-networks/praxis","tag":""},"postgres":{"digest":"","pullPolicy":"IfNotPresent","registry":"docker.io","repository":"postgres","tag":"18.3-alpine"},"traefik":{"digest":"","pullPolicy":"IfNotPresent","registry":"docker.io","repository":"traefik","tag":"v3.7.19"}}` | --------------------------------------------------------------------------- # @section Images |
+| images.controller.digest | string | `""` | Praxis kube controller image digest. Overrides tag when set. |
+| images.controller.pullPolicy | string | `"IfNotPresent"` | Praxis kube controller image pull policy. |
+| images.controller.registry | string | `"ghcr.io"` | Praxis kube controller image registry. |
+| images.controller.repository | string | `"causq-networks/praxis-kube-controller"` | Praxis kube controller image repository. |
+| images.controller.tag | string | `"0.1.0"` | Praxis kube controller image tag. Managed independently from `.Chart.AppVersion`. |
 | images.gerbil.digest | string | `""` | Gerbil image digest. Overrides tag when set. |
 | images.gerbil.pullPolicy | string | `"IfNotPresent"` | Gerbil image pull policy. |
 | images.gerbil.registry | string | `"docker.io"` | Gerbil image registry. |
-| images.gerbil.repository | string | `"fosrl/gerbil"` | Gerbil image repository. |
+| images.gerbil.repository | string | `"causq-networks/praxis-gerbil"` | Gerbil image repository. |
 | images.gerbil.tag | string | `"1.6.0"` | Gerbil image tag. |
-| images.pangolin.digest | string | `""` | Pangolin image digest. Overrides tag and automatic image selection when set. |
-| images.pangolin.pullPolicy | string | `"IfNotPresent"` | Pangolin image pull policy. |
-| images.pangolin.registry | string | `"docker.io"` | Pangolin image registry. The chart selects the correct image variant based on `database.mode` automatically. Set an explicit `tag` or `digest` to override automatic image selection. |
-| images.pangolin.repository | string | `"fosrl/pangolin"` | Pangolin image repository. |
-| images.pangolin.tag | string | `""` | Pangolin image tag. Defaults to .Chart.AppVersion when empty. Set this to override automatic database-mode-based image selection. |
-| images.pangolinPostgresql.digest | string | `""` | PostgreSQL-capable Pangolin image digest. Overrides tag when set. |
-| images.pangolinPostgresql.pullPolicy | string | `"IfNotPresent"` | PostgreSQL-capable Pangolin image pull policy. |
-| images.pangolinPostgresql.registry | string | `"docker.io"` | PostgreSQL-capable Pangolin image registry. Used automatically when database.mode is not sqlite (unless images.pangolin.tag or images.pangolin.digest is set). |
-| images.pangolinPostgresql.repository | string | `"fosrl/pangolin"` | PostgreSQL-capable Pangolin image repository. |
-| images.pangolinPostgresql.tag | string | `""` | PostgreSQL-capable Pangolin image tag. Defaults to "postgresql-<AppVersion>" when empty. |
+| images.pangolin.digest | string | `""` | Praxis image digest. Overrides tag and automatic image selection when set. |
+| images.pangolin.pullPolicy | string | `"IfNotPresent"` | Praxis image pull policy. |
+| images.pangolin.registry | string | `"docker.io"` | Praxis image registry. The chart selects the correct image variant based on `database.mode` automatically. Set an explicit `tag` or `digest` to override automatic image selection. |
+| images.pangolin.repository | string | `"causq-networks/praxis"` | Praxis image repository. |
+| images.pangolin.tag | string | `""` | Praxis image tag. Defaults to .Chart.AppVersion when empty. Set this to override automatic database-mode-based image selection. |
+| images.pangolinPostgresql.digest | string | `""` | PostgreSQL-capable Praxis image digest. Overrides tag when set. |
+| images.pangolinPostgresql.pullPolicy | string | `"IfNotPresent"` | PostgreSQL-capable Praxis image pull policy. |
+| images.pangolinPostgresql.registry | string | `"docker.io"` | PostgreSQL-capable Praxis image registry. Used automatically when database.mode is not sqlite (unless images.pangolin.tag or images.pangolin.digest is set). |
+| images.pangolinPostgresql.repository | string | `"causq-networks/praxis"` | PostgreSQL-capable Praxis image repository. |
+| images.pangolinPostgresql.tag | string | `""` | PostgreSQL-capable Praxis image tag. Defaults to "postgresql-<AppVersion>" when empty. |
 | images.postgres.digest | string | `""` | Embedded Postgres image digest. Overrides tag when set. |
 | images.postgres.pullPolicy | string | `"IfNotPresent"` | Embedded Postgres image pull policy. |
 | images.postgres.registry | string | `"docker.io"` | Embedded Postgres image registry. |
@@ -755,10 +755,10 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | namespace.podSecurity.audit | string | `""` | PSA audit level applied to the namespace. |
 | namespace.podSecurity.enforce | string | `""` | PSA enforce level applied to the namespace. Use "privileged" to allow Gerbil's NET_ADMIN capability. |
 | namespace.podSecurity.warn | string | `""` | PSA warn level applied to the namespace. |
-| networkPolicy | object | `{"allowExternalEgressHttps":false,"allowExternalIngress":true,"controller":{"egress":{"enabled":true,"kubernetesApi":{"cidr":"","enabled":true,"endpoints":[{"cidrs":["10.0.0.0/8","172.16.0.0/12","192.168.0.0/16","100.64.0.0/10","169.254.0.0/16"],"ports":[443,6443]}],"port":443}},"extraEgress":[],"extraIngress":[],"metrics":{"allowExternalIngress":false,"enabled":false,"from":[],"namespaceSelector":{},"podSelector":{}}},"database":{"cnpgPeers":[],"enabled":true,"externalCIDRs":[],"extraEgress":[],"extraIngress":[],"port":5432},"dns":{"enabled":true,"ports":[{"port":53,"protocol":"UDP"},{"port":53,"protocol":"TCP"}],"to":[{"namespaceSelector":{"matchLabels":{"kubernetes.io/metadata.name":"kube-system"}}}]},"enabled":true,"extraEgress":[],"extraIngress":[],"gerbil":{"allowWireguardUdpEgress":true,"extraEgress":[],"extraIngress":[],"hostGateway":{"nodeCIDRs":[]},"wireguardUdpCIDRs":["0.0.0.0/0"]},"kubernetesApiCIDRs":[],"pangolin":{"externalIngress":{"aiGateway":false,"external":true,"integration":false,"next":null,"requireIntegrationFlag":true},"extraEgress":[],"extraIngress":[],"ingress":{"aiGateway":{"from":[],"fromTraefik":true},"dashboard":{"from":[]}}}}` | --------------------------------------------------------------------------- # @section NetworkPolicy |
+| networkPolicy | object | `{"allowExternalEgressHttps":false,"allowExternalIngress":true,"controller":{"egress":{"enabled":true,"kubernetesApi":{"cidr":"","enabled":true,"endpoints":[{"cidrs":["10.0.0.0/8","172.16.0.0/12","192.168.0.0/16","100.64.0.0/10","169.254.0.0/16"],"ports":[443,6443]}],"port":443}},"extraEgress":[],"extraIngress":[],"metrics":{"allowExternalIngress":false,"enabled":false,"from":[],"namespaceSelector":{},"podSelector":{}}},"database":{"cnpgPeers":[],"enabled":true,"externalCIDRs":[],"extraEgress":[],"extraIngress":[],"port":5432},"dns":{"enabled":true,"ports":[{"port":53,"protocol":"UDP"},{"port":53,"protocol":"TCP"}],"to":[{"namespaceSelector":{"matchLabels":{"kubernetes.io/metadata.name":"kube-system"}}}]},"enabled":true,"extraEgress":[],"extraIngress":[],"gerbil":{"allowWireguardUdpEgress":true,"extraEgress":[],"extraIngress":[],"hostGateway":{"nodeCIDRs":[]},"wireguardUdpCIDRs":["0.0.0.0/0"]},"kubernetesApiCIDRs":[],"praxis":{"externalIngress":{"aiGateway":false,"external":true,"integration":false,"next":null,"requireIntegrationFlag":true},"extraEgress":[],"extraIngress":[],"ingress":{"aiGateway":{"from":[],"fromTraefik":true},"dashboard":{"from":[]}}}}` | --------------------------------------------------------------------------- # @section NetworkPolicy |
 | networkPolicy.allowExternalEgressHttps | bool | `false` | Allow HTTPS egress (TCP/443) to 0.0.0.0/0. Disabled by default; prefer using `networkPolicy.extraEgress` for a scoped allow-list. |
 | networkPolicy.allowExternalIngress | bool | `true` | Allow ingress from everywhere to public entrypoints / services managed by this chart. Component-level controls below can further restrict which ports open externally. |
-| networkPolicy.controller.egress.enabled | bool | `true` | Enable explicit controller egress NetworkPolicy. When disabled, no controller egress policy is rendered by this chart even if DNS/Pangolin/Kubernetes API egress rules are configured. |
+| networkPolicy.controller.egress.enabled | bool | `true` | Enable explicit controller egress NetworkPolicy. When disabled, no controller egress policy is rendered by this chart even if DNS/Praxis/Kubernetes API egress rules are configured. |
 | networkPolicy.controller.egress.kubernetesApi.cidr | string | `""` | DEPRECATED: single CIDR for the Kubernetes API server egress target. Superseded by `endpoints`. When set it takes precedence over `endpoints` and is rendered as one rule on `port`. |
 | networkPolicy.controller.egress.kubernetesApi.enabled | bool | `true` | Enable egress rules to the Kubernetes API server. The controller cannot reconcile Traefik CRDs without this, so disable it only when you supply an equivalent rule yourself via `networkPolicy.controller.extraEgress`. |
 | networkPolicy.controller.egress.kubernetesApi.endpoints | list | `[{"cidrs":["10.0.0.0/8","172.16.0.0/12","192.168.0.0/16","100.64.0.0/10","169.254.0.0/16"],"ports":[443,6443]}]` | Kubernetes API server egress destinations. Each entry allows TCP egress to every CIDR in `cidrs` on every port in `ports`; `except` is optional.  Two destinations have to be covered because CNIs disagree about when a NetworkPolicy is evaluated relative to kube-proxy DNAT:   pre-DNAT  -> the `kubernetes` Service ClusterIP on 443 (k3s 10.43.0.1, kubeadm 10.96.0.1)   post-DNAT -> the control-plane node IP(s) on 6443 (k3s, RKE2) or 443 (managed) Neither address is discoverable at template time, so the default covers the private ranges those addresses fall in, on both ports. It is deliberately not `0.0.0.0/0`: general outbound HTTPS stays behind `networkPolicy.allowExternalEgressHttps`, and this rule must not quietly become internet egress.  Narrow it once you know your cluster's API address, for example:   endpoints:     - cidrs: ["10.43.0.1/32"]       ports: [443]     - cidrs: ["192.168.1.10/32", "192.168.1.11/32"]       ports: [6443] |
@@ -771,7 +771,7 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | networkPolicy.controller.metrics.namespaceSelector | object | `{}` | Optional namespace selector for scoped metrics ingress. |
 | networkPolicy.controller.metrics.podSelector | object | `{}` | Optional pod selector for scoped metrics ingress. |
 | networkPolicy.database.cnpgPeers | list | `[]` | Optional explicit peers used for CNPG DB egress. If empty, same-namespace egress is used. |
-| networkPolicy.database.enabled | bool | `true` | Add DB egress rules for Pangolin workload. |
+| networkPolicy.database.enabled | bool | `true` | Add DB egress rules for Praxis workload. |
 | networkPolicy.database.externalCIDRs | list | `[]` | Optional CIDRs used for external DB egress. |
 | networkPolicy.database.extraEgress | list | `[]` | Additional egress rules appended to the embedded-postgres NetworkPolicy only. |
 | networkPolicy.database.extraIngress | list | `[]` | Additional ingress rules appended to the embedded-postgres NetworkPolicy only. |
@@ -785,21 +785,21 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | networkPolicy.gerbil.allowWireguardUdpEgress | bool | `true` | Allow UDP egress for WireGuard peer traffic. |
 | networkPolicy.gerbil.extraEgress | list | `[]` | Additional egress rules appended to the Gerbil NetworkPolicy only. Use this for Gerbil-specific outbound rules. |
 | networkPolicy.gerbil.extraIngress | list | `[]` | Additional ingress rules appended to the Gerbil NetworkPolicy only. |
-| networkPolicy.gerbil.hostGateway.nodeCIDRs | list | `[]` | Source CIDRs used for the Gerbil -> Pangolin internal-API rule when `gerbil.hostGateway.enabled=true`. A hostNetwork Pod is not matched by a podSelector on any mainstream CNI - its traffic sources from the node IP - so the rule has to be expressed as node address blocks or Gerbil's --remoteConfig polling is blackholed by this chart's own default policy. There is no safe default: RFC1918 and CGNAT contain every mainstream Pod CIDR (flannel 10.244/16, k3s 10.42/16, Calico 192.168/16), so seeding this with those ranges would admit every Pod in the cluster to Pangolin's internal API instead of just the Gerbil node. Supply your node addresses:   kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}' |
+| networkPolicy.gerbil.hostGateway.nodeCIDRs | list | `[]` | Source CIDRs used for the Gerbil -> Praxis internal-API rule when `gerbil.hostGateway.enabled=true`. A hostNetwork Pod is not matched by a podSelector on any mainstream CNI - its traffic sources from the node IP - so the rule has to be expressed as node address blocks or Gerbil's --remoteConfig polling is blackholed by this chart's own default policy. There is no safe default: RFC1918 and CGNAT contain every mainstream Pod CIDR (flannel 10.244/16, k3s 10.42/16, Calico 192.168/16), so seeding this with those ranges would admit every Pod in the cluster to Praxis's internal API instead of just the Gerbil node. Supply your node addresses:   kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}' |
 | networkPolicy.gerbil.wireguardUdpCIDRs | list | `["0.0.0.0/0"]` | CIDRs allowed for Gerbil UDP egress when WireGuard egress is enabled. |
 | networkPolicy.kubernetesApiCIDRs | list | `[]` | DEPRECATED: CIDRs allowed for controller egress to the Kubernetes API on `networkPolicy.controller.egress.kubernetesApi.port`. Superseded by `networkPolicy.controller.egress.kubernetesApi.endpoints`. When this or the deprecated `kubernetesApi.cidr` is set it takes precedence over `endpoints`, so an existing scoped allow-list is never widened by an upgrade. |
-| networkPolicy.pangolin.externalIngress.aiGateway | bool | `false` | Allow ingress on the Pangolin AI gateway port from every source. Off by default. The gateway proxies to model providers on the caller's behalf and holds the virtual API keys that pay for it, so it is not a port to hand to every Pod in the cluster. The supported path is the source-scoped rule under `networkPolicy.pangolin.ingress.aiGateway`; turn this on only for a caller that cannot be expressed as a peer there. |
-| networkPolicy.pangolin.externalIngress.external | bool | `true` | Allow external ingress on Pangolin public port. |
-| networkPolicy.pangolin.externalIngress.integration | bool | `false` | Allow external ingress on Pangolin integration API port. |
-| networkPolicy.pangolin.externalIngress.next | string | `nil` | Allow external ingress on the Pangolin next (dashboard) port. `null` (default) derives this from the chart-managed dashboard IngressRoute: the port is opened exactly when a route actually targets it, so enabling the dashboard no longer leaves it blocked (#22) and standalone mode keeps it shut. Set an explicit `true`/`false` to override the derivation. |
+| networkPolicy.pangolin.externalIngress.aiGateway | bool | `false` | Allow ingress on the Praxis AI gateway port from every source. Off by default. The gateway proxies to model providers on the caller's behalf and holds the virtual API keys that pay for it, so it is not a port to hand to every Pod in the cluster. The supported path is the source-scoped rule under `networkPolicy.pangolin.ingress.aiGateway`; turn this on only for a caller that cannot be expressed as a peer there. |
+| networkPolicy.pangolin.externalIngress.external | bool | `true` | Allow external ingress on Praxis public port. |
+| networkPolicy.pangolin.externalIngress.integration | bool | `false` | Allow external ingress on Praxis integration API port. |
+| networkPolicy.pangolin.externalIngress.next | string | `nil` | Allow external ingress on the Praxis next (dashboard) port. `null` (default) derives this from the chart-managed dashboard IngressRoute: the port is opened exactly when a route actually targets it, so enabling the dashboard no longer leaves it blocked (#22) and standalone mode keeps it shut. Set an explicit `true`/`false` to override the derivation. |
 | networkPolicy.pangolin.externalIngress.requireIntegrationFlag | bool | `true` | Require `pangolin.config.flags.enable_integration_api=true` before opening integration ingress. |
-| networkPolicy.pangolin.extraEgress | list | `[]` | Additional egress rules appended to the Pangolin NetworkPolicy only. Use this for Pangolin-specific outbound rules such as SMTP or OIDC provider egress. |
-| networkPolicy.pangolin.extraIngress | list | `[]` | Additional ingress rules appended to the Pangolin NetworkPolicy only. |
-| networkPolicy.pangolin.ingress.aiGateway.from | list | `[]` | Additional source peers allowed to reach the Pangolin AI gateway port. Each item supports standard NetworkPolicyPeer fields (namespaceSelector, podSelector, ipBlock). This is the supported mechanism for an externally installed Traefik: the chart cannot select a workload it did not render, so name it here. For example:   from:     - namespaceSelector:         matchLabels:           kubernetes.io/metadata.name: traefik       podSelector:         matchLabels:           app.kubernetes.io/name: traefik |
-| networkPolicy.pangolin.ingress.aiGateway.fromTraefik | bool | `true` | Allow the Traefik this chart knows about to reach the AI gateway port. Every AI gateway resource is a route Traefik terminates and forwards to this port on the Pangolin Pod, so the path needs a rule - but only for Traefik, which is why this is source-scoped instead of an open port.  The peer is derived from the topology:   chart-managed standalone Traefik -> the Pod this chart renders   bundled Traefik subchart         -> the Pods that subchart renders, plus a                                       namespaceSelector when                                       `traefikController.namespaceOverride` moves                                       them out of the release namespace   externally installed Traefik     -> nothing is derivable; name it in `from` below  `deployment.mode=single` needs no rule: Traefik runs in the Pangolin Pod and reaches the gateway over loopback, which NetworkPolicy does not govern. |
-| networkPolicy.pangolin.ingress.dashboard.from | list | `[]` | Optional source peers allowed to reach Pangolin public dashboard/API port. Each item supports standard NetworkPolicyPeer fields (namespaceSelector, podSelector, ipBlock). Applies only when `networkPolicy.pangolin.externalIngress.external=true`. |
-| pangolin | object | `{"blueprints":{"configMap":{"create":false,"name":""},"enabled":false,"environment":{},"environmentSecret":{"create":false,"name":""},"existingConfigMap":"","existingEnvironmentSecret":"","files":{}},"commonAnnotations":{},"commonLabels":{},"config":{"app":{"dashboard_url":"https://pangolin.example.com","log_failed_attempts":true,"log_level":"info","notifications":{"new_releases":true,"product_updates":true},"save_logs":false,"telemetry":{"anonymous_usage":true}},"domains":{"domain1":{"base_domain":"example.com","cert_resolver":"letsencrypt"}},"email":{"enabled":false,"no_reply":"","smtp_host":"","smtp_port":587,"smtp_secure":false,"smtp_tls_reject_unauthorized":true,"smtp_user":""},"extraConfig":"","flags":{"allow_raw_resources":true,"disable_basic_wireguard_sites":false,"disable_config_managed_domains":false,"disable_enterprise_features":false,"disable_local_sites":false,"disable_private_http_placeholder":false,"disable_product_help_banners":false,"disable_signup_without_invite":true,"disable_user_create_org":false,"disable_virtual_api_keys_ui":false,"enable_acme_cert_sync":true,"enable_integration_api":false,"require_email_verification":false},"gerbil":{"base_endpoint":"pangolin.example.com","block_size":24,"clients_start_port":21820,"site_block_size":30,"start_port":51820,"subnet_group":"100.89.137.0/20"},"offline_checker":{"check_interval_ms":null,"newt_threshold_ms":null,"newt_wireguard_threshold_ms":null,"olm_threshold_ms":null,"remote_exit_node_threshold_ms":null},"orgs":{"block_size":24,"enabled":false,"subnet_group":"100.90.128.0/20","utility_subnet_group":"100.96.128.0/20"},"postgres":{"enabled":false,"pool":{"connection_timeout_ms":5000,"idle_timeout_ms":30000,"max_connections":20,"max_replica_connections":10}},"rate_limits":{"auth":{"max_requests":10,"window_minutes":1},"enabled":true,"global":{"max_requests":500,"window_minutes":1}},"server":{"ai_gateway_override":"","badger_override":"","cors":{"allowed_headers":[],"credentials":false,"methods":[],"origins":[]},"custom_ip_header":"","dashboard_session_length_hours":720,"enable_ai_gateway_client_ip_header":false,"internal_hostname":"","maxmind_asn_path":"","maxmind_db_path":"","remote_headers":{"email":"Remote-Email","name":"Remote-Name","role":"Remote-Role","user":"Remote-User","user_id":"Remote-User-Id","virtual_api_key_id":"Remote-Virtual-Api-Key-Id"},"resource_access_token_headers":{"id":"P-Access-Token-Id","token":"P-Access-Token"},"resource_access_token_param":"p_token","resource_session_length_hours":720,"resource_session_request_param":"p_session_request","session_cookie_name":"p_session_token","trust_ips":[],"trust_proxy":1},"traefik":{"additional_middlewares":[],"cert_resolver":"letsencrypt","enabled":true,"http_entrypoint":"web","https_entrypoint":"websecure","prefer_wildcard_cert":false,"rate_limit":{"average":0,"burst":0},"site_types":[],"static_domains":[]}},"configFile":{"enabled":true},"configMap":{"annotations":{},"labels":{}},"databaseWait":{"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repository":"postgres","tag":"17"},"intervalSeconds":5,"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":65534},"stableSeconds":30,"timeoutSeconds":600},"deployment":{"annotations":{},"labels":{},"podAnnotations":{},"podLabels":{},"updateStrategy":{}},"extraEnv":{},"extraVolumeMounts":[],"extraVolumes":[],"ingressRoute":{"dashboard":{"allowCrossNamespaceServices":false,"annotations":{},"enabled":true,"entryPoints":["websecure"],"host":"","ingressClassName":"","labels":{},"name":"","namespace":"","routes":{"api":{"enabled":true,"middlewares":[],"pathPrefix":"/api/v1","priority":100,"service":{"name":"","namespace":"","port":null}},"dashboard":{"enabled":true,"middlewares":[],"priority":10,"service":{"name":"","namespace":"","port":null}}},"tls":{"certResolver":"","domains":[],"enabled":true,"options":{"name":"","namespace":""},"secretName":"","store":{"name":"","namespace":""}},"traefikSelectorLabels":{}}},"privateConfig":{"enabled":false,"existingSecretKey":"privateConfig.yml","existingSecretName":"","generatedSecret":{"create":false,"data":"","key":"privateConfig.yml","name":""}},"probes":{"liveness":{"failureThreshold":3,"httpGet":{"path":"/api/v1/traefik-config","port":"internal-api"},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":5},"readiness":{"failureThreshold":3,"httpGet":{"path":"/api/v1/traefik-config","port":"internal-api"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":5},"startup":{"failureThreshold":60,"httpGet":{"path":"/api/v1/traefik-config","port":"internal-api"},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":5}},"replicaCount":1,"resources":{"limits":{"cpu":"1000m","ephemeral-storage":"256Mi","memory":"1Gi"},"requests":{"cpu":"200m","ephemeral-storage":"32Mi","memory":"256Mi"}},"secret":{"annotations":{},"existingSecretKey":"SERVER_SECRET","existingSecretName":"","generated":{"create":true,"key":"SERVER_SECRET","length":64,"name":""},"labels":{}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":false,"runAsNonRoot":false},"service":{"annotations":{},"enabled":true,"labels":{},"ports":{"aiGateway":3005,"external":3000,"integration":3003,"internalApi":3001,"next":3002},"type":"ClusterIP"},"serviceAccount":{"annotations":{},"labels":{}},"workloadType":"Deployment"}` | --------------------------------------------------------------------------- # @section Pangolin core application |
-| pangolin.blueprints | object | `{"configMap":{"create":false,"name":""},"enabled":false,"environment":{},"environmentSecret":{"create":false,"name":""},"existingConfigMap":"","existingEnvironmentSecret":"","files":{}}` | provisioning-blueprint-file. Blueprints are NOT consumed directly by the Pangolin server. Enabling this feature stores blueprint definitions as Kubernetes ConfigMaps/Secrets within this Helm release so they can be managed declaratively alongside the rest of the chart.  Blueprint YAML supports environment variable templating using {{env.VARIABLE_NAME}} syntax. Sensitive templating values (e.g. per-site serial numbers, customer IDs) must be stored in a Secret, not a ConfigMap.  See https://docs.pangolin.net/manage/blueprints for the blueprint schema. |
+| networkPolicy.pangolin.extraEgress | list | `[]` | Additional egress rules appended to the Praxis NetworkPolicy only. Use this for Praxis-specific outbound rules such as SMTP or OIDC provider egress. |
+| networkPolicy.pangolin.extraIngress | list | `[]` | Additional ingress rules appended to the Praxis NetworkPolicy only. |
+| networkPolicy.pangolin.ingress.aiGateway.from | list | `[]` | Additional source peers allowed to reach the Praxis AI gateway port. Each item supports standard NetworkPolicyPeer fields (namespaceSelector, podSelector, ipBlock). This is the supported mechanism for an externally installed Traefik: the chart cannot select a workload it did not render, so name it here. For example:   from:     - namespaceSelector:         matchLabels:           kubernetes.io/metadata.name: traefik       podSelector:         matchLabels:           app.kubernetes.io/name: traefik |
+| networkPolicy.pangolin.ingress.aiGateway.fromTraefik | bool | `true` | Allow the Traefik this chart knows about to reach the AI gateway port. Every AI gateway resource is a route Traefik terminates and forwards to this port on the Praxis Pod, so the path needs a rule - but only for Traefik, which is why this is source-scoped instead of an open port.  The peer is derived from the topology:   chart-managed standalone Traefik -> the Pod this chart renders   bundled Traefik subchart         -> the Pods that subchart renders, plus a                                       namespaceSelector when                                       `traefikController.namespaceOverride` moves                                       them out of the release namespace   externally installed Traefik     -> nothing is derivable; name it in `from` below  `deployment.mode=single` needs no rule: Traefik runs in the Praxis Pod and reaches the gateway over loopback, which NetworkPolicy does not govern. |
+| networkPolicy.pangolin.ingress.dashboard.from | list | `[]` | Optional source peers allowed to reach Praxis public dashboard/API port. Each item supports standard NetworkPolicyPeer fields (namespaceSelector, podSelector, ipBlock). Applies only when `networkPolicy.pangolin.externalIngress.external=true`. |
+| praxis | object | `{"blueprints":{"configMap":{"create":false,"name":""},"enabled":false,"environment":{},"environmentSecret":{"create":false,"name":""},"existingConfigMap":"","existingEnvironmentSecret":"","files":{}},"commonAnnotations":{},"commonLabels":{},"config":{"app":{"dashboard_url":"https://praxis.example.com","log_failed_attempts":true,"log_level":"info","notifications":{"new_releases":true,"product_updates":true},"save_logs":false,"telemetry":{"anonymous_usage":true}},"domains":{"domain1":{"base_domain":"example.com","cert_resolver":"letsencrypt"}},"email":{"enabled":false,"no_reply":"","smtp_host":"","smtp_port":587,"smtp_secure":false,"smtp_tls_reject_unauthorized":true,"smtp_user":""},"extraConfig":"","flags":{"allow_raw_resources":true,"disable_basic_wireguard_sites":false,"disable_config_managed_domains":false,"disable_enterprise_features":false,"disable_local_sites":false,"disable_private_http_placeholder":false,"disable_product_help_banners":false,"disable_signup_without_invite":true,"disable_user_create_org":false,"disable_virtual_api_keys_ui":false,"enable_acme_cert_sync":true,"enable_integration_api":false,"require_email_verification":false},"gerbil":{"base_endpoint":"pangolin.example.com","block_size":24,"clients_start_port":21820,"site_block_size":30,"start_port":51820,"subnet_group":"100.89.137.0/20"},"offline_checker":{"check_interval_ms":null,"newt_threshold_ms":null,"newt_wireguard_threshold_ms":null,"olm_threshold_ms":null,"remote_exit_node_threshold_ms":null},"orgs":{"block_size":24,"enabled":false,"subnet_group":"100.90.128.0/20","utility_subnet_group":"100.96.128.0/20"},"postgres":{"enabled":false,"pool":{"connection_timeout_ms":5000,"idle_timeout_ms":30000,"max_connections":20,"max_replica_connections":10}},"rate_limits":{"auth":{"max_requests":10,"window_minutes":1},"enabled":true,"global":{"max_requests":500,"window_minutes":1}},"server":{"ai_gateway_override":"","badger_override":"","cors":{"allowed_headers":[],"credentials":false,"methods":[],"origins":[]},"custom_ip_header":"","dashboard_session_length_hours":720,"enable_ai_gateway_client_ip_header":false,"internal_hostname":"","maxmind_asn_path":"","maxmind_db_path":"","remote_headers":{"email":"Remote-Email","name":"Remote-Name","role":"Remote-Role","user":"Remote-User","user_id":"Remote-User-Id","virtual_api_key_id":"Remote-Virtual-Api-Key-Id"},"resource_access_token_headers":{"id":"P-Access-Token-Id","token":"P-Access-Token"},"resource_access_token_param":"p_token","resource_session_length_hours":720,"resource_session_request_param":"p_session_request","session_cookie_name":"p_session_token","trust_ips":[],"trust_proxy":1},"traefik":{"additional_middlewares":[],"cert_resolver":"letsencrypt","enabled":true,"http_entrypoint":"web","https_entrypoint":"websecure","prefer_wildcard_cert":false,"rate_limit":{"average":0,"burst":0},"site_types":[],"static_domains":[]}},"configFile":{"enabled":true},"configMap":{"annotations":{},"labels":{}},"databaseWait":{"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repository":"postgres","tag":"17"},"intervalSeconds":5,"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":65534},"stableSeconds":30,"timeoutSeconds":600},"deployment":{"annotations":{},"labels":{},"podAnnotations":{},"podLabels":{},"updateStrategy":{}},"extraEnv":{},"extraVolumeMounts":[],"extraVolumes":[],"ingressRoute":{"dashboard":{"allowCrossNamespaceServices":false,"annotations":{},"enabled":true,"entryPoints":["websecure"],"host":"","ingressClassName":"","labels":{},"name":"","namespace":"","routes":{"api":{"enabled":true,"middlewares":[],"pathPrefix":"/api/v1","priority":100,"service":{"name":"","namespace":"","port":null}},"dashboard":{"enabled":true,"middlewares":[],"priority":10,"service":{"name":"","namespace":"","port":null}}},"tls":{"certResolver":"","domains":[],"enabled":true,"options":{"name":"","namespace":""},"secretName":"","store":{"name":"","namespace":""}},"traefikSelectorLabels":{}}},"privateConfig":{"enabled":false,"existingSecretKey":"privateConfig.yml","existingSecretName":"","generatedSecret":{"create":false,"data":"","key":"privateConfig.yml","name":""}},"probes":{"liveness":{"failureThreshold":3,"httpGet":{"path":"/api/v1/traefik-config","port":"internal-api"},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":5},"readiness":{"failureThreshold":3,"httpGet":{"path":"/api/v1/traefik-config","port":"internal-api"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":5},"startup":{"failureThreshold":60,"httpGet":{"path":"/api/v1/traefik-config","port":"internal-api"},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":5}},"replicaCount":1,"resources":{"limits":{"cpu":"1000m","ephemeral-storage":"256Mi","memory":"1Gi"},"requests":{"cpu":"200m","ephemeral-storage":"32Mi","memory":"256Mi"}},"secret":{"annotations":{},"existingSecretKey":"SERVER_SECRET","existingSecretName":"","generated":{"create":true,"key":"SERVER_SECRET","length":64,"name":""},"labels":{}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":false,"runAsNonRoot":false},"service":{"annotations":{},"enabled":true,"labels":{},"ports":{"aiGateway":3005,"external":3000,"integration":3003,"internalApi":3001,"next":3002},"type":"ClusterIP"},"serviceAccount":{"annotations":{},"labels":{}},"workloadType":"Deployment"}` | --------------------------------------------------------------------------- # @section Praxis core application |
+| pangolin.blueprints | object | `{"configMap":{"create":false,"name":""},"enabled":false,"environment":{},"environmentSecret":{"create":false,"name":""},"existingConfigMap":"","existingEnvironmentSecret":"","files":{}}` | provisioning-blueprint-file. Blueprints are NOT consumed directly by the Praxis server. Enabling this feature stores blueprint definitions as Kubernetes ConfigMaps/Secrets within this Helm release so they can be managed declaratively alongside the rest of the chart.  Blueprint YAML supports environment variable templating using {{env.VARIABLE_NAME}} syntax. Sensitive templating values (e.g. per-site serial numbers, customer IDs) must be stored in a Secret, not a ConfigMap.  See https://docs.praxis.causq.com/manage/blueprints for the blueprint schema. |
 | pangolin.blueprints.configMap.create | bool | `false` | Create a chart-managed ConfigMap containing blueprint YAML file(s). Each key in `files` becomes a ConfigMap data entry. Mutually exclusive with `existingConfigMap`; setting both will cause validation to fail. |
 | pangolin.blueprints.configMap.name | string | `""` | Name override for the generated ConfigMap. Defaults to "<fullname>-blueprints" when empty. |
 | pangolin.blueprints.enabled | bool | `false` | Enable chart-managed blueprint resources. When false (default) no Blueprint ConfigMap or Secret is rendered. Set to true and configure configMap or existingConfigMap to manage blueprint YAML files as Kubernetes resources in this release namespace. |
@@ -809,17 +809,17 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | pangolin.blueprints.existingConfigMap | string | `""` | Reference an existing ConfigMap that already contains blueprint YAML files. When set, the chart does not create a managed ConfigMap. |
 | pangolin.blueprints.existingEnvironmentSecret | string | `""` | Reference an existing Secret containing environment templating values. When set, the chart does not create a managed environmentSecret. |
 | pangolin.blueprints.files | object | `{}` | Blueprint YAML file(s) keyed by filename (e.g. `site.yaml`). Each entry is rendered as a data key in the chart-managed ConfigMap. Non-sensitive blueprint definitions belong here. Example:   files:     site.yaml: |       sites:         my-site:           name: My Site           docker-socket-enabled: true |
-| pangolin.commonAnnotations | object | `{}` | Annotations added to all Pangolin resources rendered by this chart. |
-| pangolin.commonLabels | object | `{}` | Labels added to all Pangolin resources rendered by this chart. |
-| pangolin.config | object | `{"app":{"dashboard_url":"https://pangolin.example.com","log_failed_attempts":true,"log_level":"info","notifications":{"new_releases":true,"product_updates":true},"save_logs":false,"telemetry":{"anonymous_usage":true}},"domains":{"domain1":{"base_domain":"example.com","cert_resolver":"letsencrypt"}},"email":{"enabled":false,"no_reply":"","smtp_host":"","smtp_port":587,"smtp_secure":false,"smtp_tls_reject_unauthorized":true,"smtp_user":""},"extraConfig":"","flags":{"allow_raw_resources":true,"disable_basic_wireguard_sites":false,"disable_config_managed_domains":false,"disable_enterprise_features":false,"disable_local_sites":false,"disable_private_http_placeholder":false,"disable_product_help_banners":false,"disable_signup_without_invite":true,"disable_user_create_org":false,"disable_virtual_api_keys_ui":false,"enable_acme_cert_sync":true,"enable_integration_api":false,"require_email_verification":false},"gerbil":{"base_endpoint":"pangolin.example.com","block_size":24,"clients_start_port":21820,"site_block_size":30,"start_port":51820,"subnet_group":"100.89.137.0/20"},"offline_checker":{"check_interval_ms":null,"newt_threshold_ms":null,"newt_wireguard_threshold_ms":null,"olm_threshold_ms":null,"remote_exit_node_threshold_ms":null},"orgs":{"block_size":24,"enabled":false,"subnet_group":"100.90.128.0/20","utility_subnet_group":"100.96.128.0/20"},"postgres":{"enabled":false,"pool":{"connection_timeout_ms":5000,"idle_timeout_ms":30000,"max_connections":20,"max_replica_connections":10}},"rate_limits":{"auth":{"max_requests":10,"window_minutes":1},"enabled":true,"global":{"max_requests":500,"window_minutes":1}},"server":{"ai_gateway_override":"","badger_override":"","cors":{"allowed_headers":[],"credentials":false,"methods":[],"origins":[]},"custom_ip_header":"","dashboard_session_length_hours":720,"enable_ai_gateway_client_ip_header":false,"internal_hostname":"","maxmind_asn_path":"","maxmind_db_path":"","remote_headers":{"email":"Remote-Email","name":"Remote-Name","role":"Remote-Role","user":"Remote-User","user_id":"Remote-User-Id","virtual_api_key_id":"Remote-Virtual-Api-Key-Id"},"resource_access_token_headers":{"id":"P-Access-Token-Id","token":"P-Access-Token"},"resource_access_token_param":"p_token","resource_session_length_hours":720,"resource_session_request_param":"p_session_request","session_cookie_name":"p_session_token","trust_ips":[],"trust_proxy":1},"traefik":{"additional_middlewares":[],"cert_resolver":"letsencrypt","enabled":true,"http_entrypoint":"web","https_entrypoint":"websecure","prefer_wildcard_cert":false,"rate_limit":{"average":0,"burst":0},"site_types":[],"static_domains":[]}}` | Pangolin application config rendered into /app/config/config.yml. Keys and structure follow the Pangolin 1.22.x configSchema (snake_case). |
-| pangolin.config.app.dashboard_url | string | `"https://pangolin.example.com"` | Public dashboard URL exposed to end users (required by Pangolin at startup). Set this to your real public dashboard URL for production. |
+| pangolin.commonAnnotations | object | `{}` | Annotations added to all Praxis resources rendered by this chart. |
+| pangolin.commonLabels | object | `{}` | Labels added to all Praxis resources rendered by this chart. |
+| pangolin.config | object | `{"app":{"dashboard_url":"https://praxis.example.com","log_failed_attempts":true,"log_level":"info","notifications":{"new_releases":true,"product_updates":true},"save_logs":false,"telemetry":{"anonymous_usage":true}},"domains":{"domain1":{"base_domain":"example.com","cert_resolver":"letsencrypt"}},"email":{"enabled":false,"no_reply":"","smtp_host":"","smtp_port":587,"smtp_secure":false,"smtp_tls_reject_unauthorized":true,"smtp_user":""},"extraConfig":"","flags":{"allow_raw_resources":true,"disable_basic_wireguard_sites":false,"disable_config_managed_domains":false,"disable_enterprise_features":false,"disable_local_sites":false,"disable_private_http_placeholder":false,"disable_product_help_banners":false,"disable_signup_without_invite":true,"disable_user_create_org":false,"disable_virtual_api_keys_ui":false,"enable_acme_cert_sync":true,"enable_integration_api":false,"require_email_verification":false},"gerbil":{"base_endpoint":"pangolin.example.com","block_size":24,"clients_start_port":21820,"site_block_size":30,"start_port":51820,"subnet_group":"100.89.137.0/20"},"offline_checker":{"check_interval_ms":null,"newt_threshold_ms":null,"newt_wireguard_threshold_ms":null,"olm_threshold_ms":null,"remote_exit_node_threshold_ms":null},"orgs":{"block_size":24,"enabled":false,"subnet_group":"100.90.128.0/20","utility_subnet_group":"100.96.128.0/20"},"postgres":{"enabled":false,"pool":{"connection_timeout_ms":5000,"idle_timeout_ms":30000,"max_connections":20,"max_replica_connections":10}},"rate_limits":{"auth":{"max_requests":10,"window_minutes":1},"enabled":true,"global":{"max_requests":500,"window_minutes":1}},"server":{"ai_gateway_override":"","badger_override":"","cors":{"allowed_headers":[],"credentials":false,"methods":[],"origins":[]},"custom_ip_header":"","dashboard_session_length_hours":720,"enable_ai_gateway_client_ip_header":false,"internal_hostname":"","maxmind_asn_path":"","maxmind_db_path":"","remote_headers":{"email":"Remote-Email","name":"Remote-Name","role":"Remote-Role","user":"Remote-User","user_id":"Remote-User-Id","virtual_api_key_id":"Remote-Virtual-Api-Key-Id"},"resource_access_token_headers":{"id":"P-Access-Token-Id","token":"P-Access-Token"},"resource_access_token_param":"p_token","resource_session_length_hours":720,"resource_session_request_param":"p_session_request","session_cookie_name":"p_session_token","trust_ips":[],"trust_proxy":1},"traefik":{"additional_middlewares":[],"cert_resolver":"letsencrypt","enabled":true,"http_entrypoint":"web","https_entrypoint":"websecure","prefer_wildcard_cert":false,"rate_limit":{"average":0,"burst":0},"site_types":[],"static_domains":[]}}` | Praxis application config rendered into /app/config/config.yml. Keys and structure follow the Praxis 1.22.x configSchema (snake_case). |
+| pangolin.config.app.dashboard_url | string | `"https://praxis.example.com"` | Public dashboard URL exposed to end users (required by Praxis at startup). Set this to your real public dashboard URL for production. |
 | pangolin.config.app.log_failed_attempts | bool | `true` | Log failed authentication / access attempts. Enabled by default for audit and attack-detection purposes. Upstream OSS default is false; the chart overrides it to true for a security-hardened baseline. Disable if log volume or storage is a concern. |
-| pangolin.config.app.log_level | string | `"info"` | Pangolin application log level. |
+| pangolin.config.app.log_level | string | `"info"` | Praxis application log level. |
 | pangolin.config.app.notifications.new_releases | bool | `true` | Receive new release notifications. |
 | pangolin.config.app.notifications.product_updates | bool | `true` | Receive product update notifications. |
 | pangolin.config.app.save_logs | bool | `false` | Persist application logs to disk. Enabling this writes logs to the container filesystem; ensure ephemeral-storage limits are sized accordingly or mount an external volume for log retention. |
 | pangolin.config.app.telemetry.anonymous_usage | bool | `true` | Send anonymous usage telemetry to Fossorial. |
-| pangolin.config.domains | object | `{"domain1":{"base_domain":"example.com","cert_resolver":"letsencrypt"}}` | Domain map for Pangolin. Each key is a logical domain name; the value defines the base domain and optional cert settings. The default `example.com` entry is a non-production placeholder and must be replaced with a real domain before deploying to real environments. Example:   my-domain:     base_domain: example.com     cert_resolver: letsencrypt   # optional; falls back to traefik.cert_resolver     prefer_wildcard_cert: false At least one domain is required for non-sqlite installs. |
+| pangolin.config.domains | object | `{"domain1":{"base_domain":"example.com","cert_resolver":"letsencrypt"}}` | Domain map for Praxis. Each key is a logical domain name; the value defines the base domain and optional cert settings. The default `example.com` entry is a non-production placeholder and must be replaced with a real domain before deploying to real environments. Example:   my-domain:     base_domain: example.com     cert_resolver: letsencrypt   # optional; falls back to traefik.cert_resolver     prefer_wildcard_cert: false At least one domain is required for non-sqlite installs. |
 | pangolin.config.email.enabled | bool | `false` | Include the email section in the rendered config.yml. |
 | pangolin.config.email.no_reply | string | `""` | Sender address used for system emails. |
 | pangolin.config.email.smtp_host | string | `""` | SMTP server hostname. |
@@ -834,19 +834,19 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | pangolin.config.flags.disable_enterprise_features | bool | `false` | Disable Enterprise-licensed features even when a valid license is present. |
 | pangolin.config.flags.disable_local_sites | bool | `false` | Disable local (same-host) site type. |
 | pangolin.config.flags.disable_private_http_placeholder | bool | `false` | Disable the placeholder page served for private HTTP resources. |
-| pangolin.config.flags.disable_product_help_banners | bool | `false` | Disable product help banners in the Pangolin UI. |
+| pangolin.config.flags.disable_product_help_banners | bool | `false` | Disable product help banners in the Praxis UI. |
 | pangolin.config.flags.disable_signup_without_invite | bool | `true` | Disable sign-ups that were not invited. Set to true (the chart and upstream quick-install default) to lock down open registration in production. Set to false only during initial onboarding. |
 | pangolin.config.flags.disable_user_create_org | bool | `false` | Prevent regular users from creating new organizations. Set to true in production to keep org management in admin hands. Upstream default is false; the chart keeps upstream default for onboarding flexibility. |
-| pangolin.config.flags.disable_virtual_api_keys_ui | bool | `false` | Hide the virtual API keys UI (AI gateway). Requires Pangolin >= 1.22.0. |
-| pangolin.config.flags.enable_acme_cert_sync | bool | `true` | Sync ACME certificates issued by Traefik back into Pangolin. Upstream default is true. |
-| pangolin.config.flags.enable_integration_api | bool | `false` | Enable the Pangolin integration / machine-to-machine API. |
+| pangolin.config.flags.disable_virtual_api_keys_ui | bool | `false` | Hide the virtual API keys UI (AI gateway). Requires Praxis >= 1.22.0. |
+| pangolin.config.flags.enable_acme_cert_sync | bool | `true` | Sync ACME certificates issued by Traefik back into Praxis. Upstream default is true. |
+| pangolin.config.flags.enable_integration_api | bool | `false` | Enable the Praxis integration / machine-to-machine API. |
 | pangolin.config.flags.require_email_verification | bool | `false` | Require email verification for new sign-ups. Keep false unless you have configured the email section (smtp_host etc.); enabling it without a working SMTP setup will prevent new users from completing registration. |
 | pangolin.config.gerbil.base_endpoint | string | `"pangolin.example.com"` | Public endpoint (hostname or IP) where Gerbil is reachable by sites. Set this to your real public endpoint for production. |
 | pangolin.config.gerbil.block_size | int | `24` | CIDR prefix length per cluster / site group. |
 | pangolin.config.gerbil.clients_start_port | int | `21820` | WireGuard client start port. Keep in sync with gerbil.ports.wg2. |
 | pangolin.config.gerbil.site_block_size | int | `30` | CIDR prefix length per individual site. |
 | pangolin.config.gerbil.start_port | int | `51820` | WireGuard site start port Gerbil listens on. Keep in sync with gerbil.ports.wg1. |
-| pangolin.config.gerbil.subnet_group | string | `"100.89.137.0/20"` | Supernet for WireGuard address allocation. Pangolin 1.26 defaults new installs to 100.89.137.0/18 with block_size 22; the chart keeps /20 and 24 because changing them on an existing install changes how site subnets are allocated. |
+| pangolin.config.gerbil.subnet_group | string | `"100.89.137.0/20"` | Supernet for WireGuard address allocation. Praxis 1.26 defaults new installs to 100.89.137.0/18 with block_size 22; the chart keeps /20 and 24 because changing them on an existing install changes how site subnets are allocated. |
 | pangolin.config.offline_checker.check_interval_ms | string | `nil` | How often the offline checks run, in milliseconds (30000). |
 | pangolin.config.offline_checker.newt_threshold_ms | string | `nil` | Newt site threshold in milliseconds (120000). |
 | pangolin.config.offline_checker.newt_wireguard_threshold_ms | string | `nil` | WireGuard site threshold in milliseconds (480000). These sites do not ping and are judged by their last bandwidth update instead. |
@@ -866,16 +866,16 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | pangolin.config.rate_limits.enabled | bool | `true` | Include the rate_limits section in the rendered config.yml. Enabled by default for a security-hardened baseline. Upstream does not enable rate limits by default; the chart enables them to protect against brute-force and denial-of-service attacks. |
 | pangolin.config.rate_limits.global.max_requests | int | `500` | Maximum requests per window per client for the global bucket. 500 req/min is a permissive ceiling suitable for most API consumers; tighten if you observe abuse patterns. |
 | pangolin.config.rate_limits.global.window_minutes | int | `1` | Window size in minutes for the global rate limit bucket. |
-| pangolin.config.server.ai_gateway_override | string | `""` | Override the base URL used to reach the AI gateway. Empty lets Pangolin derive it from `internal_hostname` and `ai_gateway_port`. Requires Pangolin >= 1.22.0. |
-| pangolin.config.server.badger_override | string | `""` | Override the base URL Badger uses to reach the Pangolin internal API. Empty (default) lets Pangolin derive it from `internal_hostname` and the internal port. Set this when Badger must reach Pangolin by some other address. |
+| pangolin.config.server.ai_gateway_override | string | `""` | Override the base URL used to reach the AI gateway. Empty lets Praxis derive it from `internal_hostname` and `ai_gateway_port`. Requires Praxis >= 1.22.0. |
+| pangolin.config.server.badger_override | string | `""` | Override the base URL Badger uses to reach the Praxis internal API. Empty (default) lets Praxis derive it from `internal_hostname` and the internal port. Set this when Badger must reach Praxis by some other address. |
 | pangolin.config.server.cors.allowed_headers | list | `[]` | Allowed CORS request headers. |
 | pangolin.config.server.cors.credentials | bool | `false` | Allow credentials in CORS requests. |
-| pangolin.config.server.cors.methods | list | `[]` | Allowed CORS methods. Empty list falls back to Pangolin defaults. |
+| pangolin.config.server.cors.methods | list | `[]` | Allowed CORS methods. Empty list falls back to Praxis defaults. |
 | pangolin.config.server.cors.origins | list | `[]` | Allowed CORS origins. Empty list disables CORS origin restriction. |
-| pangolin.config.server.custom_ip_header | string | `""` | Header Badger reads the real client IP from when the request comes from a `trust_ips` address (for example `X-Real-IP`). Empty keeps Pangolin's default. Requires Pangolin >= 1.26.0. |
+| pangolin.config.server.custom_ip_header | string | `""` | Header Badger reads the real client IP from when the request comes from a `trust_ips` address (for example `X-Real-IP`). Empty keeps Praxis's default. Requires Praxis >= 1.26.0. |
 | pangolin.config.server.dashboard_session_length_hours | int | `720` | Dashboard session lifetime in hours. Upstream default is 720 (30 days). For production environments with stricter security requirements, consider reducing to 168 (7 days) or 336 (14 days) to limit session exposure. |
-| pangolin.config.server.enable_ai_gateway_client_ip_header | bool | `false` | Have Traefik/Badger stamp the resolved client IP into X-Pangolin-Client-Ip on the AI gateway route. Off by default: it needs a Badger build that supports realIpHeader. Requires Pangolin >= 1.22.0. |
-| pangolin.config.server.internal_hostname | string | `""` | Hostname Pangolin advertises for its own internal API. It is resolved by Badger from inside the Traefik Pod and also drives the Pangolin UI and AI gateway URLs in the generated Traefik configuration. Empty (default) derives the in-cluster FQDN `<release>-pangolin.<namespace>.svc.<clusterDomain>`, which resolves from any namespace. A bare Service name only resolves when Traefik shares the namespace, so with `deployment.traefikNamespace` set it made Badger answer 404 for every request while the Traefik dashboard still showed the router as healthy. |
+| pangolin.config.server.enable_ai_gateway_client_ip_header | bool | `false` | Have Traefik/Badger stamp the resolved client IP into X-Praxis-Client-Ip on the AI gateway route. Off by default: it needs a Badger build that supports realIpHeader. Requires Praxis >= 1.22.0. |
+| pangolin.config.server.internal_hostname | string | `""` | Hostname Praxis advertises for its own internal API. It is resolved by Badger from inside the Traefik Pod and also drives the Praxis UI and AI gateway URLs in the generated Traefik configuration. Empty (default) derives the in-cluster FQDN `<release>-pangolin.<namespace>.svc.<clusterDomain>`, which resolves from any namespace. A bare Service name only resolves when Traefik shares the namespace, so with `deployment.traefikNamespace` set it made Badger answer 404 for every request while the Traefik dashboard still showed the router as healthy. |
 | pangolin.config.server.maxmind_asn_path | string | `""` | Path to a MaxMind ASN database. |
 | pangolin.config.server.maxmind_db_path | string | `""` | Path to a MaxMind GeoLite2/GeoIP2 city database for geo-blocking rules. |
 | pangolin.config.server.remote_headers.email | string | `"Remote-Email"` | Header carrying the resolved user email. |
@@ -888,38 +888,38 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | pangolin.config.server.resource_access_token_headers.token | string | `"P-Access-Token"` | Header name for resource access token. |
 | pangolin.config.server.resource_access_token_param | string | `"p_token"` | Request parameter name for resource access tokens. |
 | pangolin.config.server.resource_session_length_hours | int | `720` | Resource session lifetime in hours. Upstream default is 720 (30 days). For production environments with stricter security requirements, consider reducing to 168 (7 days) or 336 (14 days) to limit session exposure. |
-| pangolin.config.server.resource_session_request_param | string | `"p_session_request"` | Request parameter name for resource session handling. Pangolin docs and the upstream 1.0.0-beta.9 migration use `p_session_request`. |
+| pangolin.config.server.resource_session_request_param | string | `"p_session_request"` | Request parameter name for resource session handling. Praxis docs and the upstream 1.0.0-beta.9 migration use `p_session_request`. |
 | pangolin.config.server.session_cookie_name | string | `"p_session_token"` | Session cookie name. |
-| pangolin.config.server.trust_ips | list | `[]` | Proxy addresses (IPs or CIDRs) whose client-IP headers Badger trusts. Setting any entry replaces Badger's built-in Cloudflare ranges. Empty keeps Pangolin's default. Requires Pangolin >= 1.26.0. |
+| pangolin.config.server.trust_ips | list | `[]` | Proxy addresses (IPs or CIDRs) whose client-IP headers Badger trusts. Setting any entry replaces Badger's built-in Cloudflare ranges. Empty keeps Praxis's default. Requires Praxis >= 1.26.0. |
 | pangolin.config.server.trust_proxy | int | `1` | Number of trusted reverse-proxy hops. Use 0 to disable trust-proxy. |
-| pangolin.config.traefik.additional_middlewares | list | `[]` | Extra Traefik middleware names applied to all Pangolin routes. |
+| pangolin.config.traefik.additional_middlewares | list | `[]` | Extra Traefik middleware names applied to all Praxis routes. |
 | pangolin.config.traefik.cert_resolver | string | `"letsencrypt"` | ACME cert resolver name. |
-| pangolin.config.traefik.enabled | bool | `true` | Include Pangolin's traefik section in the rendered config.yml. This configures the Traefik output Pangolin generates; it does NOT install Traefik. Entrypoint and cert resolver names must match the real Traefik deployment (external controller, bundled dependency, or standalone Traefik workload). |
+| pangolin.config.traefik.enabled | bool | `true` | Include Praxis's traefik section in the rendered config.yml. This configures the Traefik output Praxis generates; it does NOT install Traefik. Entrypoint and cert resolver names must match the real Traefik deployment (external controller, bundled dependency, or standalone Traefik workload). |
 | pangolin.config.traefik.http_entrypoint | string | `"web"` | HTTP entrypoint name in Traefik. |
 | pangolin.config.traefik.https_entrypoint | string | `"websecure"` | HTTPS entrypoint name in Traefik. |
 | pangolin.config.traefik.prefer_wildcard_cert | bool | `false` | Request wildcard certificates instead of per-domain certificates. |
 | pangolin.config.traefik.rate_limit.average | int | `0` | Average requests per second for the generated Traefik rate-limit middleware. Upstream default is 30. Set to 0 to leave the section unrendered. |
 | pangolin.config.traefik.rate_limit.burst | int | `0` | Burst size for the generated Traefik rate-limit middleware. Upstream default is 50. Set to 0 to leave the section unrendered. |
-| pangolin.config.traefik.site_types | list | `[]` | Site types Pangolin generates Traefik configuration for. Upstream default is [newt, wireguard, local]. |
+| pangolin.config.traefik.site_types | list | `[]` | Site types Praxis generates Traefik configuration for. Upstream default is [newt, wireguard, local]. |
 | pangolin.config.traefik.static_domains | list | `[]` | Domains always present in the generated Traefik configuration. |
-| pangolin.configFile.enabled | bool | `true` | Render and mount /app/config/config.yml for Pangolin. |
-| pangolin.configMap.annotations | object | `{}` | Annotations applied to chart-managed Pangolin ConfigMap resources. |
-| pangolin.configMap.labels | object | `{}` | Labels applied to chart-managed Pangolin ConfigMap resources. |
-| pangolin.databaseWait | object | `{"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repository":"postgres","tag":"17"},"intervalSeconds":5,"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":65534},"stableSeconds":30,"timeoutSeconds":600}` | Database readiness initContainer configuration. When enabled and database.mode is not sqlite, an initContainer waits for PostgreSQL readiness using the same POSTGRES_CONNECTION_STRING Secret/key as the main Pangolin container, and requires a stable success window. |
+| pangolin.configFile.enabled | bool | `true` | Render and mount /app/config/config.yml for Praxis. |
+| pangolin.configMap.annotations | object | `{}` | Annotations applied to chart-managed Praxis ConfigMap resources. |
+| pangolin.configMap.labels | object | `{}` | Labels applied to chart-managed Praxis ConfigMap resources. |
+| pangolin.databaseWait | object | `{"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"docker.io","repository":"postgres","tag":"17"},"intervalSeconds":5,"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":65534},"stableSeconds":30,"timeoutSeconds":600}` | Database readiness initContainer configuration. When enabled and database.mode is not sqlite, an initContainer waits for PostgreSQL readiness using the same POSTGRES_CONNECTION_STRING Secret/key as the main Praxis container, and requires a stable success window. |
 | pangolin.databaseWait.enabled | bool | `true` | Enable the database-wait initContainer. Automatically skipped when database.mode=sqlite. |
 | pangolin.databaseWait.image | object | `{"pullPolicy":"IfNotPresent","registry":"docker.io","repository":"postgres","tag":"17"}` | Image used by the database-wait initContainer. Must provide `pg_isready`. |
 | pangolin.databaseWait.intervalSeconds | int | `5` | Interval in seconds between readiness checks. |
 | pangolin.databaseWait.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":65534}` | Security context for the database-wait initContainer. |
-| pangolin.databaseWait.stableSeconds | int | `30` | Consecutive ready seconds required before Pangolin starts. |
+| pangolin.databaseWait.stableSeconds | int | `30` | Consecutive ready seconds required before Praxis starts. |
 | pangolin.databaseWait.timeoutSeconds | int | `600` | Total time in seconds to wait for the database before giving up. |
-| pangolin.deployment.annotations | object | `{}` | Annotations applied to Pangolin Deployment/StatefulSet metadata. |
-| pangolin.deployment.labels | object | `{}` | Labels applied to Pangolin Deployment/StatefulSet metadata. |
-| pangolin.deployment.podAnnotations | object | `{}` | Annotations applied to Pangolin Pod template metadata. |
-| pangolin.deployment.podLabels | object | `{}` | Labels applied to Pangolin Pod template metadata. |
+| pangolin.deployment.annotations | object | `{}` | Annotations applied to Praxis Deployment/StatefulSet metadata. |
+| pangolin.deployment.labels | object | `{}` | Labels applied to Praxis Deployment/StatefulSet metadata. |
+| pangolin.deployment.podAnnotations | object | `{}` | Annotations applied to Praxis Pod template metadata. |
+| pangolin.deployment.podLabels | object | `{}` | Labels applied to Praxis Pod template metadata. |
 | pangolin.deployment.updateStrategy | object | `{}` | Rollout strategy for this component, overriding `runtime.updateStrategy`. Left empty the chart picks it: a component holding a PVC that is not ReadWriteMany is switched to Recreate, because a surged Pod could never attach the volume. |
 | pangolin.ingressRoute.dashboard.allowCrossNamespaceServices | bool | `false` | Set true to permit cross-namespace Traefik service references in routes.service.namespace. Requires Traefik kubernetesCRD provider allowCrossNamespace settings. |
 | pangolin.ingressRoute.dashboard.annotations | object | `{}` | Extra metadata annotations for the dashboard IngressRoute. |
-| pangolin.ingressRoute.dashboard.enabled | bool | `true` | Enable chart-managed Traefik IngressRoute for Pangolin dashboard/API in controller mode. |
+| pangolin.ingressRoute.dashboard.enabled | bool | `true` | Enable chart-managed Traefik IngressRoute for Praxis dashboard/API in controller mode. |
 | pangolin.ingressRoute.dashboard.entryPoints | list | `["websecure"]` | Traefik entrypoints for this IngressRoute. Empty defaults to pangolin.config.traefik.https_entrypoint. |
 | pangolin.ingressRoute.dashboard.host | string | `""` | Dashboard host override for Host(...) match. Empty derives host from pangolin.config.app.dashboard_url. |
 | pangolin.ingressRoute.dashboard.ingressClassName | string | `""` | Optional ingress class value mapped to metadata annotation kubernetes.io/ingress.class. |
@@ -928,7 +928,7 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | pangolin.ingressRoute.dashboard.namespace | string | `""` | Override IngressRoute namespace. Empty uses release namespace. |
 | pangolin.ingressRoute.dashboard.routes.api.enabled | bool | `true` | Enable API route. |
 | pangolin.ingressRoute.dashboard.routes.api.middlewares | list | `[]` | Optional middleware references for API route (name required, namespace optional). |
-| pangolin.ingressRoute.dashboard.routes.api.pathPrefix | string | `"/api/v1"` | PathPrefix for Pangolin API route. |
+| pangolin.ingressRoute.dashboard.routes.api.pathPrefix | string | `"/api/v1"` | PathPrefix for Praxis API route. |
 | pangolin.ingressRoute.dashboard.routes.api.priority | int | `100` | Traefik route priority for API route. |
 | pangolin.ingressRoute.dashboard.routes.api.service.name | string | `""` | Backend service name for API route. Empty uses chart fullname. |
 | pangolin.ingressRoute.dashboard.routes.api.service.namespace | string | `""` | Backend service namespace for API route. Empty uses release namespace. |
@@ -948,32 +948,32 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | pangolin.ingressRoute.dashboard.tls.store.name | string | `""` | Optional TLSStore reference name. |
 | pangolin.ingressRoute.dashboard.tls.store.namespace | string | `""` | Optional TLSStore reference namespace. |
 | pangolin.ingressRoute.dashboard.traefikSelectorLabels | object | `{}` | Optional selector labels for multi-Traefik setups (matches provider labelSelector). |
-| pangolin.privateConfig.enabled | bool | `false` | Enable mounting a privateConfig.yml for Pangolin Enterprise features. Disabled by default; OSS installations do not require this. |
+| pangolin.privateConfig.enabled | bool | `false` | Enable mounting a privateConfig.yml for Praxis Enterprise features. Disabled by default; OSS installations do not require this. |
 | pangolin.privateConfig.existingSecretKey | string | `"privateConfig.yml"` | Key inside the existing Secret that holds the privateConfig.yml content. |
 | pangolin.privateConfig.existingSecretName | string | `""` | Existing Secret name that contains the privateConfig.yml content. When set, the chart mounts this Secret without creating a new one. |
 | pangolin.privateConfig.generatedSecret.create | bool | `false` | Create a chart-managed Secret containing the privateConfig.yml content. |
 | pangolin.privateConfig.generatedSecret.data | string | `""` | Raw YAML content for the privateConfig.yml file. |
 | pangolin.privateConfig.generatedSecret.key | string | `"privateConfig.yml"` | Key inside the generated Secret. |
 | pangolin.privateConfig.generatedSecret.name | string | `""` | Name of the generated Secret. Defaults to "<fullname>-private-config" when empty. |
-| pangolin.replicaCount | int | `1` | Number of Pangolin replicas in multi mode. |
-| pangolin.secret.annotations | object | `{}` | Annotations applied to chart-managed Pangolin Secret resources. |
+| pangolin.replicaCount | int | `1` | Number of Praxis replicas in multi mode. |
+| pangolin.secret.annotations | object | `{}` | Annotations applied to chart-managed Praxis Secret resources. |
 | pangolin.secret.existingSecretKey | string | `"SERVER_SECRET"` | Key name inside the existing Secret. |
-| pangolin.secret.existingSecretName | string | `""` | Existing Secret containing the Pangolin application secret (SERVER_SECRET). |
+| pangolin.secret.existingSecretName | string | `""` | Existing Secret containing the Praxis application secret (SERVER_SECRET). |
 | pangolin.secret.generated.create | bool | `true` | Create a chart-managed Secret when no existing Secret is supplied. |
 | pangolin.secret.generated.key | string | `"SERVER_SECRET"` | Key name used inside the generated Secret. |
 | pangolin.secret.generated.length | int | `64` | Random generated secret length in bytes. |
 | pangolin.secret.generated.name | string | `""` | Name of the generated Secret. Defaults to "<fullname>-app" when empty. |
-| pangolin.secret.labels | object | `{}` | Labels applied to chart-managed Pangolin Secret resources. |
-| pangolin.service.annotations | object | `{}` | Additional Service annotations for Pangolin. |
-| pangolin.service.enabled | bool | `true` | Create an internal Service for Pangolin. |
-| pangolin.service.labels | object | `{}` | Additional Service labels for Pangolin. |
+| pangolin.secret.labels | object | `{}` | Labels applied to chart-managed Praxis Secret resources. |
+| pangolin.service.annotations | object | `{}` | Additional Service annotations for Praxis. |
+| pangolin.service.enabled | bool | `true` | Create an internal Service for Praxis. |
+| pangolin.service.labels | object | `{}` | Additional Service labels for Praxis. |
 | pangolin.service.ports | object | `{"aiGateway":3005,"external":3000,"integration":3003,"internalApi":3001,"next":3002}` | Service port configuration. |
-| pangolin.service.ports.aiGateway | int | `3005` | AI gateway port. Requires Pangolin >= 1.22.0. |
-| pangolin.service.type | string | `"ClusterIP"` | Pangolin Service type. |
-| pangolin.serviceAccount.annotations | object | `{}` | Annotations applied to chart-managed Pangolin ServiceAccount metadata. |
-| pangolin.serviceAccount.labels | object | `{}` | Labels applied to chart-managed Pangolin ServiceAccount metadata. |
-| pangolin.workloadType | string | `"Deployment"` | Workload kind for Pangolin in multi mode. |
-| rbac.create | bool | `true` | Create RBAC resources for the pangolin-kube-controller. Only the controller receives Kubernetes API permissions; Pangolin and Gerbil Pods use their own ServiceAccounts without any RBAC bindings. |
+| pangolin.service.ports.aiGateway | int | `3005` | AI gateway port. Requires Praxis >= 1.22.0. |
+| pangolin.service.type | string | `"ClusterIP"` | Praxis Service type. |
+| pangolin.serviceAccount.annotations | object | `{}` | Annotations applied to chart-managed Praxis ServiceAccount metadata. |
+| pangolin.serviceAccount.labels | object | `{}` | Labels applied to chart-managed Praxis ServiceAccount metadata. |
+| pangolin.workloadType | string | `"Deployment"` | Workload kind for Praxis in multi mode. |
+| rbac.create | bool | `true` | Create RBAC resources for the pangolin-kube-controller. Only the controller receives Kubernetes API permissions; Praxis and Gerbil Pods use their own ServiceAccounts without any RBAC bindings. |
 | resourcesPolicy | object | `{"cpuLimits":{"enabled":true},"ephemeralStorage":{"enabled":false}}` | Global resource rendering policy controlling which optional resource fields are included. |
 | resourcesPolicy.cpuLimits | object | `{"enabled":true}` | Enable CPU limits on all workloads. Set to `false` to omit CPU limits without affecting CPU requests or memory resources. Useful when running VPA or relying on burstable CPU scheduling. |
 | resourcesPolicy.ephemeralStorage | object | `{"enabled":false}` | Enable ephemeral-storage requests and limits on all workloads. Disabled by default to avoid unexpected pod scheduling constraints and evictions. Enable only when your cluster enforces ephemeral-storage policies or you want to bound disk usage per container. |
@@ -988,7 +988,7 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | runtime.minReadySeconds | int | `0` | Min ready seconds for Deployments. |
 | runtime.terminationGracePeriodSeconds | int | `30` | Grace period in seconds before Pod termination. |
 | runtime.updateStrategy | object | `{"rollingUpdate":{"maxSurge":1,"maxUnavailable":0},"type":"RollingUpdate"}` | Default update strategy for Deployments managed by this chart. |
-| serviceAccount | object | `{"controller":{"annotations":{},"automountServiceAccountToken":true,"create":true,"labels":{},"name":""},"gerbil":{"annotations":{},"automountServiceAccountToken":false,"create":true,"labels":{},"name":""},"pangolin":{"annotations":{},"automountServiceAccountToken":false,"create":true,"labels":{},"name":""}}` | Per-component ServiceAccount configuration. In `deployment.mode=multi`, each component uses its own ServiceAccount so RBAC can be scoped precisely. In `deployment.mode=single` with `deployment.type=controller`, the shared Pod uses the controller ServiceAccount (and its token/RBAC), so Pangolin and Gerbil run in the same Pod security context. |
+| serviceAccount | object | `{"controller":{"annotations":{},"automountServiceAccountToken":true,"create":true,"labels":{},"name":""},"gerbil":{"annotations":{},"automountServiceAccountToken":false,"create":true,"labels":{},"name":""},"praxis":{"annotations":{},"automountServiceAccountToken":false,"create":true,"labels":{},"name":""}}` | Per-component ServiceAccount configuration. In `deployment.mode=multi`, each component uses its own ServiceAccount so RBAC can be scoped precisely. In `deployment.mode=single` with `deployment.type=controller`, the shared Pod uses the controller ServiceAccount (and its token/RBAC), so Praxis and Gerbil run in the same Pod security context. |
 | serviceAccount.controller.annotations | object | `{}` | Extra annotations added to the controller ServiceAccount. |
 | serviceAccount.controller.automountServiceAccountToken | bool | `true` | Automount Kubernetes API token into controller Pods. The controller needs in-cluster API access to manage Traefik CRDs; defaults to true. |
 | serviceAccount.controller.create | bool | `true` | Create a ServiceAccount for the pangolin-kube-controller Pod. |
@@ -999,15 +999,15 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | serviceAccount.gerbil.create | bool | `true` | Create a ServiceAccount for Gerbil Pods. |
 | serviceAccount.gerbil.labels | object | `{}` | Extra labels added to the Gerbil ServiceAccount. |
 | serviceAccount.gerbil.name | string | `""` | Existing ServiceAccount name. When empty and create=true, a name is generated. |
-| serviceAccount.pangolin.annotations | object | `{}` | Extra annotations added to the Pangolin ServiceAccount. |
-| serviceAccount.pangolin.automountServiceAccountToken | bool | `false` | Automount Kubernetes API token into Pangolin Pods. Pangolin does not need cluster API access; defaults to false. |
-| serviceAccount.pangolin.create | bool | `true` | Create a ServiceAccount for Pangolin Pods. |
-| serviceAccount.pangolin.labels | object | `{}` | Extra labels added to the Pangolin ServiceAccount. |
+| serviceAccount.pangolin.annotations | object | `{}` | Extra annotations added to the Praxis ServiceAccount. |
+| serviceAccount.pangolin.automountServiceAccountToken | bool | `false` | Automount Kubernetes API token into Praxis Pods. Praxis does not need cluster API access; defaults to false. |
+| serviceAccount.pangolin.create | bool | `true` | Create a ServiceAccount for Praxis Pods. |
+| serviceAccount.pangolin.labels | object | `{}` | Extra labels added to the Praxis ServiceAccount. |
 | serviceAccount.pangolin.name | string | `""` | Existing ServiceAccount name. When empty and create=true, a name is generated. |
-| traefik | object | `{"badger":{"enabled":true,"moduleName":"github.com/fosrl/badger","version":"v1.8.0"},"cloudflare":{"existingSecretName":"","generatedSecret":{"apiToken":"","create":false,"dnsApiToken":"","email":"","name":"","zoneApiToken":""},"keys":{"dnsApiToken":"dnsApiToken","email":"email","zoneApiToken":"zoneApiToken"}},"colocateWithGerbil":"auto","commonAnnotations":{},"commonLabels":{},"config":{"acmeCaServer":"https://acme-v02.api.letsencrypt.org/directory","acmeDelayBeforeCheck":0,"adminPort":8085,"certResolver":"letsencrypt","dashboard":false,"dashboardDeclareContainerPort":false,"dynamicRouters":{"host":"example.com"},"httpEntrypoint":"web","httpProvider":{"enabled":true,"endpoint":"","pollInterval":"5s"},"httpsEntrypoint":"websecure","insecureSkipVerify":false,"letsencryptEmail":"","logLevel":"INFO"},"deployment":{"annotations":{},"labels":{},"podAnnotations":{},"podLabels":{},"updateStrategy":{}},"enabled":false,"persistence":{"accessModes":["ReadWriteOnce"],"enabled":false,"existingClaim":"","size":"1Gi","storageClass":""},"probes":{"liveness":{"failureThreshold":3,"httpGet":{"path":"/ping","port":8085},"initialDelaySeconds":10,"periodSeconds":30,"timeoutSeconds":5},"readiness":{"failureThreshold":3,"httpGet":{"path":"/ping","port":8085},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":3},"startup":{"failureThreshold":20,"httpGet":{"path":"/ping","port":8085},"initialDelaySeconds":5,"periodSeconds":5,"timeoutSeconds":3}},"replicaCount":1,"resources":{"limits":{"cpu":"500m","ephemeral-storage":"128Mi","memory":"512Mi"},"requests":{"cpu":"100m","ephemeral-storage":"16Mi","memory":"128Mi"}},"runInGerbilPod":true,"securityContext":{"allowPrivilegeEscalation":true,"readOnlyRootFilesystem":false,"runAsNonRoot":false},"service":{"annotations":{},"enabled":true,"externalTrafficPolicy":"","labels":{},"loadBalancerSourceRanges":[],"type":"LoadBalancer"}}` | --------------------------------------------------------------------------- # @section Standalone Traefik mode |
-| traefik.badger | object | `{"enabled":true,"moduleName":"github.com/fosrl/badger","version":"v1.8.0"}` | Badger, the Traefik middleware that performs Pangolin's resource authentication. Pangolin's generated dynamic configuration describes the middleware itself, but the plugin must be declared in Traefik's STATIC configuration or Traefik cannot instantiate it and every generated router fails with `unknown plugin type: badger`. The alias is not cosmetic: Pangolin hardcodes "badger" as both the middleware name and the plugin type. |
+| traefik | object | `{"badger":{"enabled":true,"moduleName":"github.com/CausQ-Networks/praxis-badger","version":"v1.8.0"},"cloudflare":{"existingSecretName":"","generatedSecret":{"apiToken":"","create":false,"dnsApiToken":"","email":"","name":"","zoneApiToken":""},"keys":{"dnsApiToken":"dnsApiToken","email":"email","zoneApiToken":"zoneApiToken"}},"colocateWithGerbil":"auto","commonAnnotations":{},"commonLabels":{},"config":{"acmeCaServer":"https://acme-v02.api.letsencrypt.org/directory","acmeDelayBeforeCheck":0,"adminPort":8085,"certResolver":"letsencrypt","dashboard":false,"dashboardDeclareContainerPort":false,"dynamicRouters":{"host":"example.com"},"httpEntrypoint":"web","httpProvider":{"enabled":true,"endpoint":"","pollInterval":"5s"},"httpsEntrypoint":"websecure","insecureSkipVerify":false,"letsencryptEmail":"","logLevel":"INFO"},"deployment":{"annotations":{},"labels":{},"podAnnotations":{},"podLabels":{},"updateStrategy":{}},"enabled":false,"persistence":{"accessModes":["ReadWriteOnce"],"enabled":false,"existingClaim":"","size":"1Gi","storageClass":""},"probes":{"liveness":{"failureThreshold":3,"httpGet":{"path":"/ping","port":8085},"initialDelaySeconds":10,"periodSeconds":30,"timeoutSeconds":5},"readiness":{"failureThreshold":3,"httpGet":{"path":"/ping","port":8085},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":3},"startup":{"failureThreshold":20,"httpGet":{"path":"/ping","port":8085},"initialDelaySeconds":5,"periodSeconds":5,"timeoutSeconds":3}},"replicaCount":1,"resources":{"limits":{"cpu":"500m","ephemeral-storage":"128Mi","memory":"512Mi"},"requests":{"cpu":"100m","ephemeral-storage":"16Mi","memory":"128Mi"}},"runInGerbilPod":true,"securityContext":{"allowPrivilegeEscalation":true,"readOnlyRootFilesystem":false,"runAsNonRoot":false},"service":{"annotations":{},"enabled":true,"externalTrafficPolicy":"","labels":{},"loadBalancerSourceRanges":[],"type":"LoadBalancer"}}` | --------------------------------------------------------------------------- # @section Standalone Traefik mode |
+| traefik.badger | object | `{"enabled":true,"moduleName":"github.com/CausQ-Networks/praxis-badger","version":"v1.8.0"}` | Badger, the Traefik middleware that performs Praxis's resource authentication. Praxis's generated dynamic configuration describes the middleware itself, but the plugin must be declared in Traefik's STATIC configuration or Traefik cannot instantiate it and every generated router fails with `unknown plugin type: badger`. The alias is not cosmetic: Praxis hardcodes "badger" as both the middleware name and the plugin type. |
 | traefik.badger.enabled | bool | `true` | Declare the Badger plugin on the chart-managed Traefik. |
-| traefik.badger.moduleName | string | `"github.com/fosrl/badger"` | Go module path of the plugin. Only change this for a fork. |
+| traefik.badger.moduleName | string | `"github.com/CausQ-Networks/praxis-badger"` | Go module path of the plugin. Only change this for a fork. |
 | traefik.badger.version | string | `"v1.8.0"` | Plugin version. Must satisfy the Badger requirement in VERSION_MATRIX.md. Traefik downloads the plugin from GitHub on startup, so the Pod needs egress to github.com unless you pre-seed /plugins-storage. |
 | traefik.cloudflare.existingSecretName | string | `""` | Existing Secret name with Cloudflare credentials. |
 | traefik.cloudflare.generatedSecret.apiToken | string | `""` | One token reused for both DNS and zone scopes when the app supports it. |
@@ -1030,9 +1030,9 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | traefik.config.dashboardDeclareContainerPort | bool | `false` | Expose dashboard port as a declared container port in single mode. |
 | traefik.config.dynamicRouters.host | string | `"example.com"` | Example/default host used by generated dynamic router config. |
 | traefik.config.httpEntrypoint | string | `"web"` | HTTP entrypoint name. |
-| traefik.config.httpProvider | object | `{"enabled":true,"endpoint":"","pollInterval":"5s"}` | Poll Pangolin's generated Traefik configuration over HTTP. This is how a chart-managed Traefik receives the routers, services and middlewares Pangolin generates. Without it Traefik runs with only the Kubernetes providers and serves nothing Pangolin created, which is a healthy-looking Traefik that 404s every resource. In controller mode pangolin-kube-controller translates the same endpoint into CRDs instead, so this is off unless the chart manages Traefik. |
+| traefik.config.httpProvider | object | `{"enabled":true,"endpoint":"","pollInterval":"5s"}` | Poll Praxis's generated Traefik configuration over HTTP. This is how a chart-managed Traefik receives the routers, services and middlewares Praxis generates. Without it Traefik runs with only the Kubernetes providers and serves nothing Praxis created, which is a healthy-looking Traefik that 404s every resource. In controller mode pangolin-kube-controller translates the same endpoint into CRDs instead, so this is off unless the chart manages Traefik. |
 | traefik.config.httpProvider.enabled | bool | `true` | Enable the HTTP provider. Defaults to on whenever this chart runs Traefik. |
-| traefik.config.httpProvider.endpoint | string | `""` | Override the endpoint. Empty derives it from the Pangolin Service and `pangolin.config.server.internal_port`. |
+| traefik.config.httpProvider.endpoint | string | `""` | Override the endpoint. Empty derives it from the Praxis Service and `pangolin.config.server.internal_port`. |
 | traefik.config.httpProvider.pollInterval | string | `"5s"` | How often Traefik re-reads the generated configuration. |
 | traefik.config.httpsEntrypoint | string | `"websecure"` | HTTPS entrypoint name. |
 | traefik.config.insecureSkipVerify | bool | `false` | Skip TLS verification for upstream serversTransport. |
@@ -1042,10 +1042,10 @@ See `examples/values-blueprints.yaml` for a complete working example.
 | traefik.enabled | bool | `false` | Enable built-in Traefik workload. Used mainly when `deployment.type=standalone`. |
 | traefik.persistence.enabled | bool | `false` | Persist Traefik ACME state on a PVC. Strongly recommended when using ACME; required when enabling the dashboard (traefik.config.dashboard=true). |
 | traefik.replicaCount | int | `1` | Number of Traefik replicas when it runs in its own Deployment. Must be 1 while it runs in the Gerbil Pod (PANGOLIN-076). |
-| traefik.runInGerbilPod | bool | `true` | Run the chart-managed Traefik as a container in the Gerbil Pod (deployment.type=standalone, deployment.mode=multi). Traefik then shares Gerbil's network namespace, where the WireGuard interface and the routes to tunnel backends live - the Docker Compose layout. A Traefik in a Pod of its own has no route to the 100.89.x.x addresses Pangolin advertises and answers 502 for every tunnel-backed resource unless gerbil.hostGateway is used. Ignored when Gerbil does not run (gerbil.enabled=false or a startupMode other than `normal`); Traefik then gets its own Deployment. While Traefik shares the Pod, the Gerbil egress NetworkPolicy is not rendered, because Traefik must reach backends the chart cannot enumerate. |
+| traefik.runInGerbilPod | bool | `true` | Run the chart-managed Traefik as a container in the Gerbil Pod (deployment.type=standalone, deployment.mode=multi). Traefik then shares Gerbil's network namespace, where the WireGuard interface and the routes to tunnel backends live - the Docker Compose layout. A Traefik in a Pod of its own has no route to the 100.89.x.x addresses Praxis advertises and answers 502 for every tunnel-backed resource unless gerbil.hostGateway is used. Ignored when Gerbil does not run (gerbil.enabled=false or a startupMode other than `normal`); Traefik then gets its own Deployment. While Traefik shares the Pod, the Gerbil egress NetworkPolicy is not rendered, because Traefik must reach backends the chart cannot enumerate. |
 | traefik.service.enabled | bool | `true` | Create the public Traefik Service. |
-| traefikController | object | `{"experimental":{"plugins":{"badger":{"moduleName":"github.com/fosrl/badger","version":"v1.8.0"}}},"ingressClass":{"isDefaultClass":false},"nameOverride":"traefik"}` | Values passed to the bundled Traefik chart, which is installed only when `deployment.installTraefikController=true`. Everything the official chart accepts can be set here; the defaults below are the ones this chart cannot leave to the subchart.  In controller mode pangolin-kube-controller reads Pangolin's generated configuration and materialises it as Traefik CRDs, so the bundled Traefik needs the Kubernetes providers rather than an HTTP provider. It still needs the Badger plugin declared statically, because the middleware the controller writes into every router references it by alias. |
-| traefikController.experimental.plugins.badger | object | `{"moduleName":"github.com/fosrl/badger","version":"v1.8.0"}` | The alias must be `badger`: Pangolin hardcodes that string as the plugin type in the middleware it generates, and Traefik resolves it against this map. |
+| traefikController | object | `{"experimental":{"plugins":{"badger":{"moduleName":"github.com/CausQ-Networks/praxis-badger","version":"v1.8.0"}}},"ingressClass":{"isDefaultClass":false},"nameOverride":"traefik"}` | Values passed to the bundled Traefik chart, which is installed only when `deployment.installTraefikController=true`. Everything the official chart accepts can be set here; the defaults below are the ones this chart cannot leave to the subchart.  In controller mode pangolin-kube-controller reads Praxis's generated configuration and materialises it as Traefik CRDs, so the bundled Traefik needs the Kubernetes providers rather than an HTTP provider. It still needs the Badger plugin declared statically, because the middleware the controller writes into every router references it by alias. |
+| traefikController.experimental.plugins.badger | object | `{"moduleName":"github.com/CausQ-Networks/praxis-badger","version":"v1.8.0"}` | The alias must be `badger`: Praxis hardcodes that string as the plugin type in the middleware it generates, and Traefik resolves it against this map. |
 | traefikController.ingressClass.isDefaultClass | bool | `false` | Off by default: an externally installed Traefik is an explicitly supported topology and two default IngressClasses in one cluster is an ambiguous configuration. |
 | traefikController.nameOverride | string | `"traefik"` | Required. The alias makes Helm name subchart resources after it, and `pangolin-traefikController` is not a valid DNS-1123 name, so the API server rejects every object on install. Do not remove this. |
 

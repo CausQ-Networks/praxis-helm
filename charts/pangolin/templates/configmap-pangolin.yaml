@@ -5,7 +5,7 @@
 {{- $server := $cfg.server | default dict -}}
 {{- $gerbil := $cfg.gerbil | default dict -}}
 {{- $flags := $cfg.flags | default dict -}}
-{{- $metaAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "pangolin") | fromYaml) (.Values.pangolin.configMap.annotations | default dict) -}}
+{{- $metaAnns := mergeOverwrite (dict) (include "pangolin.global.commonAnnotations" $root | fromYaml) (include "pangolin.component.commonAnnotations" (dict "root" $root "component" "praxis") | fromYaml) (.Values.pangolin.configMap.annotations | default dict) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -13,7 +13,7 @@ metadata:
   namespace: {{ include "pangolin.namespace" . }}
   labels:
     {{- include "pangolin.labels" . | nindent 4 }}
-    {{- include "pangolin.component.commonLabels" (dict "root" . "component" "pangolin") | nindent 4 }}
+    {{- include "pangolin.component.commonLabels" (dict "root" . "component" "praxis") | nindent 4 }}
     {{- include "pangolin.renderNonSelectorLabels" (dict "labels" (.Values.pangolin.configMap.labels | default dict)) | nindent 4 }}
     app.kubernetes.io/component: pangolin
   {{- if gt (len $metaAnns) 0 }}
@@ -68,7 +68,7 @@ data:
         email: {{ $remoteHeaders.email | default "Remote-Email" | quote }}
         name: {{ $remoteHeaders.name | default "Remote-Name" | quote }}
         role: {{ $remoteHeaders.role | default "Remote-Role" | quote }}
-      {{- /* Emitted only when set so Pangolin's own defaults keep applying. */}}
+      {{- /* Emitted only when set so Praxis's own defaults keep applying. */}}
       {{- with $server.badger_override }}
       badger_override: {{ . | quote }}
       {{- end }}
@@ -91,7 +91,7 @@ data:
       custom_ip_header: {{ . | quote }}
       {{- end }}
     {{- /* Emitted only when at least one threshold is set, and then only the keys
-           that are, so Pangolin's defaults keep applying to the rest. */}}
+           that are, so Praxis's defaults keep applying to the rest. */}}
     {{- $offline := dict -}}
     {{- range $k, $v := ($cfg.offline_checker | default dict) }}
     {{- if not (kindIs "invalid" $v) }}

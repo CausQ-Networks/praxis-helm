@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Comprehensive test suite for the pangolin-cli Helm chart
-# Mirrors the Pangolin chart test suite and adds CRD-specific checks
+# Comprehensive test suite for the praxis-cli Helm chart
+# Mirrors the Praxis chart test suite and adds CRD-specific checks
 
 set -euo pipefail
 
@@ -182,11 +182,11 @@ record_test_result() {
 get_test_config() {
   case "$1" in
     minimal)
-      echo "tests/values/minimal.yaml|1,0,0,0,0,0|app.kubernetes.io/name: pangolin-cli" ;;
+      echo "tests/values/minimal.yaml|1,0,0,0,0,0|app.kubernetes.io/name: praxis-cli" ;;
     metrics)
-      echo "tests/values/metrics.yaml|1,0,0,0,0,1|app.kubernetes.io/name: pangolin-cli" ;;
+      echo "tests/values/metrics.yaml|1,0,0,0,0,1|app.kubernetes.io/name: praxis-cli" ;;
     full)
-      echo "tests/values/full.yaml|1,2,0,0,0,2|app.kubernetes.io/name: pangolin-cli" ;;
+      echo "tests/values/full.yaml|1,2,0,0,0,2|app.kubernetes.io/name: praxis-cli" ;;
     *) return 1 ;;
   esac
 }
@@ -524,7 +524,7 @@ usage() {
   cat << EOF
 Usage: $0 [OPTIONS] [TEST_NAME]
 
-Test the pangolin-cli Helm chart with comprehensive validation.
+Test the praxis-cli Helm chart with comprehensive validation.
 
 OPTIONS:
   -h, --help          Show this help message
@@ -605,7 +605,7 @@ main() {
     esac
   done
 
-  print_header "pangolin-cli Helm Chart Test Suite"
+  print_header "praxis-cli Helm Chart Test Suite"
   check_prerequisites
 
   print_step "Running initial Helm lint check"

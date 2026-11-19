@@ -11,7 +11,7 @@ templates:
   - templates/secrets.yaml
   - templates/secret-controller-tls.yaml
 tests:
-  - it: renders Pangolin ServiceAccount by default
+  - it: renders Praxis ServiceAccount by default
     template: templates/serviceaccount.yaml
     documentIndex: 0
     asserts:
@@ -172,7 +172,7 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: renders Pangolin Deployment by default
+  - it: renders Praxis Deployment by default
     template: templates/deployment-pangolin.yaml
     asserts:
       - isKind:
@@ -233,7 +233,7 @@ tests:
           path: spec.selector.matchLabels["app.kubernetes.io/component"]
           value: controller
 
-  - it: renders Pangolin Service by default
+  - it: renders Praxis Service by default
     template: templates/service-pangolin.yaml
     asserts:
       - isKind:
@@ -263,39 +263,39 @@ tests:
           path: metadata.name
           value: RELEASE-NAME-pangolin-app
 
-  - it: uses correct image for pangolin in cloudnativepg mode (postgresql image)
+  - it: uses correct image for praxis in cloudnativepg mode (postgresql image)
     template: templates/deployment-pangolin.yaml
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: docker.io/fosrl/pangolin:postgresql-1.26.0
+          value: docker.io/causq-networks/praxis:postgresql-1.26.0
 
-  - it: uses sqlite image for pangolin when database mode is sqlite
+  - it: uses sqlite image for praxis when database mode is sqlite
     set:
       database.mode: sqlite
     template: templates/deployment-pangolin.yaml
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: docker.io/fosrl/pangolin:1.26.0
+          value: docker.io/causq-networks/praxis:1.26.0
 
-  - it: respects explicit pangolin image tag override regardless of database mode
+  - it: respects explicit praxis image tag override regardless of database mode
     set:
       images.pangolin.tag: "custom-tag"
     template: templates/deployment-pangolin.yaml
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: docker.io/fosrl/pangolin:custom-tag
+          value: docker.io/causq-networks/praxis:custom-tag
 
   - it: uses correct image for gerbil
     template: templates/deployment-gerbil.yaml
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: docker.io/fosrl/gerbil:1.6.0
+          value: docker.io/causq-networks/praxis-gerbil:1.6.0
 
-  - it: renders with correct security context for pangolin (pod level)
+  - it: renders with correct security context for praxis (pod level)
     template: templates/deployment-pangolin.yaml
     asserts:
       - notExists:

@@ -6,14 +6,14 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-test
+  name: {{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-test
   annotations:
     helm.sh/hook: test
     helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded,hook-failed
   labels:
-    {{- include "pangolin-cli.labels" $root | nindent 4 }}
+    {{- include "praxis-cli.labels" $root | nindent 4 }}
     app.kubernetes.io/component: test
-    pangolin-cli.instance: {{ $inst.name }}
+    praxis-cli.instance: {{ $inst.name }}
 spec:
   backoffLimit: 0
   ttlSecondsAfterFinished: 60
@@ -22,7 +22,7 @@ spec:
       serviceAccountName: {{ $root.Release.Name }}-test
       automountServiceAccountToken: true
       restartPolicy: Never
-      {{- $ips := include "pangolin-cli.imagePullSecrets" $root -}}
+      {{- $ips := include "praxis-cli.imagePullSecrets" $root -}}
       {{- if $ips }}
 {{ $ips | nindent 6 }}
       {{- end }}
@@ -39,8 +39,8 @@ spec:
               set -euo pipefail
               echo "Waiting for pod of instance {{ $inst.name }}..."
 
-              POD=$(kubectl get pods -n {{ include "pangolin-cli.namespace" $root }} \
-                -l app.kubernetes.io/instance={{ $root.Release.Name }},pangolin-cli.instance={{ $inst.name }} \
+              POD=$(kubectl get pods -n {{ include "praxis-cli.namespace" $root }} \
+                -l app.kubernetes.io/instance={{ $root.Release.Name }},praxis-cli.instance={{ $inst.name }} \
                 -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
 
               if [ -z "$POD" ]; then
@@ -48,7 +48,7 @@ spec:
               fi
 
               for i in $(seq 1 60); do
-                PHASE=$(kubectl get pod "$POD" -n {{ include "pangolin-cli.namespace" $root }} -o jsonpath='{.status.phase}' 2>/dev/null || true)
+                PHASE=$(kubectl get pod "$POD" -n {{ include "praxis-cli.namespace" $root }} -o jsonpath='{.status.phase}' 2>/dev/null || true)
                 if [ "$PHASE" = "Running" ]; then
                   break
                 fi
@@ -63,12 +63,12 @@ spec:
                 echo "Pod for instance {{ $inst.name }} not found"; exit 1
               fi
               echo "Checking health file..."
-              kubectl exec -n {{ include "pangolin-cli.namespace" $root }} "$POD" -- test -f {{ default $root.Values.global.health.path $inst.healthFile }}
+              kubectl exec -n {{ include "praxis-cli.namespace" $root }} "$POD" -- test -f {{ default $root.Values.global.health.path $inst.healthFile }}
               echo "Health OK for instance {{ $inst.name }}"
 
               # Determine Service and Namespace
-              SVC="{{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}"
-              NS="{{ include "pangolin-cli.namespace" $root }}"
+              SVC="{{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}"
+              NS="{{ include "praxis-cli.namespace" $root }}"
 
               # External reachability check via Service type
               TYPE=$(kubectl get svc "$SVC" -n "$NS" -o jsonpath='{.spec.type}' 2>/dev/null || true)
@@ -97,19 +97,19 @@ spec:
                 echo "Service/$SVC type=$TYPE (external check skipped)"
               fi
 
-              # Pangolin endpoint reachability (best effort)
+              # Praxis endpoint reachability (best effort)
               ENDPOINT="{{ $inst.pangolinEndpoint }}"
               if [ -n "$ENDPOINT" ]; then
-                echo "Checking Pangolin endpoint reachability: $ENDPOINT"
+                echo "Checking Praxis endpoint reachability: $ENDPOINT"
                 if command -v curl >/dev/null 2>&1; then
-                  curl -skf --max-time 10 "$ENDPOINT" >/dev/null || { echo "Pangolin endpoint not reachable: $ENDPOINT" ; exit 1; }
+                  curl -skf --max-time 10 "$ENDPOINT" >/dev/null || { echo "Praxis endpoint not reachable: $ENDPOINT" ; exit 1; }
                 elif command -v wget >/dev/null 2>&1; then
-                  wget -q --spider "$ENDPOINT" || { echo "Pangolin endpoint not reachable: $ENDPOINT" ; exit 1; }
+                  wget -q --spider "$ENDPOINT" || { echo "Praxis endpoint not reachable: $ENDPOINT" ; exit 1; }
                 else
-                  echo "No curl/wget in test image; skipping Pangolin endpoint check"
+                  echo "No curl/wget in test image; skipping Praxis endpoint check"
                 fi
               else
-                echo "No inline Pangolin endpoint configured (likely using Secret); skipping endpoint check"
+                echo "No inline Praxis endpoint configured (likely using Secret); skipping endpoint check"
               fi
           resources:
             requests:

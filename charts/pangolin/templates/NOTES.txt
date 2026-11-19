@@ -1,16 +1,16 @@
 {{- if eq .Values.deployment.type "controller" }}
-Pangolin controller mode is enabled.
+Praxis controller mode is enabled.
 
-The pangolin-kube-controller and Pangolin application are deployed in multi-pod mode.
-The pangolin-kube-controller reads Pangolin Traefik config output and reconciles Kubernetes/Traefik CRs.
+The pangolin-kube-controller and Praxis application are deployed in multi-pod mode.
+The pangolin-kube-controller reads Praxis Traefik config output and reconciles Kubernetes/Traefik CRs.
 
 {{- if .Values.pangolin.config.traefik.enabled }}
-Pangolin config.yml includes a traefik section by default. This configures the
-Traefik routing/certificate output Pangolin generates; it does NOT install Traefik.
+Praxis config.yml includes a traefik section by default. This configures the
+Traefik routing/certificate output Praxis generates; it does NOT install Traefik.
 Ensure pangolin.config.traefik.http_entrypoint, https_entrypoint, and cert_resolver
 match your real Traefik deployment.
 {{- else }}
-Pangolin config.yml traefik section is disabled. Pangolin will fall back to its
+Praxis config.yml traefik section is disabled. Praxis will fall back to its
 upstream Traefik defaults instead, so ensure those match your real Traefik deployment.
 {{- end }}
 
@@ -29,15 +29,15 @@ Controller metrics: http://{{ include "pangolin.fullname" . }}-controller.{{ inc
 {{- end }}
 
 {{- if .Values.pangolin.service.enabled }}
-Pangolin service: {{ include "pangolin.fullname" . }}.{{ include "pangolin.namespace" . }}.svc:{{ .Values.pangolin.service.ports.external }}
+Praxis service: {{ include "pangolin.fullname" . }}.{{ include "pangolin.namespace" . }}.svc:{{ .Values.pangolin.service.ports.external }}
 {{- end }}
 {{- $dashboardUrl := .Values.pangolin.config.app.dashboard_url | default "" | trim }}
 {{- $dashboardPort := .Values.pangolin.service.ports.next | default 3002 }}
 {{- $pangolinNamespace := include "pangolin.namespace" . }}
 {{- $pangolinDeployment := include "pangolin.fullname" . }}
-{{- $pangolinContainer := "pangolin" }}
+{{- $pangolinContainer := "praxis" }}
 
-Pangolin dashboard URL:
+Praxis dashboard URL:
 {{- if $dashboardUrl }}
   {{ $dashboardUrl }}
 {{- else }}
@@ -48,16 +48,16 @@ Pangolin dashboard URL:
     http://localhost:{{ $dashboardPort }}
 {{- end }}
 
-Initial Pangolin setup token (preferred: prints the full token block):
+Initial Praxis setup token (preferred: prints the full token block):
   kubectl logs -n {{ $pangolinNamespace }} deploy/{{ $pangolinDeployment }} -c {{ $pangolinContainer }} | sed -n '/SETUP TOKEN GENERATED/,/================================/p'
 Simpler fallback (matches the marker line and next two lines):
   kubectl logs -n {{ $pangolinNamespace }} deploy/{{ $pangolinDeployment }} -c {{ $pangolinContainer }} | grep -A2 "SETUP TOKEN GENERATED"
 
-The setup token is printed during the first Pangolin startup. If the token is no longer visible, check previous logs:
+The setup token is printed during the first Praxis startup. If the token is no longer visible, check previous logs:
   kubectl logs -n {{ $pangolinNamespace }} deploy/{{ $pangolinDeployment }} -c {{ $pangolinContainer }} --previous
 
 {{- if and (not .Values.pangolin.secret.existingSecretName) .Values.pangolin.secret.generated.create }}
-Pangolin app Secret: {{ include "pangolin.app.secretName" . }} (key: {{ .Values.pangolin.secret.generated.key }})
+Praxis app Secret: {{ include "pangolin.app.secretName" . }} (key: {{ .Values.pangolin.secret.generated.key }})
 Tip: For production, set pangolin.secret.existingSecretName to an externally managed Secret.
 {{- end }}
 
@@ -73,18 +73,18 @@ External database mode is enabled.
 
 {{- if and .Values.networkPolicy.enabled (not .Values.networkPolicy.allowExternalEgressHttps) }}
 NetworkPolicy: HTTPS egress to 0.0.0.0/0 is disabled by default.
-If Pangolin/Gerbil require outbound 443, set networkPolicy.allowExternalEgressHttps=true or add a scoped rule via networkPolicy.extraEgress.
+If Praxis/Gerbil require outbound 443, set networkPolicy.allowExternalEgressHttps=true or add a scoped rule via networkPolicy.extraEgress.
 {{- end }}
 {{- if .Values.networkPolicy.enabled }}
 External access depends on your ingress/service exposure and NetworkPolicy rules.
-{{- $npPangolin := .Values.networkPolicy.pangolin | default dict }}
-{{- $aiGw := ($npPangolin.ingress | default dict).aiGateway | default dict }}
+{{- $npPraxis := .Values.networkPolicy.pangolin | default dict }}
+{{- $aiGw := ($npPraxis.ingress | default dict).aiGateway | default dict }}
 {{- $aiGwFromTraefik := true }}
 {{- if kindIs "bool" $aiGw.fromTraefik }}{{- $aiGwFromTraefik = $aiGw.fromTraefik }}{{- end }}
 {{- $aiGwHasPeer := or (gt (len ($aiGw.from | default list)) 0) (and $aiGwFromTraefik .Values.deployment.installTraefikController) }}
-{{- if and (not $aiGwHasPeer) (not (($npPangolin.externalIngress | default dict).aiGateway)) }}
+{{- if and (not $aiGwHasPeer) (not (($npPraxis.externalIngress | default dict).aiGateway)) }}
 
-Nothing may reach the Pangolin AI gateway port ({{ .Values.pangolin.service.ports.aiGateway }}).
+Nothing may reach the Praxis AI gateway port ({{ .Values.pangolin.service.ports.aiGateway }}).
 Controller mode expects a Traefik this chart did not render, and a NetworkPolicy cannot
 select a workload it does not know. Give it one:
 	networkPolicy.pangolin.ingress.aiGateway.from  (namespaceSelector/podSelector for your
@@ -94,17 +94,17 @@ Only AI gateway resources are affected; every other route already works.
 {{- end }}
 
 {{- else if eq .Values.deployment.type "standalone" }}
-Pangolin standalone mode is enabled.
+Praxis standalone mode is enabled.
 
-The built-in Traefik workload and Pangolin are deployed.
+The built-in Traefik workload and Praxis are deployed.
 
 {{- if .Values.pangolin.config.traefik.enabled }}
-Pangolin config.yml includes a traefik section by default. This configures the
-Traefik routing/certificate output Pangolin generates; it does NOT install Traefik.
+Praxis config.yml includes a traefik section by default. This configures the
+Traefik routing/certificate output Praxis generates; it does NOT install Traefik.
 Ensure pangolin.config.traefik.http_entrypoint, https_entrypoint, and cert_resolver
 match the standalone Traefik configuration in this release.
 {{- else }}
-Pangolin config.yml traefik section is disabled. Pangolin will fall back to its
+Praxis config.yml traefik section is disabled. Praxis will fall back to its
 upstream Traefik defaults instead, so ensure those still match the standalone
 Traefik configuration in this release.
 {{- end }}
@@ -146,7 +146,7 @@ Note: The chart generates a strong random password by default unless database.em
 {{- $dbWaitEnabled := and (ne (include "pangolin.db.mode" .) "sqlite") $dbWaitUserEnabled -}}
 {{- $dbWaitHost := include "pangolin.db.waitHost" . | trim -}}
 {{- if and $dbWaitEnabled $dbWaitHost }}
-Initial startup may take a few minutes while the wait-for-db initContainer checks database readiness and Pangolin runs migrations.
+Initial startup may take a few minutes while the wait-for-db initContainer checks database readiness and Praxis runs migrations.
 {{- end }}
 
 {{- if eq (include "pangolin.gerbil.resourcesEnabled" .) "true" }}
@@ -156,11 +156,11 @@ gerbil.securityContext.capabilities.add only if your node kernel requires module
 from inside the container. Review cluster security policies accordingly.
 {{- if eq (include "pangolin.gerbil.startupMode" .) "delayed" }}
 Gerbil startup mode is delayed: the Gerbil Deployment is rendered with replicas=0.
-Complete Pangolin first-run setup (including exit-node registration), then run:
+Complete Praxis first-run setup (including exit-node registration), then run:
   helm upgrade {{ .Release.Name }} <chart-path-or-repo/chart> --namespace {{ include "pangolin.namespace" . }} --set gerbil.startupMode=normal
 Or scale once for immediate start:
   kubectl scale deployment/{{ include "pangolin.fullname" . }}-gerbil -n {{ include "pangolin.namespace" . }} --replicas=1
-If logs include `Created new exit node ...`, Pangolin has created the local exit node and Gerbil can be enabled/started.
+If logs include `Created new exit node ...`, Praxis has created the local exit node and Gerbil can be enabled/started.
 {{- end }}
 {{- if and (not .Values.namespace.create) (ne (default "" .Values.namespace.podSecurity.enforce) "privileged") }}
 PSA note: If Pod Security Admission is enforced, ensure the target namespace allows NET_ADMIN.
@@ -187,7 +187,7 @@ Gerbil Service is disabled (gerbil.service.enabled=false). UDP ports are still o
 {{- end }}
 {{- if and .Values.gerbil.enabled (eq (include "pangolin.gerbil.startupMode" .) "disabledUntilSetup") }}
 Gerbil startup mode is disabledUntilSetup: Gerbil resources are not rendered until you switch to normal mode.
-After Pangolin setup is complete, run:
+After Praxis setup is complete, run:
   helm upgrade {{ .Release.Name }} <chart-path-or-repo/chart> --namespace {{ include "pangolin.namespace" . }} --set gerbil.startupMode=normal
 {{- end }}
 
@@ -206,7 +206,7 @@ Blueprint environment Secret: {{ include "pangolin.blueprints.envSecretName" . }
 {{- end }}
 Tip: Supply blueprint files to Newt agents using --blueprint-file or
   --provisioning-blueprint-file pointing to the blueprint YAML content.
-  See https://docs.pangolin.net/manage/blueprints for details.
+  See https://docs.praxis.causq.com/manage/blueprints for details.
 {{- end }}
 
 {{- if .Values.networkPolicy.enabled }}
@@ -280,7 +280,7 @@ Two limits worth knowing before you rely on this:
 {{- else if and (eq .Values.deployment.type "controller") (eq .Values.deployment.mode "multi") (eq (include "pangolin.gerbil.resourcesEnabled" .) "true") }}
 
 NOTE: tunnel backends are only reachable from Gerbil's own network namespace.
-Pangolin advertises them as WireGuard peer addresses, so an externally installed
+Praxis advertises them as WireGuard peer addresses, so an externally installed
 Traefik has no route to them and tunnel-backed resources return 502 while the tunnel
 itself is healthy (fosrl/helm-charts#20).
 

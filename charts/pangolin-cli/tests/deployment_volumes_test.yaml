@@ -75,14 +75,14 @@ tests:
           configPersistence:
             enabled: true
             type: emptyDir
-            mountPath: /var/lib/pangolin
+            mountPath: /var/lib/praxis
             fileName: config.json
     asserts:
       - contains:
           path: spec.template.spec.containers[0].volumeMounts
           content:
             name: config-persistence
-            mountPath: "/var/lib/pangolin"
+            mountPath: "/var/lib/praxis"
       - contains:
           path: spec.template.spec.volumes
           content:
@@ -98,14 +98,14 @@ tests:
             enabled: true
             type: persistentVolumeClaim
             existingClaim: my-site-config
-            mountPath: /var/lib/pangolin
+            mountPath: /var/lib/praxis
             fileName: config.json
     asserts:
       - contains:
           path: spec.template.spec.containers[0].volumeMounts
           content:
             name: config-persistence
-            mountPath: "/var/lib/pangolin"
+            mountPath: "/var/lib/praxis"
       - contains:
           path: spec.template.spec.volumes
           content:
@@ -118,7 +118,7 @@ tests:
       siteInstances:
         - name: test-prov-blueprint
           enabled: true
-          provisioningBlueprintFile: /etc/pangolin/provisioning-blueprint.yaml
+          provisioningBlueprintFile: /etc/praxis/provisioning-blueprint.yaml
           provisioningBlueprintData: |
             version: 1
             routes: []
@@ -127,14 +127,14 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts
           content:
             name: provisioning-blueprint-file
-            mountPath: "/etc/pangolin"
+            mountPath: "/etc/praxis"
             readOnly: true
       - contains:
           path: spec.template.spec.volumes
           content:
             name: provisioning-blueprint-file
             configMap:
-              name: RELEASE-NAME-pangolin-cli-test-prov-blueprint-provisioning-blueprint
+              name: RELEASE-NAME-praxis-cli-test-prov-blueprint-provisioning-blueprint
 
   - it: does not mount config-persistence volume when configPersistence is disabled
     set:
@@ -214,7 +214,7 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts
           content:
             name: updown-script
-            mountPath: /opt/pangolin/updown
+            mountPath: /opt/praxis/updown
       - contains:
           path: spec.template.spec.containers[0].volumeMounts
           content:

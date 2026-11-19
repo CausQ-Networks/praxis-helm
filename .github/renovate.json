@@ -12,62 +12,62 @@
   ],
   "customManagers": [
     {
-      "description": "Pangolin chart appVersion — tracks fosrl/pangolin Docker image",
+      "description": "Praxis chart appVersion — tracks causq-networks/praxis Docker image",
       "customType": "regex",
-      "fileMatch": ["^charts/pangolin/Chart\\.yaml$"],
+      "fileMatch": ["^charts/praxis/Chart\\.yaml$"],
       "matchStrings": ["appVersion:\\s*\"(?<currentValue>[^\"]+)\""],
-      "depNameTemplate": "fosrl/pangolin",
+      "depNameTemplate": "causq-networks/praxis",
       "datasourceTemplate": "docker",
       "versioningTemplate": "semver"
     },
     {
-      "description": "Newt chart appVersion — tracks fosrl/newt Docker image",
+      "description": "Newt chart appVersion — tracks causq-networks/praxis-newt Docker image",
       "customType": "regex",
       "fileMatch": ["^charts/newt/Chart\\.yaml$"],
       "matchStrings": ["appVersion:\\s*\"(?<currentValue>[^\"]+)\""],
-      "depNameTemplate": "fosrl/newt",
+      "depNameTemplate": "causq-networks/praxis-newt",
       "datasourceTemplate": "docker",
       "versioningTemplate": "semver"
     },
     {
-      "description": "Pangolin ArtifactHub annotations — standard docker.io image lines",
+      "description": "Praxis ArtifactHub annotations — standard docker.io image lines",
       "customType": "regex",
-      "fileMatch": ["^charts/pangolin/Chart\\.yaml$"],
+      "fileMatch": ["^charts/praxis/Chart\\.yaml$"],
       "matchStrings": ["image: docker\\.io/(?<depName>[^:\\s]+):(?!postgresql-)(?<currentValue>\\S+)"],
       "datasourceTemplate": "docker",
       "registryUrlTemplate": "https://registry.hub.docker.com",
       "versioningTemplate": "semver"
     },
     {
-      "description": "Pangolin ArtifactHub annotations — postgresql-* docker.io image lines",
+      "description": "Praxis ArtifactHub annotations — postgresql-* docker.io image lines",
       "customType": "regex",
-      "fileMatch": ["^charts/pangolin/Chart\\.yaml$"],
-      "matchStrings": ["image: docker\\.io/fosrl/pangolin:postgresql-(?<currentValue>\\S+)"],
-      "depNameTemplate": "fosrl/pangolin",
+      "fileMatch": ["^charts/praxis/Chart\\.yaml$"],
+      "matchStrings": ["image: docker\\.io/causq-networks/praxis:postgresql-(?<currentValue>\\S+)"],
+      "depNameTemplate": "causq-networks/praxis",
       "datasourceTemplate": "docker",
       "registryUrlTemplate": "https://registry.hub.docker.com",
       "versioningTemplate": "semver",
-      "autoReplaceStringTemplate": "image: docker.io/fosrl/pangolin:postgresql-{{newValue}}"
+      "autoReplaceStringTemplate": "image: docker.io/causq-networks/praxis:postgresql-{{newValue}}"
     },
     {
-      "description": "Pangolin ArtifactHub annotations — standard ghcr.io image lines",
+      "description": "Praxis ArtifactHub annotations — standard ghcr.io image lines",
       "customType": "regex",
-      "fileMatch": ["^charts/pangolin/Chart\\.yaml$"],
+      "fileMatch": ["^charts/praxis/Chart\\.yaml$"],
       "matchStrings": ["image: ghcr\\.io/(?<depName>[^:\\s]+):(?!postgresql-)(?<currentValue>\\S+)"],
       "datasourceTemplate": "docker",
       "registryUrlTemplate": "https://ghcr.io",
       "versioningTemplate": "semver"
     },
     {
-      "description": "Pangolin ArtifactHub annotations — postgresql-* ghcr.io image lines",
+      "description": "Praxis ArtifactHub annotations — postgresql-* ghcr.io image lines",
       "customType": "regex",
-      "fileMatch": ["^charts/pangolin/Chart\\.yaml$"],
-      "matchStrings": ["image: ghcr\\.io/fosrl/pangolin:postgresql-(?<currentValue>\\S+)"],
-      "depNameTemplate": "fosrl/pangolin",
+      "fileMatch": ["^charts/praxis/Chart\\.yaml$"],
+      "matchStrings": ["image: ghcr\\.io/causq-networks/praxis:postgresql-(?<currentValue>\\S+)"],
+      "depNameTemplate": "causq-networks/praxis",
       "datasourceTemplate": "docker",
       "registryUrlTemplate": "https://ghcr.io",
       "versioningTemplate": "semver",
-      "autoReplaceStringTemplate": "image: ghcr.io/fosrl/pangolin:postgresql-{{newValue}}"
+      "autoReplaceStringTemplate": "image: ghcr.io/causq-networks/praxis:postgresql-{{newValue}}"
     },
     {
       "description": "Newt ArtifactHub annotations — docker.io image lines",
@@ -88,27 +88,27 @@
       "versioningTemplate": "semver"
     },
     {
-      "description": "Gerbil image tag in charts/pangolin/values.yaml",
+      "description": "Gerbil image tag in charts/praxis/values.yaml",
       "customType": "regex",
-      "fileMatch": ["^charts/pangolin/values\\.yaml$"],
-      "matchStrings": ["repository: fosrl/gerbil(?:[^\\n]*\\n)+?\\s+tag: \"(?<currentValue>[^\"]+)\""],
-      "depNameTemplate": "fosrl/gerbil",
+      "fileMatch": ["^charts/praxis/values\\.yaml$"],
+      "matchStrings": ["repository: causq-networks/praxis-gerbil(?:[^\\n]*\\n)+?\\s+tag: \"(?<currentValue>[^\"]+)\""],
+      "depNameTemplate": "causq-networks/praxis-gerbil",
       "datasourceTemplate": "docker",
       "versioningTemplate": "semver"
     },
     {
-      "description": "Traefik standalone image tag in charts/pangolin/values.yaml",
+      "description": "Traefik standalone image tag in charts/praxis/values.yaml",
       "customType": "regex",
-      "fileMatch": ["^charts/pangolin/values\\.yaml$"],
+      "fileMatch": ["^charts/praxis/values\\.yaml$"],
       "matchStrings": ["repository: traefik(?:[^\\n]*\\n)+?\\s+tag: (?<currentValue>v[^\\s#\\n]+)"],
       "depNameTemplate": "traefik",
       "datasourceTemplate": "docker",
       "versioningTemplate": "semver"
     },
     {
-      "description": "Embedded Postgres image tag in charts/pangolin/values.yaml",
+      "description": "Embedded Postgres image tag in charts/praxis/values.yaml",
       "customType": "regex",
-      "fileMatch": ["^charts/pangolin/values\\.yaml$"],
+      "fileMatch": ["^charts/praxis/values\\.yaml$"],
       "matchStrings": ["repository: postgres(?:[^\\n]*\\n)+?\\s+tag: (?<currentValue>[^\\s#\\n]+)"],
       "depNameTemplate": "postgres",
       "datasourceTemplate": "docker",
@@ -135,22 +135,22 @@
       "commitMessageTopic": "GitHub Actions"
     },
     {
-      "description": "Group Pangolin application image updates (pangolin, gerbil, kube-controller)",
+      "description": "Group Praxis application image updates (pangolin, gerbil, kube-controller)",
       "matchManagers": ["custom.regex"],
       "matchPackageNames": [
-        "fosrl/pangolin",
-        "fosrl/gerbil",
-        "fosrl/pangolin-kube-controller"
+        "causq-networks/praxis",
+        "causq-networks/praxis-gerbil",
+        "causq-networks/praxis-kube-controller"
       ],
-      "groupName": "Pangolin application images",
+      "groupName": "Praxis application images",
       "labels": ["dependencies", "renovate", "chart-update"],
       "commitMessagePrefix": "chore(deps):",
-      "commitMessageTopic": "Pangolin images"
+      "commitMessageTopic": "Praxis images"
     },
     {
       "description": "Group Newt image updates into a single PR",
       "matchManagers": ["custom.regex"],
-      "matchPackageNames": ["fosrl/newt"],
+      "matchPackageNames": ["causq-networks/praxis-newt"],
       "groupName": "Newt image",
       "labels": ["dependencies", "renovate", "chart-update"],
       "commitMessagePrefix": "chore(deps):",

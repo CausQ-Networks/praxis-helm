@@ -1,6 +1,6 @@
-# Example: Installer-like Pangolin config in standalone Traefik mode
+# Example: Installer-like Praxis config in standalone Traefik mode
 #
-# Closer to upstream Docker-style topology: Pangolin + Gerbil + standalone Traefik.
+# Closer to upstream Docker-style topology: Praxis + Gerbil + standalone Traefik.
 
 deployment:
   type: standalone
@@ -12,7 +12,7 @@ controller:
 pangolin:
   config:
     app:
-      dashboard_url: "https://pangolin.yourdomain.example"
+      dashboard_url: "https://praxis.yourdomain.example"
       log_level: info
       telemetry:
         anonymous_usage: true

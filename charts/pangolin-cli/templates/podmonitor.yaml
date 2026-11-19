@@ -14,7 +14,7 @@
   {{- else -}}
     {{- range $i, $inst := (get $vals "siteInstances") -}}
       {{- if $inst.enabled -}}
-        {{- $eff := (include "pangolin-cli.effectiveMetrics" (list $inst $gm)) | fromJson -}}
+        {{- $eff := (include "praxis-cli.effectiveMetrics" (list $inst $gm)) | fromJson -}}
         {{- $effPM := (default (dict) (get $eff "podMonitor")) -}}
         {{- if $effPM.enabled -}}
           {{- $shouldPM = true -}}
@@ -29,14 +29,14 @@
 apiVersion: {{ $mPM.apiVersion | default "monitoring.coreos.com/v1" }}
 kind: PodMonitor
 metadata:
-  name: {{ include "pangolin-cli.fullname" . }}
+  name: {{ include "praxis-cli.fullname" . }}
   {{- with $mPM.namespace }}
   {{- if . }}
   namespace: {{ . }}
   {{- end }}
   {{- end }}
   labels:
-    {{- include "pangolin-cli.labels" . | nindent 4 }}
+    {{- include "praxis-cli.labels" . | nindent 4 }}
     {{- with $mPM.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -73,5 +73,5 @@ spec:
       app.kubernetes.io/component: site
   namespaceSelector:
     matchNames:
-      - {{ include "pangolin-cli.namespace" . }}
+      - {{ include "praxis-cli.namespace" . }}
 {{- end }}

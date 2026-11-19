@@ -26,7 +26,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: ghcr.io/fosrl/pangolin-kube-controller:0.1.0
+          value: ghcr.io/causq-networks/praxis-kube-controller:0.1.0
 
   - it: renders wait-for-pangolin-config initContainer before controller container
     set:
@@ -57,7 +57,7 @@ tests:
     set:
       deployment.type: controller
       controller.enabled: true
-      controller.waitForPangolin.enabled: false
+      controller.waitForPraxis.enabled: false
     asserts:
       - isNull:
           path: spec.template.spec.initContainers
@@ -70,7 +70,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].image
-          value: ghcr.io/fosrl/pangolin-kube-controller@sha256:1111111111111111111111111111111111111111111111111111111111111111
+          value: ghcr.io/causq-networks/praxis-kube-controller@sha256:1111111111111111111111111111111111111111111111111111111111111111
 
   - it: controller TLS volume is required when controller.tls.enabled=true
     set:

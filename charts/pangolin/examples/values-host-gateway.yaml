@@ -5,7 +5,7 @@
 #
 # THE PROBLEM
 #
-# Pangolin advertises the backends behind a Newt site as raw WireGuard peer addresses,
+# Praxis advertises the backends behind a Newt site as raw WireGuard peer addresses,
 # for example http://100.89.128.4:44602. Gerbil creates its WireGuard interface in
 # whatever network namespace it runs in, so under Kubernetes those addresses exist
 # inside the Gerbil Pod and nowhere else. An externally installed Traefik dials an
@@ -23,7 +23,7 @@
 # table. Traefik is then pinned to the same node.
 #
 # This is a workaround for a missing portable data path, not the intended architecture -
-# see https://github.com/fosrl/helm-charts/issues/20, which stays open.
+# see https://github.com/CausQ-Networks/praxis-helm/issues/20, which stays open.
 #
 # WHAT IT DOES NOT SOLVE
 #
@@ -44,9 +44,9 @@
 # without a tunnel at all.
 #
 # Usage:
-#   helm install pangolin charts/pangolin \
-#     -f charts/pangolin/examples/values-host-gateway.yaml \
-#     --namespace pangolin --create-namespace
+#   helm install praxis charts/praxis \
+#     -f charts/praxis/examples/values-host-gateway.yaml \
+#     --namespace praxis --create-namespace
 
 deployment:
   type: controller
@@ -69,8 +69,8 @@ namespace:
 pangolin:
   config:
     app:
-      # REPLACE: the public URL of your Pangolin dashboard.
-      dashboard_url: "https://pangolin.yourdomain.example"
+      # REPLACE: the public URL of your Praxis dashboard.
+      dashboard_url: "https://praxis.yourdomain.example"
     domains:
       domain1:
         # REPLACE: your base domain.
@@ -99,10 +99,10 @@ networkPolicy:
   gerbil:
     hostGateway:
       # A hostNetwork Pod is not matched by a podSelector - its traffic sources from the
-      # node IP - so the Gerbil -> Pangolin rule is expressed as node address blocks.
+      # node IP - so the Gerbil -> Praxis rule is expressed as node address blocks.
       # REPLACE these with your own node addresses; the chart has no default because the
       # private ranges contain every mainstream Pod CIDR, and seeding them would admit
-      # every Pod in the cluster to Pangolin's internal API.
+      # every Pod in the cluster to Praxis's internal API.
       #   kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}'
       nodeCIDRs:
         - 192.168.1.10/32

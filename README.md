@@ -1,16 +1,16 @@
 # Fossorial Kubernetes Helm Charts
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/fosrl?style=flat-square)](https://artifacthub.io/packages/search?org=fosrl)
-[![Newt Chart Version: 1.3.0](https://img.shields.io/badge/Newt%20Chart-1.3.0-informational?style=flat-square)](https://github.com/fosrl/helm-charts/releases)
+[![Newt Chart Version: 1.3.0](https://img.shields.io/badge/Newt%20Chart-1.3.0-informational?style=flat-square)](https://github.com/CausQ-Networks/praxis-helm/releases)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/license/mit)
-![Release Charts](https://github.com/fosrl/helm-charts/actions/workflows/helm-ci.yml/badge.svg?branch=main)
-[![Releases downloads](https://img.shields.io/github/downloads/fosrl/helm-charts/total.svg?style=flat-square)](https://github.com/fosrl/helm-charts/releases)
+![Release Charts](https://github.com/CausQ-Networks/praxis-helm/actions/workflows/helm-ci.yml/badge.svg?branch=main)
+[![Releases downloads](https://img.shields.io/github/downloads/fosrl/helm-charts/total.svg?style=flat-square)](https://github.com/CausQ-Networks/praxis-helm/releases)
 
 Welcome to the official repository for **Fossorial Kubernetes Helm Charts**, featuring Helm charts for
 
-- [Pangolin](https://github.com/fosrl/helm-charts/tree/main/charts/pangolin)
-- [Newt](https://github.com/fosrl/helm-charts/tree/main/charts/newt)
-- [Pangolin CLI](https://github.com/fosrl/helm-charts/tree/main/charts/pangolin-cli) (site tunnel via `pangolin-cli up site`)
+- [Praxis](https://github.com/CausQ-Networks/praxis-helm/tree/main/charts/praxis)
+- [Newt](https://github.com/CausQ-Networks/praxis-helm/tree/main/charts/newt)
+- [Praxis CLI](https://github.com/CausQ-Networks/praxis-helm/tree/main/charts/praxis-cli) (site tunnel via `praxis-cli up site`)
 
 ## Installation & Usage
 
@@ -31,16 +31,16 @@ You can then run `helm search repo fossorial` to see the charts.
 
 ### Install a Chart
 
-Example to install the Pangolin chart:
+Example to install the Praxis chart:
 
 ```console
-helm install my-pangolin fossorial/pangolin
+helm install my-pangolin fossorial/praxis
 ```
 
-Example to install the Pangolin CLI chart:
+Example to install the Praxis CLI chart:
 
 ```console
-helm install my-site fossorial/pangolin-cli
+helm install my-site fossorial/praxis-cli
 ```
 
 Example to install the older Newt chart:
@@ -61,11 +61,11 @@ For more details, please refer to the individual chart READMEs in the `charts/` 
 
 ## Contributions
 
-Looking for something to contribute? Take a look at issues marked with [help wanted](https://github.com/fosrl/helm-charts/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22help%20wanted%22).
+Looking for something to contribute? Take a look at issues marked with [help wanted](https://github.com/CausQ-Networks/praxis-helm/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22help%20wanted%22).
 
 Please see [CONTRIBUTING](./CONTRIBUTING.md) in the repository for guidelines and best practices.
 
-Please post bug reports and other functional issues in the [Issues](https://github.com/fosrl/helm-charts/issues) section of the repository.
+Please post bug reports and other functional issues in the [Issues](https://github.com/CausQ-Networks/praxis-helm/issues) section of the repository.
 
 ## Licensing
 

@@ -1,7 +1,7 @@
 # Full-ish example for manual testing; includes many common settings
 global:
   image:
-    repository: fosrl/newt
+    repository: causq-networks/praxis-newt
     tag: latest
   logLevel: DEBUG
   nativeMode:
@@ -14,7 +14,7 @@ global:
 newtInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: "https://pangolin.example.com"
+    pangolinEndpoint: "https://praxis.example.com"
     id: my-id
     secret: my-secret
     mtu: 1400

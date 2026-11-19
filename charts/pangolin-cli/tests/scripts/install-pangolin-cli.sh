@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# pangolin-cli Helm chart install/verify/uninstall helper
+# praxis-cli Helm chart install/verify/uninstall helper
 # - No secrets are created or modified by this script
 # - Uses current kubeconfig and prints current context and cluster name
 # - Applies Hetzner LB annotations for the site Service when accepting clients
@@ -17,7 +17,7 @@ NC='\033[0m'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHART_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-DEFAULT_RELEASE="pangolin-cli-validation"
+DEFAULT_RELEASE="praxis-cli-validation"
 DEFAULT_NAMESPACE="Chart-Validation-Site"
 DEFAULT_TIMEOUT="5m"
 DEFAULT_LOG_SINCE="15m"
@@ -86,7 +86,7 @@ Options:
   --set key=val            Additional Helm set (repeatable)
 
 Site-specific (required for install/verify):
-  --secret-name NAME       Name of existing Secret holding PANGOLIN_ENDPOINT, SITE_ID, SITE_SECRET
+  --secret-name NAME       Name of existing Secret holding PRAXIS_ENDPOINT, SITE_ID, SITE_SECRET
   --instance-name NAME     Instance name (default: ${DEFAULT_INSTANCE_NAME})
 
 Hetzner LoadBalancer (required when accepting clients):
@@ -101,11 +101,11 @@ Misc:
 
 Examples:
   # Install with existing secret and Hetzner LB location
-  $(basename "$0") install --secret-name pangolin-site-credentials \
+  $(basename "$0") install --secret-name praxis-site-credentials \
     --lb-location fsn1 --lb-name my-site-lb
 
   # Verify only
-  $(basename "$0") verify --secret-name pangolin-site-credentials
+  $(basename "$0") verify --secret-name praxis-site-credentials
 EOF
 }
 
@@ -207,7 +207,7 @@ verify_ready() {
 
   # Wait for Service LoadBalancer if accepting clients
   local svc_names
-  svc_names=$(kubectl -n "$NAMESPACE" "${kctx_args[@]}" get svc -l "${sel},pangolin-cli.instance=${INSTANCE_NAME}" -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' || true)
+  svc_names=$(kubectl -n "$NAMESPACE" "${kctx_args[@]}" get svc -l "${sel},praxis-cli.instance=${INSTANCE_NAME}" -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' || true)
   if [[ -n "$svc_names" ]]; then
     local name
     for name in $svc_names; do
@@ -253,7 +253,7 @@ status_summary() {
   kubectl -n "$NAMESPACE" "${kctx_args[@]}" get events --sort-by=.metadata.creationTimestamp | tail -n 50 || true
 }
 
-_debug_dir="${CHART_DIR}/tests/output/pangolin-cli-${RELEASE}-$(date +%Y%m%d-%H%M%S)"
+_debug_dir="${CHART_DIR}/tests/output/praxis-cli-${RELEASE}-$(date +%Y%m%d-%H%M%S)"
 
 debug_collect() {
   mkdir -p "${_debug_dir}/logs"

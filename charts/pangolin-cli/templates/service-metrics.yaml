@@ -5,17 +5,17 @@
 {{- $gm := (default (dict) (get $global "metrics")) -}}
 {{- range $i, $inst := (get $vals "siteInstances") }}
   {{- if $inst.enabled }}
-  {{- $m := (include "pangolin-cli.effectiveMetrics" (list $inst $gm)) | fromJson -}}
+  {{- $m := (include "praxis-cli.effectiveMetrics" (list $inst $gm)) | fromJson -}}
   {{- if and $m.enabled $m.service.enabled }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-metrics
+  name: {{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-metrics
   labels:
-    {{- include "pangolin-cli.labels" $root | nindent 4 }}
+    {{- include "praxis-cli.labels" $root | nindent 4 }}
     app.kubernetes.io/component: metrics
-    pangolin-cli.instance: {{ $inst.name }}
+    praxis-cli.instance: {{ $inst.name }}
     {{- /* Global extra labels for external Services */}}
   {{- range $k,$v := $root.Values.global.additionalServiceLabels }}
   {{ $k }}: {{ $v | quote }}
@@ -39,7 +39,7 @@ spec:
   type: {{ $m.service.type | default "ClusterIP" }}
   selector:
     app.kubernetes.io/instance: {{ $root.Release.Name }}
-    pangolin-cli.instance: {{ $inst.name }}
+    praxis-cli.instance: {{ $inst.name }}
   ports:
       - name: {{ $m.service.portName | default "metrics" }}
         port: {{ $m.service.port | default 9090 }}
@@ -54,11 +54,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "pangolin-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-metrics
+  name: {{ include "praxis-cli.instance.fullname" (dict "root" $root "inst" $inst) }}-metrics
   labels:
-    {{- include "pangolin-cli.labels" $root | nindent 4 }}
+    {{- include "praxis-cli.labels" $root | nindent 4 }}
     app.kubernetes.io/component: metrics
-    pangolin-cli.instance: {{ $inst.name }}
+    praxis-cli.instance: {{ $inst.name }}
     {{- /* Global extra labels for external Services */}}
   {{- range $k,$v := $root.Values.global.additionalServiceLabels }}
   {{ $k }}: {{ $v | quote }}
@@ -82,7 +82,7 @@ spec:
   type: {{ $m.service.type | default "ClusterIP" }}
   selector:
     app.kubernetes.io/instance: {{ $root.Release.Name }}
-    pangolin-cli.instance: {{ $inst.name }}
+    praxis-cli.instance: {{ $inst.name }}
   ports:
     - name: {{ $m.service.portName | default "metrics" }}
       port: {{ $m.service.port | default 9090 }}

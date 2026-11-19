@@ -6,7 +6,7 @@ templates:
   - templates/configmap-controller.yaml
   - templates/secret-pangolin-private.yaml
 tests:
-  - it: renders Pangolin config ConfigMap by default
+  - it: renders Praxis config ConfigMap by default
     template: templates/configmap-pangolin.yaml
     asserts:
       - isKind:
@@ -17,7 +17,7 @@ tests:
       - exists:
           path: data["config.yml"]
 
-  - it: mounts config.yml into Pangolin container
+  - it: mounts config.yml into Praxis container
     template: templates/deployment-pangolin.yaml
     asserts:
       - equal:
@@ -30,7 +30,7 @@ tests:
           path: spec.template.spec.volumes[0].configMap.name
           value: RELEASE-NAME-pangolin-config
 
-  - it: renders modern secret env keys for Pangolin
+  - it: renders modern secret env keys for Praxis
     template: templates/deployment-pangolin.yaml
     asserts:
       - equal:
@@ -40,7 +40,7 @@ tests:
           path: spec.template.spec.containers[0].env[1].name
           value: POSTGRES_CONNECTION_STRING
 
-  - it: defaults controller endpoint to internal Pangolin HTTP service
+  - it: defaults controller endpoint to internal Praxis HTTP service
     template: templates/configmap-controller.yaml
     asserts:
       - equal:
@@ -145,7 +145,7 @@ tests:
     asserts:
       - matchRegex:
           path: data["config.yml"]
-          pattern: "dashboard_url: \\\"https://pangolin.example.com\\\""
+          pattern: "dashboard_url: \\\"https://praxis.example.com\\\""
       - matchRegex:
           path: data["config.yml"]
           pattern: "log_level:"
@@ -642,8 +642,8 @@ tests:
           path: data["config.yml"]
           pattern: "smtp_tls_reject_unauthorized: false"
 
-  # --- Pangolin 1.22 configuration surface ---------------------------------------
-  # gerbil.use_subdomain was dropped from Pangolin's config schema; the chart must not
+  # --- Praxis 1.22 configuration surface ---------------------------------------
+  # gerbil.use_subdomain was dropped from Praxis's config schema; the chart must not
   # keep emitting a key upstream no longer knows about.
   - it: no longer emits the removed gerbil.use_subdomain
     template: templates/configmap-pangolin.yaml
@@ -691,7 +691,7 @@ tests:
           path: data["config.yml"]
           pattern: "virtual_api_key_id: \"Remote-Virtual-Api-Key-Id\""
 
-  # Optional keys must stay unset so Pangolin's own defaults keep applying.
+  # Optional keys must stay unset so Praxis's own defaults keep applying.
   - it: omits the optional 1.22 overrides by default
     template: templates/configmap-pangolin.yaml
     asserts:
@@ -710,13 +710,13 @@ tests:
 
   - it: emits badger_override and ai_gateway_override when set
     set:
-      pangolin.config.server.badger_override: http://pangolin.pangolin.svc.cluster.local:3001/api/v1
+      pangolin.config.server.badger_override: http://praxis.pangolin.svc.cluster.local:3001/api/v1
       pangolin.config.server.ai_gateway_override: http://ai.example:3005
     template: templates/configmap-pangolin.yaml
     asserts:
       - matchRegex:
           path: data["config.yml"]
-          pattern: "badger_override: \"http://pangolin.pangolin.svc.cluster.local:3001/api/v1\""
+          pattern: "badger_override: \"http://praxis.pangolin.svc.cluster.local:3001/api/v1\""
       - matchRegex:
           path: data["config.yml"]
           pattern: "ai_gateway_override: \"http://ai.example:3005\""

@@ -7,7 +7,7 @@ tests:
       siteInstances:
         - name: test-prov-blueprint
           enabled: true
-          provisioningBlueprintFile: /etc/pangolin/provisioning-blueprint.yaml
+          provisioningBlueprintFile: /etc/praxis/provisioning-blueprint.yaml
           provisioningBlueprintData: |
             version: 1
             routes: []
@@ -16,7 +16,7 @@ tests:
           of: ConfigMap
       - equal:
           path: metadata.name
-          value: "RELEASE-NAME-pangolin-cli-test-prov-blueprint-provisioning-blueprint"
+          value: "RELEASE-NAME-praxis-cli-test-prov-blueprint-provisioning-blueprint"
       - equal:
           path: data["provisioning-blueprint.yaml"]
           value: |
@@ -28,7 +28,7 @@ tests:
       siteInstances:
         - name: test-filename-extract
           enabled: true
-          provisioningBlueprintFile: /etc/pangolin/my-custom-blueprint.yaml
+          provisioningBlueprintFile: /etc/praxis/my-custom-blueprint.yaml
           provisioningBlueprintData: |
             version: 2
             routes:
@@ -57,12 +57,12 @@ tests:
       siteInstances:
         - name: test-prov-blueprint-missing-data
           enabled: true
-          provisioningBlueprintFile: /etc/pangolin/provisioning-blueprint.yaml
+          provisioningBlueprintFile: /etc/praxis/provisioning-blueprint.yaml
     asserts:
       - isKind:
           of: ConfigMap
       - equal:
           path: metadata.name
-          value: "RELEASE-NAME-pangolin-cli-test-prov-blueprint-missing-data-provisioning-blueprint"
+          value: "RELEASE-NAME-praxis-cli-test-prov-blueprint-missing-data-provisioning-blueprint"
       - exists:
           path: 'data["provisioning-blueprint.yaml"]'

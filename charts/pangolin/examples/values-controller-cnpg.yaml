@@ -3,7 +3,7 @@
 # Topology: deployment.type=controller + deployment.mode=multi (default)
 # Database:  database.mode=cloudnativepg
 #
-# This is the recommended production configuration. Pangolin, Gerbil and
+# This is the recommended production configuration. Praxis, Gerbil and
 # the pangolin-kube-controller each run as separate Pods. CloudNativePG
 # manages the PostgreSQL cluster lifecycle.
 #
@@ -42,7 +42,7 @@
 #   - key "password":         application user password
 #   - key "connectionString": postgresql://... (same as uri)
 #
-# Recommended: reference this Secret directly so Pangolin always gets a valid
+# Recommended: reference this Secret directly so Praxis always gets a valid
 # credential even after password rotations managed by CNPG:
 #   database.connection.existingSecretName: pangolin-db-app
 #   database.connection.existingSecretKey: uri
@@ -55,7 +55,7 @@
 #   3. A domain with DNS pointing to the Gerbil LoadBalancer IP for WireGuard
 #
 # Usage:
-#   helm install pangolin charts/pangolin \
+#   helm install praxis charts/praxis \
 #     -f examples/values-controller-cnpg.yaml \
 #     --namespace pangolin
 
@@ -125,20 +125,20 @@ cnpg-cluster:
       # storageClass: ""   # set explicitly if your cluster has no default StorageClass
 
 # ---------------------------------------------------------------------------
-# Pangolin application settings
+# Praxis application settings
 # ---------------------------------------------------------------------------
 pangolin:
   replicaCount: 1
   config:
     app:
-      # REPLACE: set to the actual public URL of your Pangolin dashboard.
-      dashboard_url: "https://pangolin.yourdomain.example"
+      # REPLACE: set to the actual public URL of your Praxis dashboard.
+      dashboard_url: "https://praxis.yourdomain.example"
       log_level: info
     gerbil:
       # REPLACE: set to the hostname/IP where external WireGuard peers reach Gerbil.
       base_endpoint: "vpn.yourdomain.example"
     traefik:
-      # This configures the Traefik output Pangolin generates for the
+      # This configures the Traefik output Praxis generates for the
       # pangolin-kube-controller; it does NOT install Traefik.
       # REPLACE if your cluster Traefik uses different names.
       enabled: true
