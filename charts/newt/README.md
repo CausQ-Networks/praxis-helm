@@ -426,4 +426,4 @@ global:
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Fossorial Inc | <contact@praxis.net> |  |
+| Fossorial Inc | <support@causq.com> |  |

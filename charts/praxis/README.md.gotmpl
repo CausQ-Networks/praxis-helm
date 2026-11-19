@@ -1,4 +1,4 @@
-# Pangolin Helm Chart
+# Praxis Helm Chart
 
 {{ template "chart.badgesSection" . }}
 
@@ -23,10 +23,10 @@
 
 ## Architecture overview
 
-This chart can deploy a Pangolin control-plane plus optional components:
+This chart can deploy a Praxis control-plane plus optional components:
 
-- **Pangolin app**: the main API/UI workloads and Services.
-- **pangolin-kube-controller** (controller mode): reconciles Traefik CRDs and reads Pangolin config from the Pangolin API endpoint.
+- **Praxis app**: the main API/UI workloads and Services.
+- **pangolin-kube-controller** (controller mode): reconciles Traefik CRDs and reads Praxis config from the Praxis API endpoint.
 - **Traefik**:
 	- **Controller mode**: you run a Traefik Ingress Controller (optionally installed via the bundled dependency, aliased as `traefikController`).
 	- **Standalone mode**: the chart runs Traefik itself. In `deployment.mode=multi` it is a container in the Gerbil Pod (see [Tunnel data path](#tunnel-data-path)); in `single` mode it is part of the shared Pod.
@@ -35,16 +35,16 @@ This chart can deploy a Pangolin control-plane plus optional components:
 ## Deployment modes
 
 - `deployment.type=controller` (recommended)
-	- Runs Pangolin + `pangolin-kube-controller`.
+	- Runs Praxis + `pangolin-kube-controller`.
 	- Requires Traefik CRDs and a Traefik controller (either installed separately or via `deployment.installTraefikController=true`).
 - `deployment.type=standalone`
-	- Runs Pangolin plus an internal Traefik workload managed by this chart.
+	- Runs Praxis plus an internal Traefik workload managed by this chart.
 	- Best for labs/dev; for production, controller mode is recommended unless you specifically need a self-contained deployment.
 
 `deployment.mode` controls how workloads are split:
 
-- `multi`: separate workloads for Pangolin / Gerbil (+ Traefik in the Gerbil Pod for `standalone`) / controller.
-- `single`: one shared Pod. In `deployment.type=controller`, it runs Pangolin + optional Gerbil + controller. In `deployment.type=standalone`, it runs Pangolin + optional Gerbil + optional standalone Traefik. `deployment.mode=multi` remains the recommended production topology.
+- `multi`: separate workloads for Praxis / Gerbil (+ Traefik in the Gerbil Pod for `standalone`) / controller.
+- `single`: one shared Pod. In `deployment.type=controller`, it runs Praxis + optional Gerbil + controller. In `deployment.type=standalone`, it runs Praxis + optional Gerbil + optional standalone Traefik. `deployment.mode=multi` remains the recommended production topology.
 
 ## Example install profiles
 
@@ -54,14 +54,14 @@ Use the examples guide for profile selection, prerequisites, and install/cleanup
 
 ## Database mode selection
 
-The default `database.mode` is **`cloudnativepg`** — the recommended production path. Pangolin automatically uses the PostgreSQL-capable image (`fosrl/pangolin:postgresql-<appVersion>`) for any non-SQLite mode.
+The default `database.mode` is **`cloudnativepg`** — the recommended production path. Praxis automatically uses the PostgreSQL-capable image (`ghcr.io/causq-networks/praxis:postgresql-<appVersion>`) for any non-SQLite mode.
 
-| Mode | Use case | Pangolin image |
+| Mode | Use case | Praxis image |
 |------|----------|---------------|
-| `cloudnativepg` | **Recommended production** – CloudNativePG operator manages PostgreSQL | `fosrl/pangolin:postgresql-<appVersion>` |
-| `external` | Production with externally managed PostgreSQL (RDS, Cloud SQL, etc.) | `fosrl/pangolin:postgresql-<appVersion>` |
-| `embedded` | Labs/test – chart-managed PostgreSQL StatefulSet | `fosrl/pangolin:postgresql-<appVersion>` |
-| `sqlite` | **Dev/CI only – NOT for production** | `fosrl/pangolin:<appVersion>` |
+| `cloudnativepg` | **Recommended production** – CloudNativePG operator manages PostgreSQL | `ghcr.io/causq-networks/praxis:postgresql-<appVersion>` |
+| `external` | Production with externally managed PostgreSQL (RDS, Cloud SQL, etc.) | `ghcr.io/causq-networks/praxis:postgresql-<appVersion>` |
+| `embedded` | Labs/test – chart-managed PostgreSQL StatefulSet | `ghcr.io/causq-networks/praxis:postgresql-<appVersion>` |
+| `sqlite` | **Dev/CI only – NOT for production** | `ghcr.io/causq-networks/praxis:<appVersion>` |
 
 ## CloudNativePG setup (recommended production database)
 
@@ -76,7 +76,7 @@ The operator and cluster are controlled only by top-level subchart values and su
 3. **Chart installs cluster only**: `cnpg-operator.enabled=false`, `cnpg-cluster.enabled=true`
 4. **Chart installs both operator and cluster**: `cnpg-operator.enabled=true`, `cnpg-cluster.enabled=true`
 
-When `database.mode=cloudnativepg` and `cnpg-cluster.enabled=true`, Pangolin resolves the cluster
+When `database.mode=cloudnativepg` and `cnpg-cluster.enabled=true`, Praxis resolves the cluster
 name in this order:
 
 1. `cnpg-cluster.fullnameOverride` (when non-empty)
@@ -85,7 +85,7 @@ name in this order:
 If both are set to different values, chart rendering fails with:
 `PANGOLIN-CNPG: cnpg-cluster.fullnameOverride and database.cloudnativepg.cluster.name must match when cnpg-cluster.enabled=true`.
 
-### Connecting Pangolin to a CNPG cluster
+### Connecting Praxis to a CNPG cluster
 
 CloudNativePG automatically creates an application Secret when a cluster boots.
 For a cluster named `pangolin-db` (the default `cnpg-cluster.fullnameOverride`),
@@ -191,15 +191,15 @@ database:
 ```
 
 > **Note:** Setting `database.mode=external` without any Secret source configuration will cause Helm
-> to fail at render time with a clear `PANGOLIN-061` error. This prevents Pangolin from starting with
+> to fail at render time with a clear `PANGOLIN-061` error. This prevents Praxis from starting with
 > a missing database Secret.
 
 See `examples/values-controller-external-db.yaml` for a complete working example.
 
 ## Ingress and Traefik guidance
 
-- In controller mode you typically expose Pangolin via Traefik CRDs/IngressRoute resources.
-- `pangolin.config.traefik` configures the Traefik output Pangolin generates in `config.yml`; it does **not** install Traefik.
+- In controller mode you typically expose Praxis via Traefik CRDs/IngressRoute resources.
+- `pangolin.config.traefik` configures the Traefik output Praxis generates in `config.yml`; it does **not** install Traefik.
 - The chart renders `pangolin.config.traefik` by default so entrypoint and cert resolver names are explicit. Review `pangolin.config.traefik.http_entrypoint`, `https_entrypoint`, and `cert_resolver` so they match your real Traefik deployment.
 - If you enable the bundled Traefik dependency, put Traefik chart overrides under the **`traefikController:`** key (the dependency is aliased).
 - In standalone mode, Traefik dashboard is **disabled by default** and the Service does **not** expose the admin port.
@@ -207,7 +207,7 @@ See `examples/values-controller-external-db.yaml` for a complete working example
 ### Chart-managed dashboard IngressRoute (controller mode)
 
 By default (`pangolin.ingressRoute.dashboard.enabled=true`) the chart renders a Traefik `IngressRoute`
-for the Pangolin dashboard/API when `deployment.type=controller`.
+for the Praxis dashboard/API when `deployment.type=controller`.
 
 - Host defaults to `pangolin.config.app.dashboard_url` (hostname extracted from URL), or set `pangolin.ingressRoute.dashboard.host`.
 - API route: `Host(<host>) && PathPrefix(/api/v1)` -> `pangolin.service.ports.external` (default `3000`), priority `100`.
@@ -223,7 +223,7 @@ for the Pangolin dashboard/API when `deployment.type=controller`.
 pangolin:
   config:
     app:
-      dashboard_url: "https://pangolin-e2e.example.com"
+      dashboard_url: "https://praxis-e2e.example.com"
   ingressRoute:
     dashboard:
       enabled: true
@@ -260,10 +260,10 @@ pangolin:
 - **NetworkPolicy:** By default, the chart does **not** allow broad HTTPS egress to the internet. If your deployment needs outbound TCP/443, explicitly enable it (or, preferably, add a scoped allow-list via `networkPolicy.extraEgress`).
 - **ServiceAccount token automount (least-privilege):**
   - **Controller** (`serviceAccount.controller.automountServiceAccountToken=true`, default): the pangolin-kube-controller must call the Kubernetes API to reconcile Traefik CRDs, manage EndpointSlices, and (optionally) perform leader election. It therefore requires a mounted ServiceAccount token. The matching RBAC Role/ClusterRole is only bound to the controller ServiceAccount.
-  - **Pangolin** (`serviceAccount.pangolin.automountServiceAccountToken=false`, default): the main Pangolin application server does not require Kubernetes API access. Keeping automount disabled follows the least-privilege principle and prevents accidental in-cluster API calls.
+  - **Praxis** (`serviceAccount.pangolin.automountServiceAccountToken=false`, default): the main Praxis application server does not require Kubernetes API access. Keeping automount disabled follows the least-privilege principle and prevents accidental in-cluster API calls.
   - **Gerbil** (`serviceAccount.gerbil.automountServiceAccountToken=false`, default): Gerbil manages WireGuard tunnels and does not require Kubernetes API access. Token automount is disabled by default.
   - All three settings are configurable via `serviceAccount.<component>.automountServiceAccountToken`.
-- **Single mode ServiceAccount trade-off:** Kubernetes ServiceAccount selection is Pod-level. In `deployment.mode=single` + `deployment.type=controller`, the shared Pod uses the controller ServiceAccount/token so Pangolin and Gerbil share that Pod-level token behavior.
+- **Single mode ServiceAccount trade-off:** Kubernetes ServiceAccount selection is Pod-level. In `deployment.mode=single` + `deployment.type=controller`, the shared Pod uses the controller ServiceAccount/token so Praxis and Gerbil share that Pod-level token behavior.
 - **Container security context:** `global.containerSecurityContext` is intentionally empty by default so you can choose a baseline that matches your cluster policy. Workloads merge this with their own `*.securityContext`.
 
 ## Production checklist
@@ -276,9 +276,9 @@ pangolin:
 	- Or explicitly reference it via `database.connection.existingSecretName: <cluster-name>-app` / `existingSecretKey: uri`
 	- Or provide a password and set `database.cloudnativepg.connection.generatedSecret.create=true`
 - Provide externally managed Secrets where appropriate:
-	- `pangolin.secret.existingSecretName` (Pangolin app server secret)
+	- `pangolin.secret.existingSecretName` (Praxis app server secret)
 	- database connection Secret (`database.connection.existingSecretName`)
-- Review `pangolin.config.traefik.*` so Pangolin emits routes for the same Traefik entrypoints and certificate resolver names your cluster actually uses.
+- Review `pangolin.config.traefik.*` so Praxis emits routes for the same Traefik entrypoints and certificate resolver names your cluster actually uses.
 - For external PostgreSQL:
 	- User-managed Secret: set `database.connection.existingSecretName` — Helm fails with PANGOLIN-061 if omitted
 	- Chart-managed Secret: set `database.external.generatedSecret.create=true` with a `connectionString` or individual params
@@ -312,7 +312,7 @@ Use this checklist before tagging alpha/RC/stable releases. This runtime validat
   - [ ] `kubectl wait --for=condition=Available deploy/<release>-pangolin -n <ns> --timeout=10m`
   - [ ] `kubectl wait --for=condition=Available deploy/<release>-pangolin-kube-controller -n <ns> --timeout=10m`
 - [ ] Default controller + CloudNativePG path reaches readiness (`deployment.type=controller`, `database.mode=cloudnativepg`).
-- [ ] Pangolin is running with PostgreSQL image:
+- [ ] Praxis is running with PostgreSQL image:
   - [ ] `kubectl get deploy/<release>-pangolin -n <ns> -o jsonpath='{.spec.template.spec.containers[0].image}'` contains `:postgresql-`.
 - [ ] Gerbil registration + persistence works:
   - [ ] Confirm startup logs show registration success.
@@ -321,7 +321,7 @@ Use this checklist before tagging alpha/RC/stable releases. This runtime validat
   - [ ] `kubectl port-forward -n <ns> svc/<release>-pangolin-kube-controller 9090:9090` then `curl -fsS http://127.0.0.1:9090/livez` and `curl -fsS http://127.0.0.1:9090/readyz`.
   - [ ] Controller logs confirm Kubernetes API connectivity (no repeated in-cluster auth/permission errors).
 - [ ] Traefik CRDs are present and reconciled where applicable (`IngressRoute`, `Middleware`, `TLSOption`).
-- [ ] Default NetworkPolicy does not block startup (Pangolin, Gerbil, controller, and DB all become ready).
+- [ ] Default NetworkPolicy does not block startup (Praxis, Gerbil, controller, and DB all become ready).
 
 ### Before stable
 
@@ -339,7 +339,7 @@ Use this checklist before tagging alpha/RC/stable releases. This runtime validat
 - [ ] ArtifactHub metadata verified (links, maintainers, image annotations).
 - [ ] Blueprint + Newt workflow tested/documented:
   - [ ] Blueprint files are stored by this chart (ConfigMap/Secret).
-  - [ ] Blueprints are applied via Newt (`--blueprint-file` / `--provisioning-blueprint-file`), not by Pangolin server directly.
+  - [ ] Blueprints are applied via Newt (`--blueprint-file` / `--provisioning-blueprint-file`), not by Praxis server directly.
 
 ## Troubleshooting basics
 
@@ -350,7 +350,7 @@ Use this checklist before tagging alpha/RC/stable releases. This runtime validat
 
 ## Tunnel data path
 
-Pangolin advertises the backends behind a Newt site as raw WireGuard peer addresses, for
+Praxis advertises the backends behind a Newt site as raw WireGuard peer addresses, for
 example `http://100.89.128.4:44602`. Gerbil creates its WireGuard interface in whatever
 network namespace it runs in, so under Kubernetes those addresses exist inside the Gerbil
 Pod and nowhere else. An externally installed Traefik has no route to them: every
@@ -371,7 +371,7 @@ ports 8000 and 9443 (HTTPS is not on 8443: Gerbil's SNI proxy binds that port in
 shared network namespace).
 
 An **externally installed** Traefik (controller mode) is a separate Pod and still has no
-route. That case is tracked in [#20](https://github.com/fosrl/helm-charts/issues/20),
+route. That case is tracked in [#20](https://github.com/CausQ-Networks/praxis-helm/issues/20),
 which remains open; host gateway mode below is the workaround.
 
 ### If your targets run in this cluster
@@ -404,7 +404,7 @@ Be clear about what it does **not** solve:
 | Requires CNI egress masquerading | Default for Flannel, Calico (`natOutgoing`) and Cilium. Without that SNAT the remote peer sees the Traefik Pod IP as source and drops the reply. The chart can neither detect nor fix this. |
 | Gerbil binds node ports | One Gerbil per node; `gerbil.replicaCount` must stay `1`, so there is no Gerbil HA. |
 | `hostNetwork` needs a privileged namespace | Pod Security Admission must be `privileged`; `baseline` forbids it. `NET_ADMIN` is still required as before. |
-| Not available in `single` mode | Gerbil shares a Pod with Pangolin there, so `hostNetwork` would bind every component's ports on the node. |
+| Not available in `single` mode | Gerbil shares a Pod with Praxis there, so `hostNetwork` would bind every component's ports on the node. |
 
 The chart refuses the combinations that cannot work rather than letting them surface as a
 Pending Pod or a silent `502`: `PANGOLIN-071` (single mode), `PANGOLIN-072` (Gerbil
@@ -414,7 +414,7 @@ namespace without `privileged`).
 ### NetworkPolicy
 
 A `hostNetwork` Pod is not matched by a `podSelector` on any mainstream CNI — its traffic
-sources from the node IP. In host gateway mode the Gerbil → Pangolin internal-API rule is
+sources from the node IP. In host gateway mode the Gerbil → Praxis internal-API rule is
 therefore expressed as node address blocks
 (`networkPolicy.gerbil.hostGateway.nodeCIDRs`). There is deliberately no default: the
 private ranges contain every mainstream Pod CIDR, so `PANGOLIN-075` fails the render
@@ -429,9 +429,9 @@ policy would blackhole Gerbil's `--remoteConfig` polling.
 
 ## Gerbil first-run bootstrap behavior
 
-- Upstream Pangolin returns `404 {"message":"Exit node not found"}` from `/gerbil/get-all-relays` until an exit node exists.
+- Upstream Praxis returns `404 {"message":"Exit node not found"}` from `/gerbil/get-all-relays` until an exit node exists.
 - Upstream Gerbil exits on startup when that endpoint returns non-200 (`Failed to fetch initial mappings`), so waiting for Gerbil readiness can fail on fresh installs before UI/bootstrap is completed.
-- Use `gerbil.startupMode=delayed` for first installs or smoke tests. This keeps Gerbil resources rendered but starts the Deployment with `replicas: 0` so `helm install --wait` can succeed while you complete initial Pangolin setup.
+- Use `gerbil.startupMode=delayed` for first installs or smoke tests. This keeps Gerbil resources rendered but starts the Deployment with `replicas: 0` so `helm install --wait` can succeed while you complete initial Praxis setup.
 - After setup, switch to normal startup with:
 
 ```bash
@@ -440,16 +440,16 @@ helm upgrade <release> <chart> -n <namespace> --reuse-values --set gerbil.startu
 
 ## Secrets
 
-- **Pangolin app secret:** If you do not provide `pangolin.secret.existingSecretName`, the chart generates a strong random secret and reuses it across upgrades.
+- **Praxis app secret:** If you do not provide `pangolin.secret.existingSecretName`, the chart generates a strong random secret and reuses it across upgrades.
 - **Controller TLS:** In controller mode, the chart can generate a self-signed `kubernetes.io/tls` Secret (or you can provide an existing one via `controller.tls.existingSecretName`).
 
 ## Standalone Traefik notes
 
-- `pangolin.config.traefik` configures Pangolin's generated Traefik output only; Traefik installation is controlled separately by top-level `traefik.enabled`.
+- `pangolin.config.traefik` configures Praxis's generated Traefik output only; Traefik installation is controlled separately by top-level `traefik.enabled`.
 - `traefik.enabled=true` requires `traefik.config.letsencryptEmail` to be set.
 - ACME uses the HTTP challenge on the HTTP entrypoint, so port 80 of the Traefik Service must be reachable from the internet. When Cloudflare credentials are configured (`traefik.cloudflare.existingSecretName` or `traefik.cloudflare.generatedSecret.create`) the Cloudflare DNS challenge is used instead.
 - Without `traefik.persistence.enabled`, ACME state lives in an `emptyDir` and certificates are re-issued after every restart; Let's Encrypt rate limits make that a problem quickly. With persistence enabled the chart creates the `<release>-pangolin-traefik-acme` PVC unless `traefik.persistence.existingClaim` is set.
-- Pangolin's generated routers use the `web` / `websecure` entrypoints and the `letsencrypt` resolver by default. If you rename them via `traefik.config.httpEntrypoint`, `httpsEntrypoint` or `certResolver`, set the same names in `pangolin.config.traefik`.
+- Praxis's generated routers use the `web` / `websecure` entrypoints and the `letsencrypt` resolver by default. If you rename them via `traefik.config.httpEntrypoint`, `httpsEntrypoint` or `certResolver`, set the same names in `pangolin.config.traefik`.
 - Raw TCP/UDP resources need an entrypoint per port (`tcp-<port>` / `udp-<port>`) and a matching Service port, which this chart does not create.
 - `traefik.replicaCount` must be `1` while Traefik runs in the Gerbil Pod (`PANGOLIN-076`).
 
@@ -459,15 +459,15 @@ helm upgrade <release> <chart> -n <namespace> --reuse-values --set gerbil.startu
 
 ## Upgrades and rollbacks
 
-- Secrets generated by the chart (like the Pangolin app secret) are designed to be stable across upgrades.
+- Secrets generated by the chart (like the Praxis app secret) are designed to be stable across upgrades.
 - For embedded database mode, data lives on a PVC; rolling back a chart does not revert database data.
 - Use standard Helm workflows: `helm upgrade` to update, `helm rollback` to revert.
 
 ## Blueprints
 
-Pangolin [Blueprints](https://docs.pangolin.net/manage/blueprints) let you define resources (public-resources, private-resources, sites) as YAML and apply them to Pangolin via Newt agents using `--blueprint-file` or `--provisioning-blueprint-file`. The Pangolin server does **not** read blueprint files directly — Newt pushes blueprints through the Pangolin API.
+Praxis [Blueprints](https://docs-praxis.causq.com/manage/blueprints) let you define resources (public-resources, private-resources, sites) as YAML and apply them to Praxis via Newt agents using `--blueprint-file` or `--provisioning-blueprint-file`. The Praxis server does **not** read blueprint files directly — Newt pushes blueprints through the Praxis API.
 
-This chart provides optional storage of blueprint YAML files as Kubernetes ConfigMaps and Secrets so they can be managed declaratively alongside your Pangolin release.
+This chart provides optional storage of blueprint YAML files as Kubernetes ConfigMaps and Secrets so they can be managed declaratively alongside your Praxis release.
 
 ### Enabling blueprints
 
