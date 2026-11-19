@@ -1,5 +1,7 @@
 # Fossorial Kubernetes Helm Charts
 
+[![Discord](https://img.shields.io/discord/1572896060949659679?logo=discord&style=flat-square&label=Discord)](https://praxis.causq.com/discord/)
+
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/fosrl?style=flat-square)](https://artifacthub.io/packages/search?org=fosrl)
 [![Newt Chart Version: 1.3.0](https://img.shields.io/badge/Newt%20Chart-1.3.0-informational?style=flat-square)](https://github.com/CausQ-Networks/praxis-helm/releases)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/license/mit)
