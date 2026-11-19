@@ -139,7 +139,7 @@ if [ "$COMMAND" = "enforce" ]; then
     fi
   }
   
-  set_key_empty "pangolinEndpoint"
+  set_key_empty "praxisEndpoint"
   set_key_empty "newtId"
   
   echo "Enforced release constraints in: $FILE"

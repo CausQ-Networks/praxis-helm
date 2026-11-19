@@ -34,7 +34,7 @@ You can then run `helm search repo fossorial` to see the charts.
 Example to install the Praxis chart:
 
 ```console
-helm install my-pangolin fossorial/praxis
+helm install my-praxis fossorial/praxis
 ```
 
 Example to install the Praxis CLI chart:
@@ -54,7 +54,7 @@ helm install my-newt fossorial/newt
 Uninstalling a chart can be done with:
 
 ```console
-helm uninstall my-pangolin
+helm uninstall my-praxis
 ```
 
 For more details, please refer to the individual chart READMEs in the `charts/` directory.

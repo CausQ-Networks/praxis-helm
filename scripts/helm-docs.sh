@@ -6,7 +6,7 @@
 #   bash scripts/helm-docs.sh --lint <...>  # after generation, run markdown lint (markdownlint-cli2) on changed READMEs
 #
 # Behavior:
-# - Arguments can be chart names (pangolin), chart directories (charts/praxis), or files under a chart (e.g., charts/praxis/values.schema.json).
+# - Arguments can be chart names (praxis), chart directories (charts/praxis), or files under a chart (e.g., charts/praxis/values.schema.json).
 # - The script maps each argument to the nearest chart root (directory containing Chart.yaml) and runs helm-docs only for those charts.
 # - With no args: fails (to enforce per-chart operation) unless --all/-a is specified.
 # - In CI (CI=true or GITHUB_ACTIONS=true), missing tools are fatal. Locally they are warnings and the script exits 0.
@@ -101,7 +101,7 @@ path_to_chart_root() {
   local p="$1"
   # Normalize: if it's a file, use its directory
   if [ -f "$p" ]; then p="$(dirname "$p")"; fi
-  # If input is just a name like 'pangolin', try charts/<name>
+  # If input is just a name like 'praxis', try charts/<name>
   if [ ! -e "$p" ] && [ -d "charts/$p" ]; then p="charts/$p"; fi
   # Walk upwards
   while [ "$p" != "/" ] && [ "$p" != "." ]; do

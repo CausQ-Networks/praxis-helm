@@ -21,7 +21,7 @@ networkPolicy:
 namespace:
   create: false
 
-pangolin:
+praxis:
   config:
     app:
       dashboard_url: https://praxis.example.test
@@ -53,7 +53,7 @@ traefik:
   config:
     letsencryptEmail: ops@example.test
     dynamicRouters:
-      host: pangolin.example.test
+      host: praxis.example.test
 
 cnpg-operator:
   enabled: false

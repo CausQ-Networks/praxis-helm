@@ -1,0 +1,59 @@
+# Example: Single Pod standalone mode (trade-off profile)
+#
+# Topology: deployment.type=standalone + deployment.mode=single
+# Database:  database.mode=cloudnativepg
+#
+# This profile demonstrates single-mode standalone behavior where Praxis +
+# Gerbil + Traefik run in one Pod. It is convenient for labs, but less
+# fault-tolerant and less recommended for production than controller/multi mode.
+
+deployment:
+  type: standalone
+  mode: single
+
+namespace:
+  create: true
+  name: praxis-single
+  podSecurity:
+    enforce: privileged
+    warn: baseline
+    audit: baseline
+
+database:
+  mode: cloudnativepg
+  cloudnativepg:
+    cluster:
+      name: praxis-db
+
+cnpg-operator:
+  enabled: false
+cnpg-cluster:
+  enabled: true
+  fullnameOverride: praxis-db
+  type: postgresql
+  mode: standalone
+  cluster:
+    instances: 1
+    storage:
+      size: 8Gi
+
+praxis:
+  config:
+    app:
+      dashboard_url: "https://praxis.yourdomain.example"
+    gerbil:
+      base_endpoint: "vpn.yourdomain.example"
+
+gerbil:
+  enabled: true
+  persistence:
+    enabled: true
+
+traefik:
+  enabled: true
+  persistence:
+    enabled: true
+  config:
+    letsencryptEmail: "ops@yourdomain.example"
+    dynamicRouters:
+      host: "praxis.yourdomain.example"

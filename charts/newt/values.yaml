@@ -599,7 +599,7 @@ newtInstances:
       # -- Name of an existing Secret containing endpoint/id/secret keys.
       # The Secret must contain keys from auth.keys.endpointKey/auth.keys.idKey/auth.keys.secretKey.
       existingSecretName: ""
-      # -- Create a Secret from inline credentials (pangolinEndpoint/id/secret) when provided.
+      # -- Create a Secret from inline credentials (praxisEndpoint/id/secret) when provided.
       # Set false to disable secret creation from inline credentials.
       createSecret: true # @schema type: boolean ; default: true
       # -- Inject inline credentials directly as env vars instead of Secret refs.
@@ -618,13 +618,13 @@ newtInstances:
     # These are intended for convenience/testing and can leak via Helm release history.
     # @schema type: string ; pattern: ^$|^https?://[a-zA-Z0-9.-]+(/.*)?$
     # -- Praxis control-plane endpoint URL (e.g., https://praxis.example.com)
-    pangolinEndpoint: ""
+    praxisEndpoint: ""
     # @schema type: string ; pattern: ^$|^[a-zA-Z0-9_-]+$
     # @schema description: Inline values are for convenience/testing. Use auth.existingSecretName for production.
-    # -- Newt instance ID issued by Praxis (must be set with pangolinEndpoint and secret)
+    # -- Newt instance ID issued by Praxis (must be set with praxisEndpoint and secret)
     id: ""
     # @schema type: string ; pattern: ^$|^[a-zA-Z0-9_-]+$
-    # -- Newt instance secret issued by Praxis (must be set with pangolinEndpoint and id) - WARNING: Use auth.existingSecretName for production.
+    # -- Newt instance secret issued by Praxis (must be set with praxisEndpoint and id) - WARNING: Use auth.existingSecretName for production.
     secret: ""
     # -- Provisioning key (NEWT_PROVISIONING_KEY env). When set, Newt can bootstrap credentials and persist them to CONFIG_FILE.
     provisioningKey: "" # @schema type: string

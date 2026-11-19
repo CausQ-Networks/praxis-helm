@@ -100,7 +100,7 @@ jobs:
       - name: Create a multi-node kind cluster
         uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0
         with:
-          cluster_name: pangolin-e2e
+          cluster_name: praxis-e2e
           # More than one node, so "Traefik landed on the Gerbil node" is a real
           # assertion rather than the only possible outcome.
           config: .github/e2e/kind-cluster.yaml
@@ -116,30 +116,30 @@ jobs:
       - name: Install the chart in host gateway mode
         run: |
           set -euo pipefail
-          kubectl create namespace pangolin-e2e
-          kubectl label namespace pangolin-e2e pod-security.kubernetes.io/enforce=privileged --overwrite
+          kubectl create namespace praxis-e2e
+          kubectl label namespace praxis-e2e pod-security.kubernetes.io/enforce=privileged --overwrite
           helm install praxis charts/praxis \
-            --namespace pangolin-e2e \
+            --namespace praxis-e2e \
             -f .github/e2e/values-host-gateway.yaml \
             --wait --timeout 10m
 
       - name: Gerbil must run in the node network namespace
         run: |
           set -euo pipefail
-          kubectl -n pangolin-e2e rollout status deploy/praxis-gerbil --timeout=5m
-          gerbil_pods=$(kubectl -n pangolin-e2e get pods -l app.kubernetes.io/component=gerbil \
+          kubectl -n praxis-e2e rollout status deploy/praxis-gerbil --timeout=5m
+          gerbil_pods=$(kubectl -n praxis-e2e get pods -l app.kubernetes.io/component=gerbil \
             -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}')
           if [ -z "${gerbil_pods}" ]; then
             echo "ERROR: no Gerbil Pods matched the selector - this check would prove nothing"
             exit 1
           fi
-          host_network=$(kubectl -n pangolin-e2e get pods -l app.kubernetes.io/component=gerbil \
+          host_network=$(kubectl -n praxis-e2e get pods -l app.kubernetes.io/component=gerbil \
             -o jsonpath='{.items[0].spec.hostNetwork}')
           if [ "$host_network" != "true" ]; then
             echo "ERROR: Gerbil is not using hostNetwork (got '${host_network}')"
             exit 1
           fi
-          dns_policy=$(kubectl -n pangolin-e2e get pods -l app.kubernetes.io/component=gerbil \
+          dns_policy=$(kubectl -n praxis-e2e get pods -l app.kubernetes.io/component=gerbil \
             -o jsonpath='{.items[0].spec.dnsPolicy}')
           if [ "$dns_policy" != "ClusterFirstWithHostNet" ]; then
             echo "ERROR: dnsPolicy is '${dns_policy}'; Gerbil could not resolve the Praxis Service"
@@ -150,7 +150,7 @@ jobs:
       - name: The WireGuard interface must exist on the node, not in a Pod namespace
         run: |
           set -euo pipefail
-          node=$(kubectl -n pangolin-e2e get pods -l app.kubernetes.io/component=gerbil \
+          node=$(kubectl -n praxis-e2e get pods -l app.kubernetes.io/component=gerbil \
             -o jsonpath='{.items[0].spec.nodeName}')
           echo "Gerbil node: ${node}"
           # kind nodes are containers, so the node network namespace is inspectable directly.
@@ -167,11 +167,11 @@ jobs:
       - name: Traefik must be co-located with Gerbil
         run: |
           set -euo pipefail
-          gerbil_node=$(kubectl -n pangolin-e2e get pods -l app.kubernetes.io/component=gerbil \
+          gerbil_node=$(kubectl -n praxis-e2e get pods -l app.kubernetes.io/component=gerbil \
             -o jsonpath='{.items[0].spec.nodeName}')
           # The chart labels its own Traefik `traefik-standalone`; a wrong selector here
           # would make this check pass without comparing anything.
-          traefik_nodes=$(kubectl -n pangolin-e2e get pods -l app.kubernetes.io/component=traefik-standalone \
+          traefik_nodes=$(kubectl -n praxis-e2e get pods -l app.kubernetes.io/component=traefik-standalone \
             -o jsonpath='{range .items[*]}{.spec.nodeName}{"\n"}{end}' | sort -u)
           echo "Gerbil: ${gerbil_node}"
           echo "Traefik: ${traefik_nodes}"
@@ -190,14 +190,14 @@ jobs:
         run: |
           set -euo pipefail
           bash scripts/e2e/assert-tunnel-backends.sh \
-            --namespace pangolin-e2e \
+            --namespace praxis-e2e \
             --tunnel-cidr 100.89.128.0/20 \
             --expect-data-path
 
       - name: Collect diagnostics
         if: failure()
         run: |
-          kubectl -n pangolin-e2e get pods -o wide || true
-          kubectl -n pangolin-e2e get endpointslices -o yaml || true
-          kubectl -n pangolin-e2e describe pods || true
-          kubectl -n pangolin-e2e logs -l app.kubernetes.io/component=gerbil --tail=200 || true
+          kubectl -n praxis-e2e get pods -o wide || true
+          kubectl -n praxis-e2e get endpointslices -o yaml || true
+          kubectl -n praxis-e2e describe pods || true
+          kubectl -n praxis-e2e logs -l app.kubernetes.io/component=gerbil --tail=200 || true

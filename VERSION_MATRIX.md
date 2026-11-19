@@ -39,7 +39,7 @@ Sources:
 | Kubernetes version | `>=1.30.14-0` |
 | Praxis default image tag | `1.26.0` |
 | Praxis PostgreSQL image tag | `postgresql-1.26.0` |
-| pangolin-kube-controller tag | `0.1.0` |
+| praxis-kube-controller tag | `0.1.0` |
 | Gerbil tag | `1.6.0` |
 | Traefik tag | `v3.7.19` |
 | Badger plugin | `v1.8.0` |

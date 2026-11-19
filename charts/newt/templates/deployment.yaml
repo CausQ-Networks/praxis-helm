@@ -229,7 +229,7 @@ spec:
             {{- $createSecret := true -}}
             {{- if hasKey $auth "createSecret" }}{{- $createSecret = (index $auth "createSecret") -}}{{- end -}}
             {{- $envVarsDirect := default false (get $auth "envVarsDirect") -}}
-            {{- $hasInlineCredentials := and $inst.pangolinEndpoint $inst.id $inst.secret -}}
+            {{- $hasInlineCredentials := and $inst.praxisEndpoint $inst.id $inst.secret -}}
             {{- $endpointKey := default "PRAXIS_ENDPOINT" (get $keys "endpointKey") -}}
             {{- $idKey := default "NEWT_ID" (get $keys "idKey") -}}
             {{- $secretKey := default "NEWT_SECRET" (get $keys "secretKey") -}}
@@ -253,7 +253,7 @@ spec:
                   key: {{ $secretKey }}
             {{- else if and $envVarsDirect $hasInlineCredentials }}
             - name: PRAXIS_ENDPOINT
-              value: {{ $inst.pangolinEndpoint | quote }}
+              value: {{ $inst.praxisEndpoint | quote }}
             - name: NEWT_ID
               value: {{ $inst.id | quote }}
             - name: NEWT_SECRET

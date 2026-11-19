@@ -10,7 +10,7 @@ tests:
         - name: args-mode
           enabled: true
           useCommandArgs: true
-          pangolinEndpoint: "https://praxis.example.com"
+          praxisEndpoint: "https://praxis.example.com"
           id: abc123
           secret: s3cret
     asserts:
@@ -24,7 +24,7 @@ tests:
         - name: args-mode
           enabled: true
           useCommandArgs: true
-          pangolinEndpoint: "https://praxis.example.com"
+          praxisEndpoint: "https://praxis.example.com"
           id: abc123
           secret: s3cret
     asserts:
@@ -45,7 +45,7 @@ tests:
         - name: minimal
           enabled: true
           useCommandArgs: true
-          pangolinEndpoint: "https://praxis.example.com"
+          praxisEndpoint: "https://praxis.example.com"
           id: abc123
           secret: s3cret
     asserts:
@@ -61,7 +61,7 @@ tests:
           enabled: true
           useCommandArgs: true
           preferEndpoint: "1.2.3.4:51820"
-          pangolinEndpoint: "https://praxis.example.com"
+          praxisEndpoint: "https://praxis.example.com"
           id: abc123
           secret: s3cret
     asserts:
@@ -90,7 +90,7 @@ tests:
           enabled: true
           useCommandArgs: true
           preferEndpoint: "1.2.3.4:51820"
-          pangolinEndpoint: "https://praxis.example.com"
+          praxisEndpoint: "https://praxis.example.com"
           id: abc123
           secret: s3cret
     asserts:
@@ -109,7 +109,7 @@ tests:
           localEndpointInterfaces:
             - eth0
             - wlan0
-          pangolinEndpoint: "https://praxis.example.com"
+          praxisEndpoint: "https://praxis.example.com"
           id: abc123
           secret: s3cret
     asserts:

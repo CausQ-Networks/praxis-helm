@@ -1,0 +1,144 @@
+{{- $root := . -}}
+{{- $pdb := $root.Values.highAvailability.podDisruptionBudget | default dict -}}
+{{- if $pdb.enabled -}}
+{{- $fullname := include "praxis.fullname" $root -}}
+{{- $namespace := include "praxis.namespace" $root -}}
+{{- $annotations := mergeOverwrite (dict) (include "praxis.global.commonAnnotations" $root | fromYaml) ($pdb.annotations | default dict) -}}
+{{- $minAvailable := $pdb.minAvailable | default 1 -}}
+{{- $maxUnavailable := $pdb.maxUnavailable -}}
+
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ printf "%s-pdb" $fullname }}
+  namespace: {{ $namespace }}
+  labels:
+    {{- include "praxis.labels" $root | nindent 4 }}
+    {{- range $k, $v := ($pdb.labels | default dict) }}
+    {{ $k }}: {{ $v | quote }}
+    {{- end }}
+  {{- if gt (len $annotations) 0 }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "praxis.praxis.selectorLabels" $root | nindent 6 }}
+  {{- if $maxUnavailable }}
+  maxUnavailable: {{ $maxUnavailable }}
+  {{- else }}
+  minAvailable: {{ $minAvailable }}
+  {{- end }}
+
+{{- if and $root.Values.controller.enabled (eq $root.Values.deployment.type "controller") }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ printf "%s-controller-pdb" $fullname }}
+  namespace: {{ $namespace }}
+  labels:
+    {{- include "praxis.labels" $root | nindent 4 }}
+    {{- range $k, $v := ($pdb.labels | default dict) }}
+    {{ $k }}: {{ $v | quote }}
+    {{- end }}
+  {{- if gt (len $annotations) 0 }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "praxis.controller.selectorLabels" $root | nindent 6 }}
+  {{- if $maxUnavailable }}
+  maxUnavailable: {{ $maxUnavailable }}
+  {{- else }}
+  minAvailable: {{ $minAvailable }}
+  {{- end }}
+{{- end }}
+
+{{- if and (eq (include "praxis.gerbil.resourcesEnabled" $root) "true") (eq $root.Values.deployment.mode "multi") }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ printf "%s-gerbil-pdb" $fullname }}
+  namespace: {{ $namespace }}
+  labels:
+    {{- include "praxis.labels" $root | nindent 4 }}
+    {{- range $k, $v := ($pdb.labels | default dict) }}
+    {{ $k }}: {{ $v | quote }}
+    {{- end }}
+  {{- if gt (len $annotations) 0 }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "praxis.gerbil.selectorLabels" $root | nindent 6 }}
+  {{- if $maxUnavailable }}
+  maxUnavailable: {{ $maxUnavailable }}
+  {{- else }}
+  minAvailable: {{ $minAvailable }}
+  {{- end }}
+{{- end }}
+
+{{- /* Only a separate Traefik Deployment needs its own budget: in single mode and in the
+       Gerbil Pod the Pod's own budget covers it, and this selector would match nothing. */}}
+{{- if eq (include "praxis.traefik.separateDeployment" $root) "true" }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ printf "%s-traefik-standalone-pdb" $fullname }}
+  namespace: {{ $namespace }}
+  labels:
+    {{- include "praxis.labels" $root | nindent 4 }}
+    {{- range $k, $v := ($pdb.labels | default dict) }}
+    {{ $k }}: {{ $v | quote }}
+    {{- end }}
+  {{- if gt (len $annotations) 0 }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "praxis.traefik.standalone.selectorLabels" $root | nindent 6 }}
+  {{- if $maxUnavailable }}
+  maxUnavailable: {{ $maxUnavailable }}
+  {{- else }}
+  minAvailable: {{ $minAvailable }}
+  {{- end }}
+{{- end }}
+
+{{- if and (eq $root.Values.database.mode "embedded") $root.Values.database.embedded.enabled }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ printf "%s-embedded-postgres-pdb" $fullname }}
+  namespace: {{ $namespace }}
+  labels:
+    {{- include "praxis.labels" $root | nindent 4 }}
+    {{- range $k, $v := ($pdb.labels | default dict) }}
+    {{ $k }}: {{ $v | quote }}
+    {{- end }}
+  {{- if gt (len $annotations) 0 }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "praxis.embeddedPostgres.selectorLabels" $root | nindent 6 }}
+  {{- if $maxUnavailable }}
+  maxUnavailable: {{ $maxUnavailable }}
+  {{- else }}
+  minAvailable: {{ $minAvailable }}
+  {{- end }}
+{{- end }}
+
+{{- end }}

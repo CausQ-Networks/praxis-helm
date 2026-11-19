@@ -1,0 +1,50 @@
+{{- if .Values.praxis.service.enabled }}
+{{- $root := . -}}
+{{- $praxis := .Values.praxis -}}
+{{- $svcType := $praxis.service.type | default "ClusterIP" -}}
+{{- $svcAnns := mergeOverwrite (dict) (include "praxis.global.commonAnnotations" $root | fromYaml) .Values.global.additionalServiceAnnotations (include "praxis.component.commonAnnotations" (dict "root" $root "component" "praxis") | fromYaml) (mergeOverwrite (dict) $praxis.service.annotations) -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "praxis.fullname" . }}
+  namespace: {{ include "praxis.namespace" . }}
+  labels:
+    {{- include "praxis.labels" $root | nindent 4 }}
+    {{- include "praxis.component.commonLabels" (dict "root" $root "component" "praxis") | nindent 4 }}
+    {{- include "praxis.renderNonSelectorLabels" (dict "labels" ($root.Values.global.additionalServiceLabels | default dict)) | nindent 4 }}
+    {{- include "praxis.renderNonSelectorLabels" (dict "labels" ($praxis.service.labels | default dict)) | nindent 4 }}
+    app.kubernetes.io/component: praxis
+  {{- if gt (len $svcAnns) 0 }}
+  annotations:
+    {{- toYaml $svcAnns | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $svcType }}
+  selector:
+    {{- if eq .Values.deployment.mode "single" }}
+    {{- include "praxis.single.selectorLabels" $root | nindent 4 }}
+    {{- else }}
+    {{- include "praxis.praxis.selectorLabels" $root | nindent 4 }}
+    {{- end }}
+  ports:
+    - name: external
+      port: {{ $praxis.service.ports.external }}
+      targetPort: {{ $praxis.service.ports.external }}
+      protocol: TCP
+    - name: internal-api
+      port: {{ $praxis.service.ports.internalApi }}
+      targetPort: {{ $praxis.service.ports.internalApi }}
+      protocol: TCP
+    - name: next
+      port: {{ $praxis.service.ports.next }}
+      targetPort: {{ $praxis.service.ports.next }}
+      protocol: TCP
+    - name: integration
+      port: {{ $praxis.service.ports.integration }}
+      targetPort: {{ $praxis.service.ports.integration }}
+      protocol: TCP
+    - name: ai-gateway
+      port: {{ $praxis.service.ports.aiGateway }}
+      targetPort: {{ $praxis.service.ports.aiGateway }}
+      protocol: TCP
+{{- end }}

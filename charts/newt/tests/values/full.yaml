@@ -30,7 +30,7 @@ newtInstances:
   - name: full-tunnel
     enabled: true
     # Inline credentials
-    pangolinEndpoint: "https://example.com"
+    praxisEndpoint: "https://example.com"
     id: "id-123"
     secret: "s3cr3t"
     acceptClients: true

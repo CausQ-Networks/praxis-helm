@@ -1,0 +1,27 @@
+{{- $bp := .Values.praxis.blueprints | default dict -}}
+{{- $bpEnabled := default false (get $bp "enabled") -}}
+{{- $bpCm := default (dict) (get $bp "configMap") -}}
+{{- $bpCmCreate := default false (get $bpCm "create") -}}
+{{- $bpExistingCm := default "" (get $bp "existingConfigMap") -}}
+{{- if and $bpEnabled $bpCmCreate (not $bpExistingCm) }}
+{{- $metaAnns := mergeOverwrite (dict) (include "praxis.global.commonAnnotations" . | fromYaml) (include "praxis.component.commonAnnotations" (dict "root" . "component" "praxis") | fromYaml) (.Values.praxis.configMap.annotations | default dict) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "praxis.blueprints.configMapName" . }}
+  namespace: {{ include "praxis.namespace" . }}
+  labels:
+    {{- include "praxis.labels" . | nindent 4 }}
+    {{- include "praxis.component.commonLabels" (dict "root" . "component" "praxis") | nindent 4 }}
+    {{- include "praxis.renderNonSelectorLabels" (dict "labels" (.Values.praxis.configMap.labels | default dict)) | nindent 4 }}
+    app.kubernetes.io/component: praxis
+  {{- if gt (len $metaAnns) 0 }}
+  annotations:
+    {{- toYaml $metaAnns | nindent 4 }}
+  {{- end }}
+data:
+  {{- range $filename, $content := (get $bp "files" | default dict) }}
+  {{ $filename | quote }}: |
+    {{- $content | nindent 4 }}
+  {{- end }}
+{{- end }}

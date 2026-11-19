@@ -98,7 +98,7 @@ spec:
               fi
 
               # Praxis endpoint reachability (best effort)
-              ENDPOINT="{{ $inst.pangolinEndpoint }}"
+              ENDPOINT="{{ $inst.praxisEndpoint }}"
               if [ -n "$ENDPOINT" ]; then
                 echo "Checking Praxis endpoint reachability: $ENDPOINT"
                 if command -v curl >/dev/null 2>&1; then

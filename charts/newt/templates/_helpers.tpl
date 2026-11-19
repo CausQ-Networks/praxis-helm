@@ -250,7 +250,7 @@ Every consumer - security context, env and CLI args - reads this one helper so t
 {{- $existing := default "" (get $auth "existingSecretName") -}}
 {{- $createSecret := default true (get $auth "createSecret") -}}
 {{- $envVarsDirect := default false (get $auth "envVarsDirect") -}}
-{{- $hasInlineCredentials := and $inst.pangolinEndpoint $inst.id $inst.secret -}}
+{{- $hasInlineCredentials := and $inst.praxisEndpoint $inst.id $inst.secret -}}
 {{- $useGeneratedSecret := and $hasInlineCredentials $createSecret (not $envVarsDirect) (not $existing) -}}
 {{- $generatedSecretName := include "newt.instance.fullname" (dict "root" $root "inst" $inst) -}}
 {{- $authSecretName := ternary $existing $generatedSecretName (ne $existing "") -}}
@@ -272,7 +272,7 @@ Every consumer - security context, env and CLI args - reads this one helper so t
       key: {{ $secretKey }}
 {{- else if and $envVarsDirect $hasInlineCredentials }}
 - name: PANGOLIN_ENDPOINT
-  value: {{ $inst.pangolinEndpoint | quote }}
+  value: {{ $inst.praxisEndpoint | quote }}
 - name: NEWT_ID
   value: {{ $inst.id | quote }}
 - name: NEWT_SECRET
@@ -488,12 +488,12 @@ Every consumer - security context, env and CLI args - reads this one helper so t
 {{- $existing := get $auth "existingSecretName" -}}
 {{- $createSecret := default true (get $auth "createSecret") -}}
 {{- $envVarsDirect := default false (get $auth "envVarsDirect") -}}
-{{- $hasInlineCredentials := and $inst.pangolinEndpoint $inst.id $inst.secret -}}
+{{- $hasInlineCredentials := and $inst.praxisEndpoint $inst.id $inst.secret -}}
 {{- $dockerSocket := default (dict) $inst.dockerSocket -}}
 {{- $updown := default (dict) $inst.updown -}}
 {{- $mtls := default (dict) $inst.mtls -}}
 {{- if not $existing }}
-  {{- $args = append $args (printf "--endpoint=%s" $inst.pangolinEndpoint) }}
+  {{- $args = append $args (printf "--endpoint=%s" $inst.praxisEndpoint) }}
   {{- if $inst.id }}{{- $args = append $args (printf "--id=%s" $inst.id) }}{{- end }}
 {{- end }}
 {{- if and $inst.mtu (ne (int $inst.mtu) 1280) }}{{- $args = append $args (printf "--mtu=%v" $inst.mtu) }}{{- end }}

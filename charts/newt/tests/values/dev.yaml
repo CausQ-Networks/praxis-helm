@@ -22,7 +22,7 @@ global:
 newtInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: https://praxis.example.com
+    praxisEndpoint: https://praxis.example.com
     id: test-id
     secret: test-secret
     # Minimal env map so `templates/configmap-env.yaml` can render

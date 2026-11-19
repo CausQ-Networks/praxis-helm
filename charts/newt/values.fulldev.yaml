@@ -565,7 +565,7 @@ newtInstances:
     # Alternative (inline): provide credentials directly (schema enforces non-empty when used)
     # @schema type: string ; pattern: ^$|^https?://[a-zA-Z0-9.-]+(/.*)?$
     # -- Praxis control-plane endpoint URL (e.g., https://praxis.example.com)
-    pangolinEndpoint: ""
+    praxisEndpoint: ""
     # @schema type: string ; pattern: ^$|^[a-zA-Z0-9_-]+$
     # @schema description: WARNING: Use auth.existingSecretName for production to avoid secrets in values
     # -- Instance ID issued by Praxis

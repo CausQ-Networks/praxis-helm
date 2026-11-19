@@ -1,0 +1,122 @@
+# E2E Test Values for Praxis Helm Chart
+#
+# Install:
+# helm dependency build charts/praxis
+# helm install praxis-e2e charts/praxis \
+#   -f charts/praxis/examples/values-e2e-cnpg.yaml \
+#   --namespace praxis-e2e \
+#   --wait \
+#   --timeout 10m
+#
+# Goal:
+# - test the recommended Kubernetes path
+# - controller mode
+# - multi workload mode
+# - CloudNativePG database
+# - chart-managed namespace with PSA labels
+# - avoid external DB workaround
+
+deployment:
+  type: controller
+  mode: multi
+  traefikNamespace: traefik
+  installTraefikController: false
+
+global:
+  storageClass: hcloud-volumes
+
+namespace:
+  create: false
+  # name: praxis-e2e
+  # podSecurity:
+  #  enforce: privileged
+  #  warn: baseline
+  #  audit: baseline
+
+praxis:
+  config:
+    app:
+      dashboard_url: "https://praxis.example.com"
+      log_level: info
+      save_logs: false
+      log_failed_attempts: true
+
+      notifications:
+        product_updates: true
+        new_releases: true
+
+    domains:
+      domain1:
+        base_domain: exampe.com
+        cert_resolver: letsencrypt
+
+    gerbil:
+      base_endpoint: "praxis.example.com"
+
+    flags:
+      require_email_verification: false
+      disable_signup_without_invite: true
+      allow_raw_resources: true
+      allow_base_domain_resources: true
+      enable_integration_api: true
+
+    traefik:
+      enabled: true
+      http_entrypoint: web
+      https_entrypoint: websecure
+      cert_resolver: letsencrypt
+
+
+gerbil:
+  enabled: true
+  service:
+    type: LoadBalancer
+    annotations:
+      load-balancer.hetzner.cloud/name: praxis-gerbil
+      load-balancer.hetzner.cloud/location: fsn1
+      load-balancer.hetzner.cloud/uses-proxyprotocol: "false"
+  persistence:
+    enabled: true
+    storageClass: hcloud-volumes
+    size: 1Gi
+
+controller:
+  enabled: true
+  config:
+    allowInsecureHttp: true
+    targetNamespace: praxis-e2e
+
+cnpg-operator:
+  enabled: false
+
+cnpg-cluster:
+  enabled: true
+  fullnameOverride: praxis-db
+  type: postgresql
+  mode: standalone
+  cluster:
+    instances: 1
+    storage:
+      size: 1Gi
+      storageClass: hcloud-volumes
+
+database:
+  mode: cloudnativepg
+  cloudnativepg:
+    enabled: true
+    namespace: praxis-e2e
+    operator:
+      enabled: false
+      namespace: cnpg-system
+    cluster:
+      name: praxis-db
+  connection:
+    existingSecretName: praxis-db-app
+    existingSecretKey: uri
+
+#database:
+#  mode: external
+#  external:
+#    generatedSecret:
+#      create: true
+#      connectionString: "postgresql://app:XXXX@praxis-db-rw.praxis:5432/app?sslmode=disable"

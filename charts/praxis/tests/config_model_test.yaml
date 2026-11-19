@@ -1,0 +1,772 @@
+suite: config model and endpoint defaults
+templates:
+  - templates/configmap-praxis.yaml
+  - templates/deployment-praxis.yaml
+  - templates/deployment-controller.yaml
+  - templates/configmap-controller.yaml
+  - templates/secret-praxis-private.yaml
+tests:
+  - it: renders Praxis config ConfigMap by default
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-praxis-config
+      - exists:
+          path: data["config.yml"]
+
+  - it: mounts config.yml into Praxis container
+    template: templates/deployment-praxis.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].mountPath
+          value: /app/config/config.yml
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].subPath
+          value: config.yml
+      - equal:
+          path: spec.template.spec.volumes[0].configMap.name
+          value: RELEASE-NAME-praxis-config
+
+  - it: renders modern secret env keys for Praxis
+    template: templates/deployment-praxis.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: SERVER_SECRET
+      - equal:
+          path: spec.template.spec.containers[0].env[1].name
+          value: POSTGRES_CONNECTION_STRING
+
+  - it: defaults controller endpoint to internal Praxis HTTP service
+    template: templates/configmap-controller.yaml
+    asserts:
+      - equal:
+          path: data.CONFIG_ENDPOINT
+          value: http://RELEASE-NAME-praxis.NAMESPACE.svc.cluster.local:3001/api/v1/traefik-config
+
+  - it: honors explicit controller config endpoint override
+    set:
+      controller.config.configEndpoint: https://custom.example/api/v1/traefik-config
+    template: templates/configmap-controller.yaml
+    asserts:
+      - equal:
+          path: data.CONFIG_ENDPOINT
+          value: https://custom.example/api/v1/traefik-config
+
+  - it: controller wait initContainer uses same default endpoint as CONFIG_ENDPOINT
+    template: templates/deployment-controller.yaml
+    set:
+      deployment.type: controller
+      controller.enabled: true
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.initContainers[0].command[2]
+          pattern: 'ENDPOINT="http://RELEASE-NAME-praxis.NAMESPACE.svc.cluster.local:3001/api/v1/traefik-config"'
+
+  - it: controller wait initContainer uses same overridden endpoint as CONFIG_ENDPOINT
+    template: templates/deployment-controller.yaml
+    set:
+      deployment.type: controller
+      controller.enabled: true
+      controller.config.configEndpoint: https://custom.example/api/v1/traefik-config
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.initContainers[0].command[2]
+          pattern: 'ENDPOINT="https://custom.example/api/v1/traefik-config"'
+
+  - it: CONFIG_ALLOW_INSECURE_HTTP defaults to true for internal HTTP endpoint
+    template: templates/configmap-controller.yaml
+    asserts:
+      - equal:
+          path: data.CONFIG_ALLOW_INSECURE_HTTP
+          value: "true"
+
+  - it: CONFIG_ALLOW_INSECURE_HTTP renders true for explicit HTTP endpoint in auto mode
+    set:
+      controller.config.configEndpoint: http://custom.example/api/v1/traefik-config
+      controller.config.allowInsecureHttp: null
+    template: templates/configmap-controller.yaml
+    asserts:
+      - equal:
+          path: data.CONFIG_ALLOW_INSECURE_HTTP
+          value: "true"
+
+  - it: CONFIG_ALLOW_INSECURE_HTTP renders false for explicit HTTPS endpoint in auto mode
+    set:
+      controller.config.configEndpoint: https://custom.example/api/v1/traefik-config
+      controller.config.allowInsecureHttp: null
+    template: templates/configmap-controller.yaml
+    asserts:
+      - equal:
+          path: data.CONFIG_ALLOW_INSECURE_HTTP
+          value: "false"
+
+  - it: CONFIG_ALLOW_INSECURE_HTTP respects explicit false override with HTTP endpoint
+    set:
+      controller.config.configEndpoint: http://custom.example/api/v1/traefik-config
+      controller.config.allowInsecureHttp: false
+    template: templates/configmap-controller.yaml
+    asserts:
+      - equal:
+          path: data.CONFIG_ALLOW_INSECURE_HTTP
+          value: "false"
+
+  - it: CONFIG_ALLOW_INSECURE_HTTP respects explicit true override with HTTPS endpoint
+    set:
+      controller.config.configEndpoint: https://custom.example/api/v1/traefik-config
+      controller.config.allowInsecureHttp: true
+    template: templates/configmap-controller.yaml
+    asserts:
+      - equal:
+          path: data.CONFIG_ALLOW_INSECURE_HTTP
+          value: "true"
+
+  - it: CONFIG_TLS_SKIP_VERIFY defaults to false
+    template: templates/configmap-controller.yaml
+    asserts:
+      - equal:
+          path: data.CONFIG_TLS_SKIP_VERIFY
+          value: "false"
+
+  - it: CONFIG_TLS_SKIP_VERIFY renders true when explicitly enabled
+    set:
+      controller.config.configTlsSkipVerify: true
+    template: templates/configmap-controller.yaml
+    asserts:
+      - equal:
+          path: data.CONFIG_TLS_SKIP_VERIFY
+          value: "true"
+
+  - it: config.yml contains app section with snake_case keys
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "dashboard_url: \\\"https://praxis.example.com\\\""
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "log_level:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "save_logs:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "log_failed_attempts:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "dashboard_url:"
+
+  - it: config.yml does not contain old CamelCase app keys
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "logLevel:"
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "saveLogs:"
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "dashboardUrl:"
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "enableIntegrationApi:"
+
+  - it: config.yml contains server section with snake_case keys
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "session_cookie_name:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "trust_proxy:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "resource_access_token_param:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "dashboard_session_length_hours:"
+
+  - it: config.yml defaults resource_session_request_param to p_session_request
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "resource_session_request_param: \\\"p_session_request\\\""
+
+  - it: config.yml honors explicit resource_session_request_param override
+    set:
+      praxis.config.server.resource_session_request_param: custom_session_request
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "resource_session_request_param: \\\"custom_session_request\\\""
+
+  - it: config.yml contains gerbil section
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "gerbil:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "start_port:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "clients_start_port:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "base_endpoint: \\\"praxis.example.com\\\""
+
+  - it: config.yml contains flags section with snake_case keys
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "flags:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "enable_integration_api:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "require_email_verification:"
+
+  - it: allow_raw_resources is true by default (installer parity)
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "allow_raw_resources: true"
+
+  - it: explicit flags override can disable allow_raw_resources
+    set:
+      praxis.config.flags.allow_raw_resources: false
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "allow_raw_resources: false"
+
+  - it: empty CORS arrays render as JSON empty arrays not null
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "origins: \\[\\]"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "methods: \\[\\]"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "allowed_headers: \\[\\]"
+
+  - it: email section is not rendered when disabled by default
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "smtp_host:"
+
+  - it: postgres pool section is not rendered when disabled by default
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "max_connections:"
+
+  - it: traefik section in config.yml is rendered by default
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "traefik:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: 'http_entrypoint: "web"'
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: 'cert_resolver: "letsencrypt"'
+
+  - it: email section renders when enabled
+    set:
+      praxis.config.email.enabled: true
+      praxis.config.email.smtp_host: mail.example.com
+      praxis.config.email.smtp_port: 587
+      praxis.config.email.smtp_user: noreply@example.com
+      praxis.config.email.no_reply: noreply@example.com
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "smtp_host:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "mail.example.com"
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "smtp_pass:"
+
+  - it: postgres pool section renders when enabled
+    set:
+      praxis.config.postgres.enabled: true
+      praxis.config.postgres.pool.max_connections: 50
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "max_connections: 50"
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "connection_string:"
+
+  - it: rate_limits section renders by default (enabled by default)
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "rate_limits:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "max_requests: 10"
+
+  - it: rate_limits section renders when enabled with custom global limit
+    set:
+      praxis.config.rate_limits.enabled: true
+      praxis.config.rate_limits.global.max_requests: 200
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "rate_limits:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "max_requests: 200"
+
+  - it: orgs section renders when enabled
+    set:
+      praxis.config.orgs.enabled: true
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "orgs:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "subnet_group:"
+
+  - it: traefik section in config.yml is rendered by default in controller mode
+    set:
+      deployment.type: controller
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "http_entrypoint:"
+
+  - it: traefik section in config.yml is rendered by default in standalone mode
+    set:
+      deployment.type: standalone
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "http_entrypoint:"
+
+  - it: traefik section in config.yml is not rendered when explicitly disabled
+    set:
+      praxis.config.traefik.enabled: false
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "http_entrypoint:"
+
+  - it: traefik config middleware list renders correctly
+    set:
+      praxis.config.traefik.enabled: true
+      praxis.config.traefik.additional_middlewares:
+        - chain-auth@kubernetescrd
+        - default-compress@file
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: 'additional_middlewares: \["chain-auth@kubernetescrd","default-compress@file"\]'
+
+  - it: domains map renders correctly when set
+    set:
+      praxis.config.domains:
+        my-domain:
+          base_domain: example.com
+          cert_resolver: letsencrypt
+          prefer_wildcard_cert: false
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "base_domain:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "example.com"
+
+  - it: default domains map renders at least one configured domain
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "domain1:"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "base_domain: example.com"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "cert_resolver: letsencrypt"
+
+  - it: does not render private config secret by default
+    template: templates/secret-praxis-private.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: renders chart-managed private config secret when enabled
+    set:
+      praxis.privateConfig.enabled: true
+      praxis.privateConfig.generatedSecret.create: true
+      praxis.privateConfig.generatedSecret.data: "licenseKey: abc123"
+    template: templates/secret-praxis-private.yaml
+    asserts:
+      - isKind:
+          of: Secret
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-praxis-private-config
+
+  - it: uses existing private config secret when existingSecretName is set
+    set:
+      praxis.privateConfig.enabled: true
+      praxis.privateConfig.existingSecretName: my-private-secret
+    template: templates/secret-praxis-private.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: mounts privateConfig.yml when enabled with existingSecretName
+    set:
+      praxis.privateConfig.enabled: true
+      praxis.privateConfig.existingSecretName: my-private-secret
+    template: templates/deployment-praxis.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: praxis-private-config
+            mountPath: /app/config/privateConfig.yml
+            subPath: "privateConfig.yml"
+            readOnly: true
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: praxis-private-config
+            secret:
+              secretName: my-private-secret
+
+  - it: uses generatedSecret.key as subPath when using chart-managed private config
+    set:
+      praxis.privateConfig.enabled: true
+      praxis.privateConfig.generatedSecret.create: true
+      praxis.privateConfig.generatedSecret.key: "enterprise.yml"
+      praxis.privateConfig.generatedSecret.data: "licenseKey: abc123"
+    template: templates/deployment-praxis.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: praxis-private-config
+            mountPath: /app/config/privateConfig.yml
+            subPath: "enterprise.yml"
+            readOnly: true
+
+  - it: log_failed_attempts is true by default (security-hardened baseline)
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "log_failed_attempts: true"
+
+  - it: empty app override keeps hardened log_failed_attempts fallback
+    set:
+      praxis.config.app: {}
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "log_failed_attempts: true"
+
+  - it: explicit app override can disable log_failed_attempts
+    set:
+      praxis.config.app.log_failed_attempts: false
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "log_failed_attempts: false"
+
+  - it: disable_signup_without_invite is true by default (production-safe)
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "disable_signup_without_invite: true"
+
+  - it: empty flags override keeps hardened disable_signup_without_invite fallback
+    set:
+      praxis.config.flags: {}
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "disable_signup_without_invite: true"
+
+  - it: explicit flags override can disable signup invite enforcement
+    set:
+      praxis.config.flags.disable_signup_without_invite: false
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "disable_signup_without_invite: false"
+
+  - it: rate_limits auth max_requests defaults to 10 (brute-force protection)
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "auth:\\n\\s+window_minutes: 1\\n\\s+max_requests: 10"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "global:\\n\\s+window_minutes: 1\\n\\s+max_requests: 500"
+
+  - it: empty auth rate_limits override keeps hardened auth max_requests fallback
+    set:
+      praxis.config.rate_limits.auth: {}
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "auth:\\n\\s+window_minutes: 1\\n\\s+max_requests: 10"
+
+  - it: explicit auth rate_limits override can raise max_requests
+    set:
+      praxis.config.rate_limits.auth.max_requests: 25
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "auth:\\n\\s+window_minutes: 1\\n\\s+max_requests: 25"
+
+  - it: rate_limits section is suppressed when disabled
+    set:
+      praxis.config.rate_limits.enabled: false
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "rate_limits:"
+
+  # `X | default true` collapsed an explicit false back onto the default, so none of
+  # these opt-outs could be applied at all - telemetry included.
+  - it: honours an explicit telemetry opt-out
+    template: templates/configmap-praxis.yaml
+    set:
+      praxis.config.app.telemetry.anonymous_usage: false
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "anonymous_usage: false"
+
+  - it: honours explicit notification opt-outs
+    template: templates/configmap-praxis.yaml
+    set:
+      praxis.config.app.notifications.product_updates: false
+      praxis.config.app.notifications.new_releases: false
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "product_updates: false"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "new_releases: false"
+
+  - it: keeps telemetry and notifications on by default
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "anonymous_usage: true"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "product_updates: true"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "new_releases: true"
+
+  - it: honours trust_proxy set to zero
+    template: templates/configmap-praxis.yaml
+    set:
+      praxis.config.server.trust_proxy: 0
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "trust_proxy: 0"
+
+  - it: defaults trust_proxy to one
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "trust_proxy: 1"
+
+  - it: honours smtp_tls_reject_unauthorized set to false
+    template: templates/configmap-praxis.yaml
+    set:
+      praxis.config.email.enabled: true
+      praxis.config.email.smtp_host: smtp.example.com
+      praxis.config.email.smtp_tls_reject_unauthorized: false
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "smtp_tls_reject_unauthorized: false"
+
+  # --- Praxis 1.22 configuration surface ---------------------------------------
+  # gerbil.use_subdomain was dropped from Praxis's config schema; the chart must not
+  # keep emitting a key upstream no longer knows about.
+  - it: no longer emits the removed gerbil.use_subdomain
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "use_subdomain"
+
+  # The listener ports and the config that advertises them must come from one place.
+  - it: derives the server ports from the Service port values
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "external_port: 3000"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "internal_port: 3001"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "next_port: 3002"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "integration_port: 3003"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "ai_gateway_port: 3005"
+
+  - it: follows a custom service port into the rendered config
+    set:
+      praxis.service.ports.aiGateway: 3105
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "ai_gateway_port: 3105"
+
+  - it: emits the remote_headers defaults
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "user_id: \"Remote-User-Id\""
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "virtual_api_key_id: \"Remote-Virtual-Api-Key-Id\""
+
+  # Optional keys must stay unset so Praxis's own defaults keep applying.
+  - it: omits the optional 1.22 overrides by default
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "badger_override"
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "ai_gateway_override"
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "enable_ai_gateway_client_ip_header"
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "maxmind"
+
+  - it: emits badger_override and ai_gateway_override when set
+    set:
+      praxis.config.server.badger_override: http://praxis.praxis.svc.cluster.local:3001/api/v1
+      praxis.config.server.ai_gateway_override: http://ai.example:3005
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "badger_override: \"http://praxis.praxis.svc.cluster.local:3001/api/v1\""
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "ai_gateway_override: \"http://ai.example:3005\""
+
+  - it: emits the 1.22 flags when set
+    set:
+      praxis.config.flags.disable_virtual_api_keys_ui: true
+      praxis.config.flags.disable_private_http_placeholder: true
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "disable_virtual_api_keys_ui: true"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "disable_private_http_placeholder: true"
+
+  - it: lets enable_acme_cert_sync be turned off
+    set:
+      praxis.config.flags.enable_acme_cert_sync: false
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "enable_acme_cert_sync: false"
+
+  - it: omits the traefik rate limit unless configured
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - notMatchRegex:
+          path: data["config.yml"]
+          pattern: "rate_limit:\n        average"
+
+  - it: emits traefik site_types, static_domains and rate_limit when set
+    set:
+      praxis.config.traefik.site_types: ["newt", "local"]
+      praxis.config.traefik.static_domains: ["a.example.com"]
+      praxis.config.traefik.rate_limit.average: 30
+      praxis.config.traefik.rate_limit.burst: 50
+    template: templates/configmap-praxis.yaml
+    asserts:
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "site_types: \\[\"newt\",\"local\"\\]"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "static_domains: \\[\"a.example.com\"\\]"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "average: 30"
+      - matchRegex:
+          path: data["config.yml"]
+          pattern: "burst: 50"

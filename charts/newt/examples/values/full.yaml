@@ -14,7 +14,7 @@ global:
 newtInstances:
   - name: main-tunnel
     enabled: true
-    pangolinEndpoint: "https://praxis.example.com"
+    praxisEndpoint: "https://praxis.example.com"
     id: my-id
     secret: my-secret
     mtu: 1400

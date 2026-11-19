@@ -2,7 +2,7 @@
 newtInstances:
   - name: dual-auth
     enabled: true
-    pangolinEndpoint: https://praxis.example.com
+    praxisEndpoint: https://praxis.example.com
     id: my-id
     secret: inline-secret
     auth:

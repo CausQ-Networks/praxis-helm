@@ -1069,7 +1069,7 @@
                         "type": "object",
                         "properties": {
                             "createSecret": {
-                                "description": "Create a Secret from inline credentials (pangolinEndpoint/id/secret) when provided. Set false to disable secret creation from inline credentials.",
+                                "description": "Create a Secret from inline credentials (praxisEndpoint/id/secret) when provided. Set false to disable secret creation from inline credentials.",
                                 "default": true,
                                 "type": "boolean"
                             },
@@ -1779,7 +1779,7 @@
                         "description": "Node selection constraints",
                         "type": "object"
                     },
-                    "pangolinEndpoint": {
+                    "praxisEndpoint": {
                         "description": "Praxis control-plane endpoint URL (e.g., https://praxis.example.com)",
                         "type": "string",
                         "pattern": "^$|^https?://[a-zA-Z0-9.-]+(/.*)?$"
@@ -1855,7 +1855,7 @@
                         }
                     },
                     "secret": {
-                        "description": "Newt instance secret issued by Praxis (must be set with pangolinEndpoint and id) - WARNING: Use auth.existingSecretName for production.",
+                        "description": "Newt instance secret issued by Praxis (must be set with praxisEndpoint and id) - WARNING: Use auth.existingSecretName for production.",
                         "type": "string",
                         "pattern": "^$|^[a-zA-Z0-9_-]+$"
                     },

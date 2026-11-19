@@ -34,7 +34,7 @@ This changelog is chart-scoped to support multiple charts over time.
   does not automount a token, so the providers failed every watch; a projected token is
   now mounted into the Traefik container only.
 - `traefik.persistence.enabled=true` without `existingClaim` creates the
-  `<release>-pangolin-traefik-acme` PVC the Pods mount. Nothing created it before, so the
+  `<release>-praxis-traefik-acme` PVC the Pods mount. Nothing created it before, so the
   Pods stayed Pending.
 - The chart-managed Traefik's HTTPS listener moves from container port 8443 to 9443.
   Gerbil's SNI proxy binds 8443, so Traefik failed with `bind: address already in use`
@@ -43,16 +43,16 @@ This changelog is chart-scoped to support multiple charts over time.
   Service ports (80/443) are unchanged.
 - `traefik.config.httpEntrypoint`, `httpsEntrypoint` and `certResolver` are applied to the
   chart-managed Traefik; the names were hardcoded.
-- The controller Role grants `secrets`. pangolin-kube-controller 0.1.0 writes the client
+- The controller Role grants `secrets`. praxis-kube-controller 0.1.0 writes the client
   CA Secrets that mTLS `TLSOption`s reference.
 
-- `pangolin.config.server.internal_hostname` now defaults to the in-cluster FQDN instead
+- `praxis.config.server.internal_hostname` now defaults to the in-cluster FQDN instead
   of the bare Service name. Badger resolves it from inside the Traefik Pod, so with
   `deployment.traefikNamespace` set it did not resolve at all and Badger answered
   `404 page not found` for every request while the Traefik dashboard still reported the
   router healthy. The same value drives the Praxis UI and AI gateway URLs
   ([#20](https://github.com/CausQ-Networks/praxis-helm/issues/20)).
-- `pangolin.extraVolumes` / `pangolin.extraVolumeMounts` no longer abort `helm template`.
+- `praxis.extraVolumes` / `praxis.extraVolumeMounts` no longer abort `helm template`.
   The `- {{- toYaml . | nindent N }}` pattern let the whitespace strip eat the list dash
   ([#25](https://github.com/CausQ-Networks/praxis-helm/issues/25)).
 - `networkPolicy.controller.egress.kubernetesApi` now renders a rule by default, so
@@ -69,9 +69,9 @@ This changelog is chart-scoped to support multiple charts over time.
   conflicts move to `PANGOLIN-080` (`traefikController.deployment.enabled=false`) and
   `PANGOLIN-081` (`traefikController.providers.kubernetesCRD.enabled=false`). The messages
   themselves are unchanged.
-- Explicit `false` and `0` now stick for `pangolin.config.app.telemetry.anonymous_usage`,
-  `pangolin.config.app.notifications.*`, `pangolin.config.server.trust_proxy` and
-  `pangolin.config.email.smtp_tls_reject_unauthorized`. `| default` collapsed them back
+- Explicit `false` and `0` now stick for `praxis.config.app.telemetry.anonymous_usage`,
+  `praxis.config.app.notifications.*`, `praxis.config.server.trust_proxy` and
+  `praxis.config.email.smtp_tls_reject_unauthorized`. `| default` collapsed them back
   onto the default, so telemetry could not be turned off.
 
 #### Added
@@ -82,7 +82,7 @@ This changelog is chart-scoped to support multiple charts over time.
   emitted only when set, so Praxis's defaults apply otherwise.
 - `traefik.runInGerbilPod` (default `true`). See the breaking change below.
 - `controller.config.ingressClass` (default `traefik`) and
-  `controller.config.resyncInterval` (default `10m`) for pangolin-kube-controller 0.1.0.
+  `controller.config.resyncInterval` (default `10m`) for praxis-kube-controller 0.1.0.
 - `PANGOLIN-076` rejects `traefik.replicaCount > 1` while Traefik runs in the Gerbil Pod.
 
 - `database.sqlite.persistence.*` is implemented: it renders a PVC and mounts the
@@ -99,9 +99,9 @@ This changelog is chart-scoped to support multiple charts over time.
   maxmind_asn_path}`, `flags.{disable_virtual_api_keys_ui, enable_acme_cert_sync,
   disable_private_http_placeholder}` and `traefik.{site_types, static_domains,
   rate_limit}`. Optional keys are emitted only when set so Praxis's defaults apply.
-- `pangolin.service.ports.aiGateway` (3005), exposed on the Service and the workload. The
+- `praxis.service.ports.aiGateway` (3005), exposed on the Service and the workload. The
   rendered `server.*_port` values now derive from these ports so they cannot drift.
-- `networkPolicy.pangolin.ingress.aiGateway` grants the AI gateway port to the Traefik
+- `networkPolicy.praxis.ingress.aiGateway` grants the AI gateway port to the Traefik
   that terminates its routes and to nothing else. `fromTraefik` (default `true`) derives
   the peer from the topology - the chart-managed standalone Traefik, or the bundled
   subchart including a `namespaceSelector` when `traefikController.namespaceOverride`
@@ -120,16 +120,16 @@ This changelog is chart-scoped to support multiple charts over time.
 
 #### Changed
 
-- Bumped Praxis appVersion to `1.26.0`, Gerbil to `1.6.0`, pangolin-kube-controller to
+- Bumped Praxis appVersion to `1.26.0`, Gerbil to `1.6.0`, praxis-kube-controller to
   `0.1.0`, Badger to `v1.8.0` (permanent redirects need it), and the chart to `0.1.0`. The
-  chart and the controller leave prerelease. pangolin-kube-controller 0.1.0 is required:
+  chart and the controller leave prerelease. praxis-kube-controller 0.1.0 is required:
   earlier builds produced TraefikServices the API server stripped of their servers, and
   could not handle TCP/UDP, mTLS or redirects.
 - **BREAKING (standalone, multi mode):** the chart-managed Traefik runs as a container in
   the Gerbil Pod instead of its own Deployment, so it shares Gerbil's network namespace
   and reaches tunnel backends; a separate Traefik Pod returned `502` for every
   tunnel-backed resource ([#20](https://github.com/CausQ-Networks/praxis-helm/issues/20)). On
-  upgrade the `<release>-pangolin-traefik` Deployment and its PDB are removed, the
+  upgrade the `<release>-praxis-traefik` Deployment and its PDB are removed, the
   Traefik Service selects the Gerbil Pod, the Traefik ClusterRoleBinding moves to the
   Gerbil ServiceAccount, and the Gerbil egress NetworkPolicy is no longer rendered.
   Set `traefik.runInGerbilPod=false` to keep the previous layout. Controller mode is
@@ -139,7 +139,7 @@ This changelog is chart-scoped to support multiple charts over time.
 - `images.traefik.tag` moves from `v3.6.15` to `v3.7.13`. The v3.6 line is out of upstream
   security support, and the bundled Traefik chart already installs v3.7.13, so the two ways
   this chart can run Traefik no longer sit on different minors.
-- **BREAKING:** `pangolin.config.gerbil.use_subdomain` is removed - Praxis dropped it
+- **BREAKING:** `praxis.config.gerbil.use_subdomain` is removed - Praxis dropped it
   from its config schema, so the chart was emitting a key upstream no longer knows.
 - **BREAKING:** the top-level `monitoring.*` tree and `runtime.hostNetwork` are removed.
   No template ever read either of them. The two removals fail differently on upgrade
@@ -153,12 +153,12 @@ This changelog is chart-scoped to support multiple charts over time.
   `networkPolicy.kubernetesApiCIDRs` are deprecated in favour of `endpoints`. Both are
   still honoured and take precedence over `endpoints`, so an existing scoped allow-list
   is never widened by an upgrade.
-- `networkPolicy.pangolin.externalIngress.next` defaults to `null` (derive from the
+- `networkPolicy.praxis.externalIngress.next` defaults to `null` (derive from the
   dashboard route). An explicit boolean still wins.
-- `networkPolicy.pangolin.externalIngress.aiGateway` stays `false`. It is the blanket
+- `networkPolicy.praxis.externalIngress.aiGateway` stays `false`. It is the blanket
   switch, and a NetworkPolicy rule with no `from` is every source: turning it on to let
   Traefik through would hand every Pod in the cluster the model providers behind the
-  gateway. Use `networkPolicy.pangolin.ingress.aiGateway` instead.
+  gateway. Use `networkPolicy.praxis.ingress.aiGateway` instead.
 - The chart-managed Traefik (`deployment.type=standalone`) now receives Praxis's
   generated configuration. It declares the Badger plugin in static configuration
   (`traefik.badger.*`), polls `/api/v1/traefik-config` over the HTTP provider
@@ -241,7 +241,7 @@ This changelog is chart-scoped to support multiple charts over time.
   longer discarded. Both were documented; only a hardcoded `minAvailable` was emitted.
 - The Prometheus scrape annotation advertises the port Newt binds instead of the
   deprecated `metrics.port`.
-- `pangolinEndpoint` no longer counts towards the "inline credentials must be set
+- `praxisEndpoint` no longer counts towards the "inline credentials must be set
   together" check. It is the server address and is needed in every auth mode, so
   provisioning-key installs (endpoint, no id/secret) always failed that check and could not
   render.

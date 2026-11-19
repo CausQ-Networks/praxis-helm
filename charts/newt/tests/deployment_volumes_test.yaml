@@ -10,7 +10,7 @@ tests:
           dockerSocket:
             enabled: true
             path: /var/run/docker.sock
-          pangolinEndpoint: https://example.com
+          praxisEndpoint: https://example.com
           id: test
     asserts:
       - isKind:
@@ -24,7 +24,7 @@ tests:
           blueprintFile: /config/blueprint.yaml
           blueprintData: |
             version: 1
-          pangolinEndpoint: https://example.com
+          praxisEndpoint: https://example.com
           id: test
     asserts:
       - isKind:
@@ -42,7 +42,7 @@ tests:
             enabled: true
             script: hook.sh
             mountPath: /opt/updown
-          pangolinEndpoint: https://example.com
+          praxisEndpoint: https://example.com
           id: test
     asserts:
       - isKind:
@@ -61,7 +61,7 @@ tests:
               clientCertPath: /certs/client.crt
               clientKeyPath: /certs/client.key
               caPath: /certs/ca.crt
-          pangolinEndpoint: https://example.com
+          praxisEndpoint: https://example.com
           id: test
     asserts:
       - isKind:
@@ -141,7 +141,7 @@ tests:
       newtInstances:
         - name: test-no-cfg-persist
           enabled: true
-          pangolinEndpoint: https://example.com
+          praxisEndpoint: https://example.com
           id: test
           secret: test-secret
     asserts:

@@ -75,7 +75,7 @@ export NEWT_SECRET='<your-secret-here>'   # Set securely
 helm install newt fossorial/newt -n newt-ns --create-namespace \
   --set newtInstances[0].name=main \
   --set newtInstances[0].enabled=true \
-  --set newtInstances[0].pangolinEndpoint=https://praxis.yourdomain.com \
+  --set newtInstances[0].praxisEndpoint=https://praxis.yourdomain.com \
   --set newtInstances[0].id=XXXX \
   --set-string newtInstances[0].secret="$NEWT_SECRET"
 ```
@@ -90,7 +90,7 @@ Example `myvalues.yaml` (ephemeral persistence via emptyDir):
 newtInstances:
   - name: main
     enabled: true
-    pangolinEndpoint: https://praxis.yourdomain.com
+    praxisEndpoint: https://praxis.yourdomain.com
 
     provisioningKey: "YOUR_PROVISIONING_KEY"
     newtName: "my-site"

@@ -11,7 +11,7 @@ tests:
         - name: test-probes
           enabled: true
           healthFile: /tmp/healthy
-          pangolinEndpoint: "https://example.com"
+          praxisEndpoint: "https://example.com"
           id: test
     asserts:
       - exists:
@@ -28,7 +28,7 @@ tests:
         - name: test-sec
           enabled: true
           useNativeInterface: true
-          pangolinEndpoint: "https://example.com"
+          praxisEndpoint: "https://example.com"
           id: test
           secret: "test-secret"
     asserts:
@@ -41,7 +41,7 @@ tests:
       newtInstances:
         - name: test-nodesel
           enabled: true
-          pangolinEndpoint: "https://example.com"
+          praxisEndpoint: "https://example.com"
           id: test
           nodeSelector:
             disktype: ssd
@@ -55,7 +55,7 @@ tests:
       newtInstances:
         - name: test-tolerations
           enabled: true
-          pangolinEndpoint: "https://example.com"
+          praxisEndpoint: "https://example.com"
           id: test
           tolerations:
             - key: dedicated

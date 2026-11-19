@@ -2,7 +2,7 @@
 newtInstances:
   - name: full
     enabled: true
-    pangolinEndpoint: https://praxis.example.com
+    praxisEndpoint: https://praxis.example.com
     id: test-id
     secret: test-secret
     port: "51820"

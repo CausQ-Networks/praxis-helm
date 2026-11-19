@@ -1,0 +1,130 @@
+{{- $root := . -}}
+{{- $praxis := default (dict) .Values.praxis -}}
+{{- $ingressRoute := default (dict) (get $praxis "ingressRoute") -}}
+{{- $dashboardIngress := default (dict) (get $ingressRoute "dashboard") -}}
+{{- $dashboardIngressEnabled := true -}}
+{{- if hasKey $dashboardIngress "enabled" -}}
+{{- $dashboardIngressEnabled = (get $dashboardIngress "enabled") -}}
+{{- end -}}
+{{- if and (eq .Values.deployment.type "controller") $dashboardIngressEnabled -}}
+{{- $praxisConfig := default (dict) (get $praxis "config") -}}
+{{- $praxisTraefik := default (dict) (get $praxisConfig "traefik") -}}
+{{- $defaultEntrypoint := default "websecure" (get $praxisTraefik "https_entrypoint") -}}
+{{- $entryPoints := default (list $defaultEntrypoint) (get $dashboardIngress "entryPoints") -}}
+{{- $routes := default (dict) (get $dashboardIngress "routes") -}}
+{{- $apiRoute := default (dict) (get $routes "api") -}}
+{{- $dashboardRoute := default (dict) (get $routes "dashboard") -}}
+{{- $apiEnabled := true -}}
+{{- if hasKey $apiRoute "enabled" -}}
+{{- $apiEnabled = (get $apiRoute "enabled") -}}
+{{- end -}}
+{{- $dashboardEnabled := true -}}
+{{- if hasKey $dashboardRoute "enabled" -}}
+{{- $dashboardEnabled = (get $dashboardRoute "enabled") -}}
+{{- end -}}
+{{- $metadataAnnotations := mergeOverwrite (dict) (include "praxis.global.commonAnnotations" $root | fromYaml) (include "praxis.component.commonAnnotations" (dict "root" $root "component" "praxis") | fromYaml) (mergeOverwrite (dict) (default (dict) (get $dashboardIngress "annotations"))) -}}
+{{- $ingressClassName := trim (default "" (get $dashboardIngress "ingressClassName")) -}}
+{{- if $ingressClassName -}}
+{{- $_ := set $metadataAnnotations "kubernetes.io/ingress.class" $ingressClassName -}}
+{{- end -}}
+{{- $dashboardHost := include "praxis.ingressRoute.dashboard.host" . -}}
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ default (printf "%s-dashboard" (include "praxis.fullname" .)) (get $dashboardIngress "name") }}
+  namespace: {{ default (include "praxis.namespace" .) (get $dashboardIngress "namespace") }}
+  labels:
+    {{- include "praxis.labels" $root | nindent 4 }}
+    {{- include "praxis.component.commonLabels" (dict "root" $root "component" "praxis") | nindent 4 }}
+    {{- include "praxis.renderNonSelectorLabels" (dict "labels" (default (dict) (get $dashboardIngress "labels"))) | nindent 4 }}
+    {{- include "praxis.renderNonSelectorLabels" (dict "labels" (default (dict) (get $dashboardIngress "traefikSelectorLabels"))) | nindent 4 }}
+    app.kubernetes.io/component: dashboard-ingressroute
+  {{- if gt (len $metadataAnnotations) 0 }}
+  annotations:
+    {{- toYaml $metadataAnnotations | nindent 4 }}
+  {{- end }}
+spec:
+  entryPoints:
+    {{- range $entryPoint := $entryPoints }}
+    - {{ $entryPoint }}
+    {{- end }}
+  routes:
+    {{- if $apiEnabled }}
+    - kind: Rule
+      match: Host(`{{ $dashboardHost }}`) && PathPrefix(`{{ default "/api/v1" (get $apiRoute "pathPrefix") }}`)
+      priority: {{ default 100 (get $apiRoute "priority") }}
+      {{- $apiMiddlewares := default (list) (get $apiRoute "middlewares") -}}
+      {{- if gt (len $apiMiddlewares) 0 }}
+      middlewares:
+        {{- range $middleware := $apiMiddlewares }}
+        - name: {{ get $middleware "name" }}
+          {{- if (get $middleware "namespace") }}
+          namespace: {{ get $middleware "namespace" }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      services:
+        - kind: Service
+          name: {{ include "praxis.ingressRoute.dashboard.serviceName" (dict "root" $root "route" $apiRoute) }}
+          namespace: {{ include "praxis.ingressRoute.dashboard.serviceNamespace" (dict "root" $root "route" $apiRoute) }}
+          port: {{ include "praxis.ingressRoute.dashboard.servicePort" (dict "root" $root "route" $apiRoute "defaultPort" .Values.praxis.service.ports.external) }}
+    {{- end }}
+    {{- if $dashboardEnabled }}
+    - kind: Rule
+      match: Host(`{{ $dashboardHost }}`)
+      priority: {{ default 10 (get $dashboardRoute "priority") }}
+      {{- $dashboardMiddlewares := default (list) (get $dashboardRoute "middlewares") -}}
+      {{- if gt (len $dashboardMiddlewares) 0 }}
+      middlewares:
+        {{- range $middleware := $dashboardMiddlewares }}
+        - name: {{ get $middleware "name" }}
+          {{- if (get $middleware "namespace") }}
+          namespace: {{ get $middleware "namespace" }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      services:
+        - kind: Service
+          name: {{ include "praxis.ingressRoute.dashboard.serviceName" (dict "root" $root "route" $dashboardRoute) }}
+          namespace: {{ include "praxis.ingressRoute.dashboard.serviceNamespace" (dict "root" $root "route" $dashboardRoute) }}
+          port: {{ include "praxis.ingressRoute.dashboard.servicePort" (dict "root" $root "route" $dashboardRoute "defaultPort" .Values.praxis.service.ports.next) }}
+    {{- end }}
+{{- $tls := default (dict) (get $dashboardIngress "tls") -}}
+{{- $tlsEnabled := true -}}
+{{- if hasKey $tls "enabled" }}
+{{- $tlsEnabled = (get $tls "enabled") -}}
+{{- end }}
+{{- if $tlsEnabled }}
+{{- $tlsSecretName := trim (default "" (get $tls "secretName")) -}}
+{{- $tlsCertResolver := trim (default "" (get $tls "certResolver")) -}}
+{{- if and (not $tlsCertResolver) (not $tlsSecretName) }}
+{{- $tlsCertResolver = trim (default "" (get $praxisTraefik "cert_resolver")) -}}
+{{- end }}
+  tls:
+    {{- if $tlsSecretName }}
+    secretName: {{ $tlsSecretName }}
+    {{- else if $tlsCertResolver }}
+    certResolver: {{ $tlsCertResolver }}
+    {{- end }}
+    {{- if gt (len (default (list) (get $tls "domains"))) 0 }}
+    domains:
+      {{- toYaml (get $tls "domains") | nindent 6 }}
+    {{- end }}
+    {{- $tlsOptions := default (dict) (get $tls "options") -}}
+    {{- if (get $tlsOptions "name") }}
+    options:
+      name: {{ get $tlsOptions "name" }}
+      {{- if (get $tlsOptions "namespace") }}
+      namespace: {{ get $tlsOptions "namespace" }}
+      {{- end }}
+    {{- end }}
+    {{- $tlsStore := default (dict) (get $tls "store") -}}
+    {{- if (get $tlsStore "name") }}
+    store:
+      name: {{ get $tlsStore "name" }}
+      {{- if (get $tlsStore "namespace") }}
+      namespace: {{ get $tlsStore "namespace" }}
+      {{- end }}
+    {{- end }}
+{{- end }}
+{{- end }}

@@ -7,18 +7,18 @@ description: Helm chart to deploy Newt (causq-networks/praxis-newt) client insta
 type: application
 keywords:
   - newt
-  - pangolin
+  - praxis
   - vpn
   - wireguard
   - networking
-home: https://digpangolin.com/
+home: https://digpraxis.com/
 icon: https://raw.githubusercontent.com/causq-networks/praxis/refs/heads/main/public/logo/praxis_orange.svg
 sources:
   - https://github.com/CausQ-Networks/praxis-helm
   - https://github.com/CausQ-Networks/praxis-newt
 maintainers:
   - name: Fossorial Inc
-    email: contact@pangolin.net
+    email: contact@praxis.net
 annotations:
   artifacthub.io/category: networking
   artifacthub.io/changes: |
@@ -39,7 +39,7 @@ annotations:
     - kind: fixed
       description: "Args mode no longer passes the nonexistent --secret-env flag that made Newt exit."
     - kind: fixed
-      description: "Provisioning-key installs render again; pangolinEndpoint no longer counts as a partial inline credential."
+      description: "Provisioning-key installs render again; praxisEndpoint no longer counts as a partial inline credential."
     - kind: changed
       description: "global.nativeMode.enabled is now only a permission gate. Pods are privileged only when an instance requests a native interface, and native interfaces without the gate are rejected."
     - kind: changed
@@ -71,7 +71,7 @@ annotations:
     - name: support
       url: https://github.com/CausQ-Networks/praxis-helm/issues
     - name: documentation
-      url: https://docs.digpangolin.com/self-host/manual/kubernetes
+      url: https://docs.digpraxis.com/self-host/manual/kubernetes
   artifacthub.io/prerelease: "false"
   # artifacthub.io/recommendations: |
   #   - url: https://artifacthub.io/packages/helm/causq-networks/praxis

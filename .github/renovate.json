@@ -135,7 +135,7 @@
       "commitMessageTopic": "GitHub Actions"
     },
     {
-      "description": "Group Praxis application image updates (pangolin, gerbil, kube-controller)",
+      "description": "Group Praxis application image updates (praxis, gerbil, kube-controller)",
       "matchManagers": ["custom.regex"],
       "matchPackageNames": [
         "causq-networks/praxis",

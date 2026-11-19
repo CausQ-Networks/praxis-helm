@@ -19,7 +19,7 @@ tests:
         - name: test-port
           enabled: true
           port: "51821"
-          pangolinEndpoint: https://example.com
+          praxisEndpoint: https://example.com
           id: test
     asserts:
       - isKind:
@@ -34,7 +34,7 @@ tests:
         - name: test-mtu
           enabled: true
           mtu: 1400
-          pangolinEndpoint: https://example.com
+          praxisEndpoint: https://example.com
           id: test
     asserts:
       - isKind:
@@ -46,7 +46,7 @@ tests:
         - name: test-dns
           enabled: true
           dns: 1.1.1.1
-          pangolinEndpoint: https://example.com
+          praxisEndpoint: https://example.com
           id: test
     asserts:
       - isKind:
@@ -59,7 +59,7 @@ tests:
           enabled: true
           dockerSocket:
             enabled: true
-          pangolinEndpoint: https://example.com
+          praxisEndpoint: https://example.com
           id: test
     asserts:
       - isKind:
@@ -71,7 +71,7 @@ tests:
         - name: test-nocloud
           enabled: true
           noCloud: true
-          pangolinEndpoint: https://example.com
+          praxisEndpoint: https://example.com
           id: test
     asserts:
       - isKind:
@@ -83,7 +83,7 @@ tests:
         - name: test-disable-clients
           enabled: true
           disableClients: true
-          pangolinEndpoint: https://example.com
+          praxisEndpoint: https://example.com
           id: test
     asserts:
       - isKind:
@@ -98,7 +98,7 @@ tests:
           blueprintData: |
             version: 1
             routes: []
-          pangolinEndpoint: https://example.com
+          praxisEndpoint: https://example.com
           id: test
     asserts:
       - isKind:
@@ -109,7 +109,7 @@ tests:
       newtInstances:
         - name: test-extraenv
           enabled: true
-          pangolinEndpoint: https://example.com
+          praxisEndpoint: https://example.com
           id: test
           extraEnv:
             CUSTOM_VAR1: value1

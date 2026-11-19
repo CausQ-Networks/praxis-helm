@@ -70,7 +70,7 @@
                     "name": {
                         "type": "string"
                     },
-                    "pangolinEndpoint": {
+                    "praxisEndpoint": {
                         "type": "string"
                     },
                     "secret": {

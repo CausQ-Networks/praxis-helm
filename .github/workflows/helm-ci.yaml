@@ -45,7 +45,7 @@ jobs:
   #       if: steps.list-changed.outputs.changed == 'true'
   #       run: ct lint --target-branch ${{ github.event.repository.default_branch }}
 
-  pangolin-validate:
+  praxis-validate:
     name: Praxis chart validation
     runs-on: ubuntu-latest
 
@@ -129,8 +129,8 @@ jobs:
           helm template demo charts/praxis --namespace praxis --set gerbil.service.type=LoadBalancer > rendered/gerbil-lb.yaml
 
           # Regression coverage for the values that used to abort `helm template`.
-          helm template demo charts/praxis --namespace praxis             --set database.mode=sqlite             --set-json 'pangolin.extraVolumes=[{"name":"extra","emptyDir":{}}]'             --set-json 'pangolin.extraVolumeMounts=[{"name":"extra","mountPath":"/extra"}]'             > rendered/extra-volumes.yaml
-          helm template demo charts/praxis --namespace praxis             --set deployment.mode=single --set database.mode=sqlite             --set-json 'pangolin.extraVolumes=[{"name":"extra","emptyDir":{}}]'             --set-json 'pangolin.extraVolumeMounts=[{"name":"extra","mountPath":"/extra"}]'             > rendered/extra-volumes-single.yaml
+          helm template demo charts/praxis --namespace praxis             --set database.mode=sqlite             --set-json 'praxis.extraVolumes=[{"name":"extra","emptyDir":{}}]'             --set-json 'praxis.extraVolumeMounts=[{"name":"extra","mountPath":"/extra"}]'             > rendered/extra-volumes.yaml
+          helm template demo charts/praxis --namespace praxis             --set deployment.mode=single --set database.mode=sqlite             --set-json 'praxis.extraVolumes=[{"name":"extra","emptyDir":{}}]'             --set-json 'praxis.extraVolumeMounts=[{"name":"extra","mountPath":"/extra"}]'             > rendered/extra-volumes-single.yaml
           helm template demo charts/praxis --namespace praxis             --set deployment.type=controller --set deployment.mode=multi             --set networkPolicy.enabled=true > rendered/controller-netpol.yaml
           helm template demo charts/praxis --namespace praxis             --set database.mode=sqlite --set database.sqlite.persistence.enabled=true             > rendered/sqlite-persistence.yaml
           helm template demo charts/praxis --namespace praxis             --set gerbil.startupMode=disabledUntilSetup > rendered/gerbil-disabled.yaml
@@ -169,12 +169,12 @@ jobs:
           ports = {p["port"] for r in egress["spec"]["egress"] for p in r.get("ports", [])}
           if not {443, 6443} & ports:
               sys.exit("controller egress has no Kubernetes API rule: %s" % sorted(ports))
-          ingress = next(p for n, p in policies.items() if n.endswith("-pangolin-ingress"))
+          ingress = next(p for n, p in policies.items() if n.endswith("-praxis-ingress"))
           in_ports = {p["port"] for r in ingress["spec"]["ingress"] for p in r.get("ports", [])}
           if 3002 not in in_ports:
               sys.exit("dashboard next port 3002 is not allowed: %s" % sorted(in_ports))
           print("controller egress ports:", sorted(ports))
-          print("pangolin ingress ports:", sorted(in_ports))
+          print("praxis ingress ports:", sorted(in_ports))
           PY
 
       - name: Verify every default image tag exists in its registry
@@ -237,7 +237,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: pangolin-rendered-manifests
+          name: praxis-rendered-manifests
           path: rendered/*.yaml
           if-no-files-found: ignore
 

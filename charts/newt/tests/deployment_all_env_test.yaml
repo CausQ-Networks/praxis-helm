@@ -28,7 +28,7 @@ tests:
       newtInstances:
         - name: test-inline
           enabled: true
-          pangolinEndpoint: https://praxis.example.com
+          praxisEndpoint: https://praxis.example.com
           id: my-id
           secret: my-secret
           extraEnv: {}

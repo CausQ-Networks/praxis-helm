@@ -1,0 +1,73 @@
+suite: NOTES rendering
+templates:
+  - templates/NOTES.txt
+tests:
+  - it: shows configured dashboard URL and setup token command
+    set:
+      praxis.config.app.dashboard_url: https://praxis-e2e.cloud.mschaeferger.org
+    asserts:
+      - matchRegex:
+          path: raw
+          pattern: 'Praxis dashboard URL:\n  https://praxis-e2e\.cloud\.mschaeferger\.org'
+      - matchRegex:
+          path: raw
+          pattern: 'kubectl logs -n [^ ]+ deploy/[^ ]+ -c praxis \| sed -n ''/SETUP TOKEN GENERATED/,/================================/p'''
+      - matchRegex:
+          path: raw
+          pattern: 'kubectl logs -n [^ ]+ deploy/[^ ]+ -c praxis \| grep -A2 "SETUP TOKEN GENERATED"'
+
+  - it: shows local port-forward fallback when dashboard URL is empty
+    set:
+      praxis.config.app.dashboard_url: ""
+    asserts:
+      - matchRegex:
+          path: raw
+          pattern: 'No dashboard URL was configured\.'
+      - matchRegex:
+          path: raw
+          pattern: 'kubectl -n [^ ]+ port-forward svc/[^ ]+ 3002:3002'
+      - matchRegex:
+          path: raw
+          pattern: 'http://localhost:3002'
+
+  - it: shows delayed gerbil enable command
+    set:
+      gerbil.startupMode: delayed
+    asserts:
+      - matchRegex:
+          path: raw
+          pattern: 'helm upgrade RELEASE-NAME <chart-path-or-repo/chart> --namespace NAMESPACE --set gerbil\.startupMode=normal'
+
+  # An external Traefik is the normal controller-mode topology, and the chart cannot
+  # select it. Say so at install time rather than letting AI gateway routes time out.
+  - it: says the AI gateway has no source when controller mode has no Traefik it can select
+    set:
+      networkPolicy.enabled: true
+    asserts:
+      - matchRegex:
+          path: raw
+          pattern: 'Nothing may reach the Praxis AI gateway port \(3005\)\.'
+      - matchRegex:
+          path: raw
+          pattern: 'networkPolicy\.praxis\.ingress\.aiGateway\.from'
+
+  - it: stays quiet once the AI gateway has a source
+    set:
+      networkPolicy.enabled: true
+      deployment.installTraefikController: true
+    asserts:
+      - notMatchRegex:
+          path: raw
+          pattern: 'Nothing may reach the Praxis AI gateway port'
+
+  - it: stays quiet when an external Traefik is named explicitly
+    set:
+      networkPolicy.enabled: true
+      networkPolicy.praxis.ingress.aiGateway.from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: traefik
+    asserts:
+      - notMatchRegex:
+          path: raw
+          pattern: 'Nothing may reach the Praxis AI gateway port'
